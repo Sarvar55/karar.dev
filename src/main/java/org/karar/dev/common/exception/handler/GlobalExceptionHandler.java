@@ -1,6 +1,8 @@
-package org.karar.dev.common.exception;
+package org.karar.dev.common.exception.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.karar.dev.common.exception.base.BaseException;
+import org.karar.dev.common.exception.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -24,11 +26,12 @@ public class GlobalExceptionHandler {
                 .error(ex.getStatus().getReasonPhrase())
                 .message(ex.getMessage())
                 .path(request.getRequestURI())
+                .validationErrors(ex.getValidationErrors())
                 .build();
         return new ResponseEntity<>(response, ex.getStatus());
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+        @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
         Map<String, String> validationErrors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {

@@ -1,4 +1,4 @@
-package org.karar.dev.common.exception;
+package org.karar.dev.common.exception.notFound;
 
 public class ResourceNotFoundException extends NotFoundException {
     public ResourceNotFoundException(String resourceName, String fieldName, Object fieldValue) {

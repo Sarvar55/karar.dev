@@ -1,4 +1,4 @@
-package org.karar.dev.common.exception;
+package org.karar.dev.common.exception.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
