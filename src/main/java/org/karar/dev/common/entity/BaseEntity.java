@@ -12,6 +12,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.GenerationType;
+import java.util.UUID;
+
 @Getter
 @Setter
 @MappedSuperclass
@@ -19,8 +22,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public abstract class BaseEntity {
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

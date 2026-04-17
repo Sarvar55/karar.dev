@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/karardb}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  config:
+    activate:
+      on-profile: dev
+
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security: INFO
