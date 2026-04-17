@@ -1,0 +1,171 @@
+================================================================================
+               settings.json - RESOURCES (Extensions, Skills, vb.)
+================================================================================
+
+Pi, proje seviyesinde extensions, skills, prompts ve themes 
+yüklemeyi settings.json üzerinden kontrol edebilir.
+
+================================================================================
+                        1. EXTENSIONS
+================================================================================
+
+Ne İşe Yarar:
+→ Custom tool'lar ekler (örn: web_search, git_commit, deploy)
+→ Yeni komutlar tanımlar
+→ Terminal UI'ı değiştirir (custom editor, status bar, footer)
+→ Event handler'lar ekler (tool_call, message, vb.)
+
+Kullanım:
+
+  "extensions": [
+    "./extensions/my-extension.ts",       // Yerel dosya
+    "./extensions/",                      // Klasör (tüm .ts dosyaları)
+    "npm:@org/pi-extension",              // npm paketi
+    "git:github.com/user/repo"            // Git reposu
+  ]
+
+Örnek:
+
+  "extensions": [
+    "./pi-extensions/custom-tools.ts"
+  ]
+
+================================================================================
+                         2. SKILLS
+================================================================================
+
+Ne İşe Yarar:
+→ Belirli konularda AI'ın uzmanlaşmasını sağlar
+→ Markdown formatında talimatlar içerir
+→ /skill:isim komutu ile çağrılır veya otomatik yüklenir
+
+Kullanım:
+
+  "skills": [
+    "./skills/my-skill/",                 // Yerel skill klasörü
+    "npm:pi-skills",                       // npm paketindeki tüm skill'ler
+    "npm:pi-skills@1.0.0/brave-search"     // Belirli skill
+  ]
+
+Skill Yapısı (./skills/maven/SKILL.md):
+
+  # Maven Skill
+  Use when building Java projects with Maven.
+  
+  ## Steps
+  1. Check pom.xml exists
+  2. Run: ./mvnw clean compile
+  3. Check for errors
+
+  "skills": [
+    "./skills/maven/",
+    "./skills/spring-boot/"
+  ]
+
+================================================================================
+                        3. PROMPTS
+================================================================================
+
+Ne İşe Yarar:
+→ Tekrar kullanılabilir prompt şablonları
+→ /komut_adı ile hızlıca erişim
+
+Kullanım:
+
+  "prompts": [
+    "./prompts/code-review.md",
+    "./prompts/refactor.md"
+  ]
+
+Prompt Yapısı (./prompts/test.md):
+
+  Review this code for test coverage:
+  - Check unit tests exist
+  - Verify edge cases
+  - Suggest missing test cases
+  
+  Code: {{code}}
+
+Çağırma: /test
+
+================================================================================
+                        4. THEMES
+================================================================================
+
+Ne İşe Yarar:
+→ Terminal UI'ın renklerini, stilini değiştirir
+→ Dark/light mode ayarı
+→ Hot-reload desteği (dosya değişince otomatik uygulanır)
+
+Kullanım:
+
+  "themes": [
+    "./themes/custom-dark.json"
+  ]
+
+================================================================================
+                        5. PACKAGES
+================================================================================
+
+Ne İşe Yarar:
+→ npm/git paketlerinden extension/skill/prompt/theme yükler
+→ Birden fazla kaynak tek seferde yönetilir
+
+Kullanım (String form):
+
+  "packages": [
+    "npm:@mariozechner/pi-tools",
+    "git:github.com/user/pi-helpers"
+  ]
+
+Kullanım (Object form - filtreli):
+
+  "packages": [
+    {
+      "source": "pi-skills",
+      "skills": ["brave-search", "web-search"],
+      "extensions": [],
+      "prompts": [],
+      "themes": []
+    }
+  ]
+
+================================================================================
+                         GLOB PATTERNS
+================================================================================
+
+Tüm resource alanlarında glob pattern ve exclude kullanılabilir:
+
+  "extensions": [
+    "./exts/**/*.ts",        // Tüm .ts dosyaları
+    "!./exts/temp/**",       // (hariç tut)
+    "+./exts/important.ts"  // (zorla dahil et)
+    "-./exts/old.ts"        // (zorla hariç tut)
+  ]
+
+================================================================================
+                       ÖNEMLİ HUSUSLAR
+================================================================================
+
+1. Yollar:
+   - settings.json'daki yollar .pi/'ye göre çözülür
+   - Mutlak yol ve ~ (home) desteklenir
+
+2. Öncelik:
+   --no-* CLI flag'leri > settings.json > varsayılan keşif
+   
+   Örn: pi --no-extensions - Sadece settings.json'daki extension'ları yükler
+   Örn: pi --no-skills - Hiçbir skill yüklemez
+
+3. Güvenlik:
+   - Extension'lar ve skill'ler tam sistem erişimi sahibidir
+   - Üçüncü parti paketleri kurmadan önce kaynağını kontrol edin!
+
+4. CLI ile Geçersiz Kılma:
+   
+   pi -e ./my-ext.ts              # Ek extension yükle
+   pi --skill ./skills/xyz        # Ek skill yükle
+   pi --prompt-template ./p/abc   # Ek prompt yükle
+   pi --theme ./themes/custom     # Ek theme yükle
+
+================================================================================

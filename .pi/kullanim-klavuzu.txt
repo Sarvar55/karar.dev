@@ -1,0 +1,135 @@
+================================================================================
+                     .pi/ KLASÖR KULLANIM KILAVUZU
+================================================================================
+
+Bu proje, Pi Coding Agent (pi) ile çalışmak için yapılandırılmıştır.
+Bu klasör, AI asistanının projeyi daha iyi anlaması için gerekli 
+konfigürasyon ve dokümantasyon dosyalarını içerir.
+
+================================================================================
+                          KLASÖR YAPISI
+================================================================================
+
+.pi/
+├── settings.json      → Proje ayarları ve yapılandırması
+├── AGENTS.md          → Proje bağlamı ve teknoloji stack'i
+├── kullanim-klavuzu.txt → Bu dosya (kullanım rehberi)
+├── scripts/           → Yardımcı betikler
+├── logs/              → Pi işlem logları
+└── docs/              → Ek dokümantasyon
+
+================================================================================
+                         DOSYA AÇIKLAMALARI
+================================================================================
+
+1. settings.json
+   ----------------
+   Proje tespiti ve AI davranış ayarlarını içerir.
+   
+   Ne Zaman Kullanılır:
+   - Proje tipi belirleme (Spring Boot, Node.js, vb.)
+   - AI'ın düşünme seviyesini ayarlama
+   - Aktif skill'leri yapılandırma
+   - Build/test komutlarını tanımlama
+   
+   Örnek İçerik:
+   - Proje adı ve versiyonu
+   - Java/Spring Boot versiyonları
+   - Kullanılan bağımlılıklar
+   - Terminal komutları (build, test, run)
+
+
+2. AGENTS.md
+   -----------
+   AI asistanı için proje bağlamı sağlar. Her oturum başlangıcında
+   AI bu dosyayı okuyarak projenizi anlar.
+   
+   Ne Zaman Kullanılır:
+   - Yeni bir kodlama oturumu başlattığınızda
+   - AI'a proje yapısını anlatmak istediğinizde
+   - Kodlama standartlarını tanımlamak için
+   
+   İçerdiği Bilgiler:
+   - Teknoloji stack'i
+   - Proje dizin yapısı
+   - Build ve test komutları
+   - Kodlama konvansiyonları
+   
+
+3. scripts/
+   ---------
+   Projeye özel yardımcı betikleri barındırır.
+   
+   Ne Zaman Kullanılır:
+   - Sık kullanılan komutları otomatikleştirmek için
+   - DB migration/setup scriptleri
+   - Deployment scriptleri
+   - Backup/restore işlemleri
+   
+   Örnek Scriptler:
+   - start-dev.sh        → Geliştirme sunucusunu başlat
+   - run-tests.sh        → Tüm testleri çalıştır
+   - db-seed.sh          → Veritabanını örnek verilerle doldur
+
+
+4. logs/
+   ------
+   Pi agent işlemlerinin loglarını tutar.
+   
+   Ne Zaman Kullanılır:
+   - AI işlemlerini izlemek için
+   - Hata ayıklama (debug) amaçlı
+   - Geçmiş komutları gözden geçirmek için
+   
+   Not: Bu klasör .gitignore'a eklenmelidir.
+
+
+5. docs/
+   ------
+   Ek dokümantasyon ve referans materyalleri.
+   
+   Ne Zaman Kullanılır:
+   - API dokümantasyonu
+   - Mimari kararlar (ADR - Architecture Decision Records)
+   - Kullanıcı kılavuzları
+   - Planlama notları
+   
+   Örnek Dosyalar:
+   - api-endpoints.md    → REST API endpoint listesi
+   - database-schema.md  → Veritabanı şeması
+   - todo.md             → Yapılacaklar listesi
+
+================================================================================
+                         NASIL KULLANILIR?
+================================================================================
+
+1. Projenizle çalışırken:
+   → Pi otomatik olarak .pi/ klasörünü okur ve projenizi tanır
+   
+2. Yeni bir component eklerken:
+   → Pi proje yapısına uygun kod üretir
+   
+3. Build/test yaparken:
+   → settings.json'daki komutları kullanır
+   
+4. Dokümantasyon gerektiğinde:
+   → docs/ klasörüne dosya ekleyin
+
+5. Script çalıştırmak istediğinizde:
+   → scripts/ klasöründen çağırın
+
+================================================================================
+                          TEKNİK DETAYLAR
+================================================================================
+
+Proje:     karar.dev
+Tip:       Spring Boot REST API
+Java:      17
+Spring:    4.0.3
+Database:  H2 (Geliştirme)
+Build:     Maven
+
+Swagger UI: http://localhost:8080/swagger-ui.html
+H2 Console: http://localhost:8080/h2-console
+
+================================================================================

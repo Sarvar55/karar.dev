@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: karar.dev
+  datasource:
+    url: ${DATABASE_URL:jdbc:h2:mem:test }
+    username: ${DATABASE_USER:sa}
+    password: ${DATABASE_PASSWORD:}
+    driver-class-name: org.h2.Driver
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+logging:
+  pattern:
+   console: ${LOG_PATTERN_CONSOLE:%green(%d{HH:mm:ss.SSS}) %red([%thread]) %highlight(%-5level) %yellow(%-40.40logger{39}:%L) - %msg%n}
