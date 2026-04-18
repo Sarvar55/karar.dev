@@ -1,0 +1,206 @@
+package org.karar.dev.domain.decision;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.karar.dev.common.enums.RegretLevel;
+import org.karar.dev.domain.base.BaseResponse;
+import org.karar.dev.domain.decision.dto.DecisionRequest;
+import org.karar.dev.domain.decision.dto.DecisionResponse;
+import org.karar.dev.domain.decision.dto.DecisionUpdateRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/v1/decisions")
+@RequiredArgsConstructor
+@Tag(name = "Decision Management", description = "CRUD operations for decisions")
+public class DecisionController {
+
+    private final DecisionService decisionService;
+
+    @Operation(
+            summary = "Get all decisions",
+            description = "Retrieve a list of all decisions in the system"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved all decisions",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            )
+    })
+    @GetMapping
+    public ResponseEntity<BaseResponse<List<DecisionResponse>>> getAllDecisions() {
+        BaseResponse<List<DecisionResponse>> response = decisionService.getAllDecisions();
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @Operation(
+            summary = "Get decision by ID",
+            description = "Retrieve a specific decision by its unique identifier"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Decision found successfully",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Decision not found",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            )
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<BaseResponse<DecisionResponse>> getDecisionById(
+            @Parameter(description = "UUID of the decision to retrieve", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
+            @PathVariable UUID id) {
+        BaseResponse<DecisionResponse> response = decisionService.getDecisionById(id);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @Operation(
+            summary = "Get decisions by user ID",
+            description = "Retrieve all decisions created by a specific user"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved user's decisions",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            )
+    })
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<BaseResponse<List<DecisionResponse>>> getDecisionsByUserId(
+            @Parameter(description = "UUID of the user", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
+            @PathVariable UUID userId) {
+        BaseResponse<List<DecisionResponse>> response = decisionService.getDecisionsByUserId(userId);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @Operation(
+            summary = "Get decisions by regret level",
+            description = "Filter decisions by their regret level (LOW, MEDIUM, HIGH)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved decisions by regret level",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            )
+    })
+    @GetMapping("/regret-level/{level}")
+    public ResponseEntity<BaseResponse<List<DecisionResponse>>> getDecisionsByRegretLevel(
+            @Parameter(description = "Regret level filter", required = true, example = "LOW")
+            @PathVariable RegretLevel level) {
+        BaseResponse<List<DecisionResponse>> response = decisionService.getDecisionsByRegretLevel(level);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @Operation(
+            summary = "Create a new decision",
+            description = "Create a new decision with title, reasoning, and regret level"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Decision created successfully",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid input data",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Decision with this title already exists for this user",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            )
+    })
+    @PostMapping
+    public ResponseEntity<BaseResponse<DecisionResponse>> createDecision(
+            @Valid @RequestBody DecisionRequest request) {
+        BaseResponse<DecisionResponse> response = decisionService.createDecision(request);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @Operation(
+            summary = "Update an existing decision",
+            description = "Update the details of an existing decision by its ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Decision updated successfully",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid input data",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Decision not found",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Decision with this title already exists for this user",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            )
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<BaseResponse<DecisionResponse>> updateDecision(
+            @Parameter(description = "UUID of the decision to update", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
+            @PathVariable UUID id,
+            @Valid @RequestBody DecisionUpdateRequest request) {
+        BaseResponse<DecisionResponse> response = decisionService.updateDecision(id, request);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @Operation(
+            summary = "Delete a decision",
+            description = "Remove a decision from the system by its ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Decision deleted successfully",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Decision not found",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            )
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BaseResponse<Void>> deleteDecision(
+            @Parameter(description = "UUID of the decision to delete", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
+            @PathVariable UUID id) {
+        BaseResponse<Void> response = decisionService.deleteDecision(id);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+}
