@@ -7,10 +7,12 @@ import org.karar.dev.common.exception.base.ValidationException;
 import org.karar.dev.common.exception.conflict.EmailAlreadyExistsException;
 import org.karar.dev.domain.auth.dto.AuthResponse;
 import org.karar.dev.domain.auth.dto.RegisterRequest;
+import org.karar.dev.domain.base.BaseResponse;
 import org.karar.dev.domain.user.User;
 import org.karar.dev.domain.user.UserRepository;
 import org.karar.dev.domain.user.company.CompanyUser;
 import org.karar.dev.domain.user.regular.RegularUser;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,18 +35,23 @@ public class AuthService {
     }
 
     @Transactional
-    public AuthResponse register(RegisterRequest request) {
+    public BaseResponse<AuthResponse> register(RegisterRequest request) {
         checkEmailUniqueness(request.email());
 
         Function<RegisterRequest, User> strategy = registrationStrategies.get(request.role());
         if (strategy == null) {
-            throw new RuntimeException("Unsupported role: " + request.role());
+            return BaseResponse.error(
+                    "UnsupportedRole",
+                    "Unsupported role: " + request.role(),
+                    HttpStatus.BAD_REQUEST
+            );
         }
 
         User user = strategy.apply(request);
         User savedUser = userRepository.save(user);
 
-        return mapToAuthResponse(savedUser);
+        AuthResponse authResponse = mapToAuthResponse(savedUser);
+        return BaseResponse.success(authResponse, HttpStatus.CREATED);
     }
 
     private User createRegularUser(RegisterRequest request) {
