@@ -4,12 +4,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.karar.dev.common.exception.dto.PageResponse;
+import org.karar.dev.domain.base.BaseResponse;
 import org.karar.dev.domain.user.regular.dto.RegularUserResponse;
 import org.karar.dev.domain.user.regular.dto.RegularUserUpdateRequest;
-import org.springframework.http.HttpStatus;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,26 +26,30 @@ public class RegularUserController {
 
     @GetMapping
     @Operation(summary = "Get all regular users")
-    public List<RegularUserResponse> getAll() {
-        return regularUserService.getAll();
+    public ResponseEntity<BaseResponse<PageResponse<RegularUserResponse>>> getAll(
+            @ParameterObject @PageableDefault(value = 5, sort = "createdAt") Pageable pageable) {
+        BaseResponse<PageResponse<RegularUserResponse>> response = regularUserService.getAll(pageable);
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get regular user by ID")
-    public RegularUserResponse getById(@PathVariable UUID id) {
-        return regularUserService.getById(id);
+    public ResponseEntity<BaseResponse<RegularUserResponse>> getById(@PathVariable UUID id) {
+        BaseResponse<RegularUserResponse> response = regularUserService.getUserById(id);
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update regular user")
-    public RegularUserResponse update(@PathVariable UUID id, @Valid @RequestBody RegularUserUpdateRequest request) {
-        return regularUserService.update(id, request);
+    public ResponseEntity<BaseResponse<RegularUserResponse>> update(@PathVariable UUID id, @Valid @RequestBody RegularUserUpdateRequest request) {
+        BaseResponse<RegularUserResponse> response = regularUserService.update(id, request);
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete regular user")
-    public void delete(@PathVariable UUID id) {
-        regularUserService.delete(id);
+    public ResponseEntity<BaseResponse<Void>> delete(@PathVariable UUID id) {
+        BaseResponse<Void> response = regularUserService.delete(id);
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 }

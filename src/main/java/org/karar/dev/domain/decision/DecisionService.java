@@ -3,17 +3,28 @@ package org.karar.dev.domain.decision;
 import lombok.RequiredArgsConstructor;
 import org.karar.dev.common.enums.RegretLevel;
 import org.karar.dev.common.exception.conflict.ConflictException;
+import org.karar.dev.common.exception.dto.PageResponse;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
 import org.karar.dev.domain.base.BaseResponse;
+import org.karar.dev.domain.base.DecisionTagId;
 import org.karar.dev.domain.decision.dto.DecisionRequest;
 import org.karar.dev.domain.decision.dto.DecisionResponse;
 import org.karar.dev.domain.decision.dto.DecisionUpdateRequest;
+import org.karar.dev.domain.decisiontag.DecisionTag;
+import org.karar.dev.domain.decisiontag.DecisionTagService;
+import org.karar.dev.domain.tag.Tag;
+import org.karar.dev.domain.tag.TagService;
 import org.karar.dev.domain.user.regular.RegularUser;
-import org.karar.dev.domain.user.regular.RegularUserRepository;
+import org.karar.dev.domain.user.regular.RegularUserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -24,15 +35,14 @@ import java.util.stream.Collectors;
 public class DecisionService {
 
     private final DecisionRepository decisionRepository;
-    private final RegularUserRepository regularUserRepository;
+    private final RegularUserService regularUserService;
+    private final TagService tagService;
+    private final DecisionTagService decisionTagService;
 
     @Transactional(readOnly = true)
-    public BaseResponse<List<DecisionResponse>> getAllDecisions() {
-        List<Decision> decisions = decisionRepository.findAll();
-        List<DecisionResponse> responseList = decisions.stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-        return BaseResponse.success(responseList);
+    public BaseResponse<PageResponse<DecisionResponse>> getAllDecisions(Pageable pageable) {
+        Page<Decision> decisions = decisionRepository.findAll(pageable);
+        return BaseResponse.success(mapToPageResponse(decisions.map(this::mapToResponse)));
     }
 
     @Transactional(readOnly = true)
@@ -42,30 +52,32 @@ public class DecisionService {
     }
 
     @Transactional(readOnly = true)
-    public BaseResponse<List<DecisionResponse>> getDecisionsByUserId(UUID userId) {
-        if (!regularUserRepository.existsById(userId)) {
+    public BaseResponse<PageResponse<DecisionResponse>> getDecisionsByUserId(UUID userId, Pageable pageable) {
+        if (!regularUserService.existsById(userId)) {
             throw new ResourceNotFoundException("User", "id", userId);
         }
-        List<Decision> decisions = decisionRepository.findByUserId(userId);
-        List<DecisionResponse> responseList = decisions.stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-        return BaseResponse.success(responseList);
+        Page<Decision> decisions = decisionRepository.findByUserId(userId, pageable);
+        return BaseResponse.success(mapToPageResponse(decisions.map(this::mapToResponse)));
     }
 
     @Transactional(readOnly = true)
-    public BaseResponse<List<DecisionResponse>> getDecisionsByRegretLevel(RegretLevel regretLevel) {
-        List<Decision> decisions = decisionRepository.findByRegretLevel(regretLevel);
-        List<DecisionResponse> responseList = decisions.stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-        return BaseResponse.success(responseList);
+    public BaseResponse<PageResponse<DecisionResponse>> getDecisionsByRegretLevel(RegretLevel regretLevel, Pageable pageable) {
+        Page<Decision> decisions = decisionRepository.findByRegretLevel(regretLevel, pageable);
+        return BaseResponse.success(mapToPageResponse(decisions.map(this::mapToResponse)));
+    }
+
+    @Transactional(readOnly = true)
+    public BaseResponse<PageResponse<DecisionResponse>> getDecisionsByTagId(UUID tagId, Pageable pageable) {
+        if (!tagService.existsById(tagId)) {
+            throw new ResourceNotFoundException("Tag", "id", tagId);
+        }
+        Page<Decision> decisions = decisionRepository.findByTagId(tagId, pageable);
+        return BaseResponse.success(mapToPageResponse(decisions.map(this::mapToResponse)));
     }
 
     @Transactional
     public BaseResponse<DecisionResponse> createDecision(DecisionRequest request) {
-        RegularUser user = regularUserRepository.findById(request.userId())
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", request.userId()));
+        RegularUser user = regularUserService.getById(request.userId());
 
         if (decisionRepository.existsByTitleAndUserId(request.title(), request.userId())) {
             throw new ConflictException("Decision with this title already exists for this user");
@@ -80,6 +92,15 @@ public class DecisionService {
         decision.setVoteCount(0);
 
         Decision savedDecision = decisionRepository.saveAndFlush(decision);
+
+        // Handle tag associations
+        if (request.tagIds() != null && !request.tagIds().isEmpty()) {
+            associateTagsWithDecision(savedDecision, request.tagIds());
+        }
+
+        // Reload to get tags
+        savedDecision = decisionRepository.getDecisionsWithTags(savedDecision.getId()).orElse(savedDecision);
+
         return BaseResponse.success(mapToResponse(savedDecision), HttpStatus.CREATED);
     }
 
@@ -97,6 +118,10 @@ public class DecisionService {
         decision.setAlternative(request.alternative());
         decision.setRegretLevel(request.regretLevel());
 
+        if (request.tagIds() != null) {
+            updateDecisionTags(decision, request.tagIds());
+        }
+
         Decision updatedDecision = decisionRepository.saveAndFlush(decision);
         return BaseResponse.success(mapToResponse(updatedDecision));
     }
@@ -110,10 +135,68 @@ public class DecisionService {
         return BaseResponse.success(null, HttpStatus.NO_CONTENT);
     }
 
+    @Transactional
+    public void incrementVoteCount(UUID id) {
+        if (!decisionRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Decision", "id", id);
+        }
+        decisionRepository.incrementVoteCount(id);
+    }
+
+    @Transactional
+    public void decrementVoteCount(UUID id) {
+        if (!decisionRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Decision", "id", id);
+        }
+        decisionRepository.decrementVoteCount(id);
+    }
+
+    @Transactional
+    public void save(Decision decision) {
+        decisionRepository.save(decision);
+    }
+
+    private void associateTagsWithDecision(Decision decision, Set<UUID> tagIds) {
+
+        for (UUID tagId : tagIds) {
+
+            Tag tag = tagService.getById(tagId);
+
+            DecisionTag dt = new DecisionTag();
+            dt.setId(new DecisionTagId(decision.getId(), tagId));
+            dt.setDecision(decision);
+            dt.setTag(tag);
+
+            decision.getTags().add(dt);
+        }
+    }
+
+    private void updateDecisionTags(Decision decision, Set<UUID> newTagIds) {
+        // Remove existing tag associations
+        decisionTagService.deleteByDecisionId(decision.getId());
+
+        // Add new tag associations
+        if (!newTagIds.isEmpty()) {
+            associateTagsWithDecision(decision, newTagIds);
+        }
+    }
+
+    public boolean existsById(UUID id) {
+        return decisionRepository.existsById(id);
+    }
+
+    public Decision getById(UUID id) {
+        return findDecisionOrThrow(id);
+    }
+
     private Decision findDecisionOrThrow(UUID id) {
         return decisionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Decision", "id", id));
-    }       
+    }
+
+    private <T> PageResponse<T> mapToPageResponse(Page<T> page) {
+        return new PageResponse<>(page);
+    }
 
     private DecisionResponse mapToResponse(Decision decision) {
         return new DecisionResponse(
@@ -128,9 +211,9 @@ public class DecisionService {
                 decision.getComments() != null ? decision.getComments().size() : 0,
                 decision.getTags() != null && !decision.getTags().isEmpty()
                         ? decision.getTags().stream()
-                        .map(tag -> tag.getTag() != null ? tag.getTag().getName() : "")
-                        .filter(name -> name != null && !name.isEmpty())
-                        .collect(Collectors.toSet())
+                          .map(tag -> tag.getTag() != null ? tag.getTag().getName() : "")
+                          .filter(name -> name != null && !name.isEmpty())
+                          .collect(Collectors.toSet())
                         : java.util.Collections.emptySet(),
                 decision.getCreatedAt(),
                 decision.getUpdatedAt()

@@ -9,6 +9,7 @@ import org.karar.dev.domain.decisiontag.DecisionTag;
 import org.karar.dev.domain.user.regular.RegularUser;
 import org.karar.dev.domain.vote.Vote;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -31,8 +32,8 @@ public class Decision extends BaseEntity {
     @OneToMany(mappedBy = "decision", orphanRemoval = true, fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     private Set<Comment> comments;
 
-    @OneToMany(mappedBy = "decision", orphanRemoval = true, fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
-    private Set<DecisionTag> tags;
+    @OneToMany(mappedBy = "decision", orphanRemoval = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<DecisionTag> tags = new HashSet<>();
 
     @OneToMany(mappedBy = "decision", orphanRemoval = true, fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     private Set<Vote> votes;

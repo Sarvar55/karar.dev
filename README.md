@@ -41,6 +41,20 @@ Karar.dev ("Karar" means "Decision" in Turkish) is a social platform where users
 - Automatic association with decisions
 - Usage count tracking
 
+### Comment Management
+- Full CRUD operations for comments
+- Filter comments by decision or user
+- Content validation
+- Automatic user and decision association
+
+### Vote Management
+- Cast votes on decisions (one vote per user per decision)
+- Vote statistics endpoint (count + user vote status)
+- Check if user has voted on a decision
+- "Unvote" functionality (remove vote)
+- Automatic vote count updates on decisions
+- Duplicate vote prevention
+
 ### Consistent API Response
 All API responses follow a unified structure using `BaseResponse<T>`:
 
@@ -119,6 +133,30 @@ Once the application is running, access:
 | PUT | `/api/v1/tags/{id}` | Update tag |
 | DELETE | `/api/v1/tags/{id}` | Delete tag |
 
+### Comments
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/comments` | Get all comments |
+| GET | `/api/v1/comments/{id}` | Get comment by ID |
+| GET | `/api/v1/comments/decision/{decisionId}` | Get decision's comments |
+| GET | `/api/v1/comments/user/{userId}` | Get user's comments |
+| POST | `/api/v1/comments` | Create comment |
+| PUT | `/api/v1/comments/{id}` | Update comment |
+| DELETE | `/api/v1/comments/{id}` | Delete comment |
+
+### Votes
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/votes` | Get all votes |
+| GET | `/api/v1/votes/{id}` | Get vote by ID |
+| GET | `/api/v1/votes/decision/{decisionId}` | Get decision's votes |
+| GET | `/api/v1/votes/user/{userId}` | Get user's votes |
+| GET | `/api/v1/votes/decision/{decisionId}/count` | Get vote count & user status |
+| GET | `/api/v1/votes/check` | Check if user has voted |
+| POST | `/api/v1/votes` | Cast a vote |
+| DELETE | `/api/v1/votes/{id}` | Delete vote by ID |
+| DELETE | `/api/v1/votes` | Delete vote (unvote by user & decision) |
+
 ## Project Structure
 
 ```
@@ -137,6 +175,10 @@ org.karar.dev/
     ├── auth/           # Authentication module
     ├── base/           # BaseResponse
     ├── comment/        # Comment system
+    │   ├── dto/        # CommentRequest, CommentResponse
+    │   ├── CommentController.java
+    │   ├── CommentService.java
+    │   └── CommentRepository.java
     ├── decision/       # Decision management
     │   ├── dto/        # DecisionRequest, DecisionResponse
     │   ├── DecisionController.java
@@ -152,6 +194,10 @@ org.karar.dev/
     │   ├── company/    # Company users
     │   └── regular/    # Regular users
     └── vote/           # Voting system
+        ├── dto/        # VoteRequest, VoteResponse
+        ├── VoteController.java
+        ├── VoteService.java
+        └── VoteRepository.java
 ```
 
 ## Database Schema
@@ -242,6 +288,9 @@ For detailed API documentation, see:
 - ✅ Integrated BaseResponse into Auth module
 - ✅ Added complete CRUD for Decision module
 - ✅ Added complete CRUD for Tag module
+- ✅ Added complete CRUD for Comment module
+- ✅ Added complete CRUD for Vote module (with automatic vote count updates)
+- ✅ **Fixed Decision-Tag relationship** (now properly creates associations via DecisionTag junction table)
 - ✅ Fixed entity mappings and timestamp persistence
 - ✅ Added comprehensive API documentation
 

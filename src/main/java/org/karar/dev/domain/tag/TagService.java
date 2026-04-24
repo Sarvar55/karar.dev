@@ -80,6 +80,14 @@ public class TagService {
         return BaseResponse.success(null, HttpStatus.NO_CONTENT);
     }
 
+    public boolean existsById(UUID id) {
+        return tagRepository.existsById(id);
+    }
+
+    public Tag getById(UUID id) {
+        return findTagOrThrow(id);
+    }
+
     private Tag findTagOrThrow(UUID id) {
         return tagRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tag", "id", id));

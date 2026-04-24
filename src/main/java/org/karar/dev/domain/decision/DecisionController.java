@@ -10,39 +10,47 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.karar.dev.common.enums.RegretLevel;
+import org.karar.dev.common.exception.dto.PageResponse;
+import org.karar.dev.common.exception.dto.PageableRequest;
+import org.karar.dev.common.exception.dto.PageResponse;
 import org.karar.dev.domain.base.BaseResponse;
 import org.karar.dev.domain.decision.dto.DecisionRequest;
 import org.karar.dev.domain.decision.dto.DecisionResponse;
 import org.karar.dev.domain.decision.dto.DecisionUpdateRequest;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/decisions")
 @RequiredArgsConstructor
-@Tag(name = "Decision Management", description = "CRUD operations for decisions")
+@Tag(name = "Decision Management", description = "RESTful API for Decision resources")
 public class DecisionController {
 
     private final DecisionService decisionService;
 
     @Operation(
-            summary = "Get all decisions",
-            description = "Retrieve a list of all decisions in the system"
+            summary = "List decisions",
+            description = "Example: /decisions?page=0&size=10&sort=createdAt,desc"
     )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Successfully retrieved all decisions",
+                    description = "Successfully retrieved decisions",
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))
             )
     })
     @GetMapping
-    public ResponseEntity<BaseResponse<List<DecisionResponse>>> getAllDecisions() {
-        BaseResponse<List<DecisionResponse>> response = decisionService.getAllDecisions();
-        return ResponseEntity.status(response.getStatus()).body(response);
+    public ResponseEntity<BaseResponse<PageResponse<DecisionResponse>>> getDecisions(
+            @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(decisionService.getAllDecisions(pageable));
     }
 
     @Operation(
@@ -63,15 +71,15 @@ public class DecisionController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse<DecisionResponse>> getDecisionById(
-            @Parameter(description = "UUID of the decision to retrieve", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
+            @Parameter(description = "UUID of the decision to retrieve", required = true)
             @PathVariable UUID id) {
         BaseResponse<DecisionResponse> response = decisionService.getDecisionById(id);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     @Operation(
-            summary = "Get decisions by user ID",
-            description = "Retrieve all decisions created by a specific user"
+            summary = "List decisions by user",
+            description = "Retrieve a paginated list of decisions created by a specific user"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -85,30 +93,39 @@ public class DecisionController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))
             )
     })
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<BaseResponse<List<DecisionResponse>>> getDecisionsByUserId(
-            @Parameter(description = "UUID of the user", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
-            @PathVariable UUID userId) {
-        BaseResponse<List<DecisionResponse>> response = decisionService.getDecisionsByUserId(userId);
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<BaseResponse<PageResponse<DecisionResponse>>> getDecisionsByUser(
+            @PathVariable UUID userId,
+            @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+        BaseResponse<PageResponse<DecisionResponse>> response = decisionService.getDecisionsByUserId(userId, pageable);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     @Operation(
-            summary = "Get decisions by regret level",
-            description = "Filter decisions by their regret level (LOW, MEDIUM, HIGH)"
+            summary = "List decisions by regret level",
+            description = "Retrieve a paginated list of decisions filtered by regret level"
     )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Successfully retrieved decisions by regret level",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
-            )
-    })
-    @GetMapping("/regret-level/{level}")
-    public ResponseEntity<BaseResponse<List<DecisionResponse>>> getDecisionsByRegretLevel(
-            @Parameter(description = "Regret level filter", required = true, example = "LOW")
-            @PathVariable RegretLevel level) {
-        BaseResponse<List<DecisionResponse>> response = decisionService.getDecisionsByRegretLevel(level);
+    @GetMapping("/regret-levels/{level}")
+    public ResponseEntity<BaseResponse<PageResponse<DecisionResponse>>> getDecisionsByRegretLevel(
+            @PathVariable RegretLevel level,
+            @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) 
+            Pageable pageable
+    ) {
+        BaseResponse<PageResponse<DecisionResponse>> response = decisionService.getDecisionsByRegretLevel(level, pageable);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @Operation(
+            summary = "List decisions by tag",
+            description = "Retrieve a paginated list of decisions associated with a specific tag"
+    )
+    @GetMapping("/tags/{tagId}")
+    public ResponseEntity<BaseResponse<PageResponse<DecisionResponse>>> getDecisionsByTag(
+            @PathVariable UUID tagId,
+            @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) 
+            Pageable pageable) {
+        BaseResponse<PageResponse<DecisionResponse>> response = decisionService.getDecisionsByTagId(tagId, pageable);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 

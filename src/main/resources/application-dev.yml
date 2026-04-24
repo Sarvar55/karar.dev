@@ -1,4 +1,8 @@
 spring:
+  config:
+    activate:
+      on-profile: dev
+
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/karardb}
     username: ${DB_USER}
@@ -8,9 +12,7 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: false
-  config:
-    activate:
-      on-profile: dev
+
 
 
 logging:

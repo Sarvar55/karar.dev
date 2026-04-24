@@ -6,7 +6,12 @@ import jakarta.validation.constraints.NotNull;
 import org.karar.dev.common.enums.Role;
 
 public record RegisterRequest(
+        @Email
+        @NotBlank
+        @NotNull
         String email,
+        @NotBlank
+        @NotNull
         String password,
         Role role,
         String username,
