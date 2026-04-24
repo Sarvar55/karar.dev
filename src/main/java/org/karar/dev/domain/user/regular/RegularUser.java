@@ -38,4 +38,10 @@ public class RegularUser extends User {
         super(email, password, Role.USER);
         this.username = username;
     }
+
+    public RegularUser(String email, String password, Role role) {
+        this.setEmail(email);
+        this.setRole(role);
+        this.setPassword(password);
+    }
 }
