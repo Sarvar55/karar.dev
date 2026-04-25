@@ -13,6 +13,8 @@ import org.karar.dev.domain.base.BaseResponse;
 import org.karar.dev.domain.vote.dto.VoteCountResponse;
 import org.karar.dev.domain.vote.dto.VoteRequest;
 import org.karar.dev.domain.vote.dto.VoteResponse;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/votes")
+@RequestMapping("/api/v1/")
 @RequiredArgsConstructor
 @Tag(name = "Vote Management", description = "Operations for voting on decisions")
 public class VoteController {
@@ -60,7 +62,7 @@ public class VoteController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))
             )
     })
-    @GetMapping("/{id}")
+    @GetMapping("/votes/{id}")
     public ResponseEntity<BaseResponse<VoteResponse>> getVoteById(
             @Parameter(description = "UUID of the vote to retrieve", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable UUID id) {
@@ -84,12 +86,22 @@ public class VoteController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))
             )
     })
-    @GetMapping("/decision/{decisionId}")
-    public ResponseEntity<BaseResponse<List<VoteResponse>>> getVotesByDecisionId(
-            @Parameter(description = "UUID of the decision", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
-            @PathVariable UUID decisionId) {
+    @GetMapping("/decisions/{decisionId}/votes")
+    public ResponseEntity<BaseResponse<?>> getVotesByDecisionId(
+            @PathVariable UUID decisionId,
+            @RequestParam(required = false, defaultValue = "false") boolean onlyCount,
+            @ParameterObject Pageable pageable) {
+
+        if (onlyCount) {
+            UUID currentUserId = UUID.randomUUID();//I will write after auth
+            BaseResponse<VoteCountResponse> response =
+                    voteService.getVoteCountByDecisionId(decisionId, currentUserId);
+            return ResponseEntity.ok(response);
+        }
+
         BaseResponse<List<VoteResponse>> response = voteService.getVotesByDecisionId(decisionId);
-        return ResponseEntity.status(response.getStatus()).body(response);
+
+        return ResponseEntity.ok(response);
     }
 
     @Operation(
@@ -108,37 +120,11 @@ public class VoteController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))
             )
     })
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/{userId}/votes")
     public ResponseEntity<BaseResponse<List<VoteResponse>>> getVotesByUserId(
             @Parameter(description = "UUID of the user", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable UUID userId) {
         BaseResponse<List<VoteResponse>> response = voteService.getVotesByUserId(userId);
-        return ResponseEntity.status(response.getStatus()).body(response);
-    }
-
-    @Operation(
-            summary = "Get vote count for a decision",
-            description = "Retrieve the total vote count and check if current user has voted"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Successfully retrieved vote count",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Decision not found",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
-            )
-    })
-    @GetMapping("/decision/{decisionId}/count")
-    public ResponseEntity<BaseResponse<VoteCountResponse>> getVoteCountByDecisionId(
-            @Parameter(description = "UUID of the decision", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
-            @PathVariable UUID decisionId,
-            @Parameter(description = "UUID of the current user (optional)", example = "550e8400-e29b-41d4-a716-446655440001")
-            @RequestParam(required = false) UUID currentUserId) {
-        BaseResponse<VoteCountResponse> response = voteService.getVoteCountByDecisionId(decisionId, currentUserId);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
@@ -158,12 +144,11 @@ public class VoteController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))
             )
     })
-    @GetMapping("/check")
+    @GetMapping("/users/{userId}/decisions/{decisionId}/vote")
     public ResponseEntity<BaseResponse<Boolean>> hasUserVoted(
-            @Parameter(description = "UUID of the user", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
-            @RequestParam UUID userId,
-            @Parameter(description = "UUID of the decision", required = true, example = "550e8400-e29b-41d4-a716-446655440001")
-            @RequestParam UUID decisionId) {
+            @PathVariable UUID userId,
+            @PathVariable UUID decisionId) {
+
         BaseResponse<Boolean> response = voteService.hasUserVoted(userId, decisionId);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
@@ -194,7 +179,7 @@ public class VoteController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))
             )
     })
-    @PostMapping
+    @PostMapping("/votes")
     public ResponseEntity<BaseResponse<VoteResponse>> createVote(
             @Valid @RequestBody VoteRequest request) {
         BaseResponse<VoteResponse> response = voteService.createVote(request);
@@ -217,7 +202,7 @@ public class VoteController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))
             )
     })
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/votes/{id}")
     public ResponseEntity<BaseResponse<Void>> deleteVote(
             @Parameter(description = "UUID of the vote to delete", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable UUID id) {
@@ -241,12 +226,12 @@ public class VoteController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))
             )
     })
-    @DeleteMapping
+    @DeleteMapping("/users/{userId}/decisions/{decisionId}/votes")
     public ResponseEntity<BaseResponse<Void>> deleteVoteByUserAndDecision(
             @Parameter(description = "UUID of the user", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
-            @RequestParam UUID userId,
+            @PathVariable UUID userId,
             @Parameter(description = "UUID of the decision", required = true, example = "550e8400-e29b-41d4-a716-446655440001")
-            @RequestParam UUID decisionId) {
+            @PathVariable UUID decisionId) {
         BaseResponse<Void> response = voteService.deleteVoteByUserAndDecision(userId, decisionId);
         return ResponseEntity.status(response.getStatus()).body(response);
     }

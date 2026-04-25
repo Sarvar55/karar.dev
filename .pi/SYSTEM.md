@@ -14,6 +14,94 @@ Bu kurallar:
 
 ---
 
+# REST API Design Rules – Filtering & Resource Structure
+
+## 1. General Principle
+
+Avoid creating multiple endpoints for the same resource when the difference is only filtering criteria.
+
+Instead, prefer a single endpoint with query parameters.
+
+---
+
+## 2. Filtering Rule (MUST)
+
+Use query parameters for filtering resources.
+
+### ✅ Correct
+
+GET /api/v1/comments
+GET /api/v1/comments?decisionId={id}
+GET /api/v1/comments?userId={id}
+GET /api/v1/comments?decisionId={id}&userId={id}
+
+### ❌ Avoid
+
+GET /api/v1/comments/decisions/{decisionId}
+GET /api/v1/comments/users/{userId}
+
+Reason:
+
+* Reduces endpoint duplication
+* Improves flexibility
+* Simplifies maintenance and security configuration
+
+---
+
+## 3. Nested Resources Rule (ALLOWED)
+
+Use nested paths only when representing a true parent-child relationship.
+
+### ✅ Acceptable
+
+GET /api/v1/decisions/{decisionId}/comments
+GET /api/v1/users/{userId}/comments
+
+### ❌ Avoid incorrect nesting
+
+GET /api/v1/comments/decisions/{decisionId}
+
+---
+
+## 4. HTTP Method Semantics (MUST)
+
+GET     → Retrieve data
+POST    → Create resource
+PUT     → Full update
+PATCH   → Partial update
+DELETE  → Remove resource
+
+---
+
+## 5. Endpoint Simplicity (MUST)
+
+* Prefer fewer, more flexible endpoints
+* Do not duplicate logic across multiple URLs
+* Keep controllers minimal; move logic to service layer
+
+---
+
+## 6. Security Compatibility Rule
+
+Design endpoints so they can be easily secured using HTTP method + path.
+
+Example:
+
+.requestMatchers(HttpMethod.GET, "/api/v1/comments/**").permitAll()
+.requestMatchers(HttpMethod.POST, "/api/v1/comments").authenticated()
+
+Avoid designs that require custom filters to distinguish endpoints.
+
+---
+
+## 7. Summary
+
+* Use query params for filtering
+* Use nested resources only for hierarchy
+* Avoid redundant endpoints
+* Keep API predictable and scalable
+
+
 # 🧱 1. Mimari Prensipler
 
 ## Katman Yapısı (Layered Architecture)

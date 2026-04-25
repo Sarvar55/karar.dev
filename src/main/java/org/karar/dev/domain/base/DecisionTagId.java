@@ -9,12 +9,18 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.UUID;
 
-@Embeddable
-@Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Embeddable
 public class DecisionTagId implements Serializable {
     private UUID decisionId;
     private UUID tagId;
+
+    public DecisionTagId(UUID decisionId, UUID tagId) {
+        this.decisionId = decisionId;
+        this.tagId = tagId;
+    }
+    public DecisionTagId() {
+    }
+
 }

@@ -10,6 +10,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.karar.dev.domain.base.BaseResponse;
+import org.karar.dev.domain.decision.DecisionService;
+import org.karar.dev.domain.decision.dto.DecisionResponse;
+import org.karar.dev.common.exception.dto.PageResponse;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Sort;
 import org.karar.dev.domain.tag.dto.TagRequest;
 import org.karar.dev.domain.tag.dto.TagResponse;
 import org.karar.dev.domain.tag.dto.TagUpdateRequest;
@@ -26,6 +33,33 @@ import java.util.UUID;
 public class TagController {
 
     private final TagService tagService;
+    private final DecisionService decisionService;
+
+    @Operation(
+            summary = "Get decisions by tag ID",
+            description = "Retrieve a paginated list of decisions associated with a specific tag"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved decisions for the tag",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Tag not found",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            )
+    })
+    @GetMapping("/{id}/decisions")
+    public ResponseEntity<BaseResponse<PageResponse<DecisionResponse>>> getDecisionsByTag(
+            @Parameter(description = "UUID of the tag", required = true)
+            @PathVariable UUID id,
+            @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+        BaseResponse<PageResponse<DecisionResponse>> response = decisionService.getDecisionsByTagId(id, pageable);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
 
     @Operation(
             summary = "Get all tags",

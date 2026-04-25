@@ -45,7 +45,7 @@ public class TagService {
 
     @Transactional
     public BaseResponse<TagResponse> createTag(TagRequest request) {
-        if (tagRepository.existsByName(request.name())) {
+        if (tagRepository.existsByName(request.name().toLowerCase().trim())) {
             throw new ConflictException("Tag with name '" + request.name() + "' already exists");
         }
 

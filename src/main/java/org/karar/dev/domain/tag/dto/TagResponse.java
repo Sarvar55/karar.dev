@@ -1,11 +1,13 @@
 package org.karar.dev.domain.tag.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Schema(description = "Response object containing tag details")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record TagResponse(
 
         @Schema(description = "Unique identifier of the tag", example = "550e8400-e29b-41d4-a716-446655440000")

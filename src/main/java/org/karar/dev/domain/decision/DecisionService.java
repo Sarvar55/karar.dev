@@ -1,5 +1,7 @@
 package org.karar.dev.domain.decision;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.karar.dev.common.enums.RegretLevel;
 import org.karar.dev.common.exception.conflict.ConflictException;
@@ -118,11 +120,28 @@ public class DecisionService {
         decision.setAlternative(request.alternative());
         decision.setRegretLevel(request.regretLevel());
 
-        if (request.tagIds() != null) {
-            updateDecisionTags(decision, request.tagIds());
+        if (request.tagIds() != null && !request.tagIds().isEmpty()) {
+            Set<UUID> existingTagIds = decision.getTags().stream()
+                    .map(dt -> dt.getTag().getId())
+                    .collect(Collectors.toSet());/// 1 2
+
+            Set<UUID> newTagIds = request.tagIds();// 3
+
+            decision.getTags().removeIf(dt -> !newTagIds.contains(dt.getTag().getId()));
+
+            for (UUID tagId : newTagIds) {
+                if (!existingTagIds.contains(tagId)) {
+                    Tag tag = tagService.getById(tagId);
+                    DecisionTag dt = new DecisionTag();
+                    dt.setId(new DecisionTagId(decision.getId(), tag.getId()));
+                    dt.setDecision(decision);
+                    dt.setTag(tag);
+                    decision.getTags().add(dt);
+                }
+            }
         }
 
-        Decision updatedDecision = decisionRepository.saveAndFlush(decision);
+        Decision updatedDecision = decisionRepository.save(decision);
         return BaseResponse.success(mapToResponse(updatedDecision));
     }
 
@@ -163,17 +182,18 @@ public class DecisionService {
             Tag tag = tagService.getById(tagId);
 
             DecisionTag dt = new DecisionTag();
-            dt.setId(new DecisionTagId(decision.getId(), tagId));
             dt.setDecision(decision);
             dt.setTag(tag);
 
             decision.getTags().add(dt);
         }
+
     }
 
     private void updateDecisionTags(Decision decision, Set<UUID> newTagIds) {
         // Remove existing tag associations
-        decisionTagService.deleteByDecisionId(decision.getId());
+        decision.getTags().clear();
+        //decisionTagService.deleteByDecisionId(decision.getId());
 
         // Add new tag associations
         if (!newTagIds.isEmpty()) {

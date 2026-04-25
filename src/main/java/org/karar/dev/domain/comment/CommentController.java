@@ -1,7 +1,6 @@
 package org.karar.dev.domain.comment;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/comments")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Tag(name = "Comment Management", description = "RESTful API for Comment resources")
 public class CommentController {
@@ -33,13 +32,13 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getAllComments(pageable));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/comments/{id}")
     @Operation(summary = "Get comment by ID")
     public ResponseEntity<BaseResponse<CommentResponse>> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(commentService.getCommentById(id));
     }
 
-    @GetMapping("/decisions/{decisionId}")
+    @GetMapping("/decisions/{decisionId}/comments")
     @Operation(summary = "List comments by decision")
     public ResponseEntity<BaseResponse<PageResponse<CommentResponse>>> getByDecision(
             @PathVariable UUID decisionId,
@@ -47,7 +46,7 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getCommentsByDecisionId(decisionId, pageable));
     }
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("/users/{userId}/comments")
     @Operation(summary = "List comments by user")
     public ResponseEntity<BaseResponse<PageResponse<CommentResponse>>> getByUser(
             @PathVariable UUID userId,
@@ -55,20 +54,20 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getCommentsByUserId(userId, pageable));
     }
 
-    @PostMapping
+    @PostMapping("/comments")
     @Operation(summary = "Create comment")
     public ResponseEntity<BaseResponse<CommentResponse>> create(@Valid @RequestBody CommentRequest request) {
         BaseResponse<CommentResponse> response = commentService.createComment(request);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/comments/{id}")
     @Operation(summary = "Update comment")
     public ResponseEntity<BaseResponse<CommentResponse>> update(@PathVariable UUID id, @Valid @RequestBody CommentUpdateRequest request) {
         return ResponseEntity.ok(commentService.updateComment(id, request));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/comments/{id}")
     @Operation(summary = "Delete comment")
     public ResponseEntity<BaseResponse<Void>> delete(@PathVariable UUID id) {
         return ResponseEntity.ok(commentService.deleteComment(id));
