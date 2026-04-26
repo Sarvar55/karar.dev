@@ -38,22 +38,6 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getCommentById(id));
     }
 
-    @GetMapping("/decisions/{decisionId}/comments")
-    @Operation(summary = "List comments by decision")
-    public ResponseEntity<BaseResponse<PageResponse<CommentResponse>>> getByDecision(
-            @PathVariable UUID decisionId,
-            @ParameterObject @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
-        return ResponseEntity.ok(commentService.getCommentsByDecisionId(decisionId, pageable));
-    }
-
-    @GetMapping("/users/{userId}/comments")
-    @Operation(summary = "List comments by user")
-    public ResponseEntity<BaseResponse<PageResponse<CommentResponse>>> getByUser(
-            @PathVariable UUID userId,
-            @ParameterObject @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
-        return ResponseEntity.ok(commentService.getCommentsByUserId(userId, pageable));
-    }
-
     @PostMapping("/comments")
     @Operation(summary = "Create comment")
     public ResponseEntity<BaseResponse<CommentResponse>> create(@Valid @RequestBody CommentRequest request) {
