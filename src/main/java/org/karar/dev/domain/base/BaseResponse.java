@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.karar.dev.common.exception.base.BaseException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.AuthenticationException;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -99,6 +100,15 @@ public class BaseResponse<T> {
                 .success(false)
                 .error(ErrorData.of(code, message))
                 .status(status)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    public static <T> BaseResponse<T> error(AuthenticationException ex) {
+        return BaseResponse.<T>builder()
+                .success(false)
+                .error(ErrorData.of("UNAUTHORIZED", ex.getMessage()))
+                .status(HttpStatus.UNAUTHORIZED)
                 .timestamp(LocalDateTime.now())
                 .build();
     }

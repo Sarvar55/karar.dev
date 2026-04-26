@@ -1,6 +1,7 @@
 package org.karar.dev.common.security;
 
 import org.karar.dev.common.enums.Role;
+import org.karar.dev.common.security.exception.CustomAuthenticationEntryPoint;
 import org.karar.dev.common.security.user.SecurityUser;
 import org.karar.dev.domain.user.regular.RegularUser;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +19,14 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @Profile("local")
+
 public class ProjectLocalSecurityConfig {
+
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+
+    public ProjectLocalSecurityConfig(CustomAuthenticationEntryPoint authenticationEntryPoint) {
+        this.authenticationEntryPoint = authenticationEntryPoint;
+    }
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -59,6 +67,7 @@ public class ProjectLocalSecurityConfig {
 
         http.formLogin(withDefaults());
         http.httpBasic(withDefaults());
+        http.exceptionHandling(exh -> exh.authenticationEntryPoint(authenticationEntryPoint));
 
         return http.build();
     }

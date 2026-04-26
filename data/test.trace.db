@@ -1858,3 +1858,63 @@ create global temporary table HTE_companies(rn_ integer not null, createdAt time
 2026-04-26 00:06:18.471696+04:00 jdbc[258]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_REGULAR_USERS" already exists; SQL statement:
 create global temporary table HTE_regular_users(rn_ integer not null, createdAt timestamp(6), updatedAt timestamp(6), id uuid, email varchar(255), password varchar(255), username varchar(255), role enum ('ADMIN','COMPANY','USER'), primary key (rn_)) transactional [42101-240]
+2026-04-26 00:30:28.325503+04:00 jdbc[270]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_USERS" already exists; SQL statement:
+create global temporary table HT_users(id uuid not null, primary key (id)) transactional [42101-240]
+2026-04-26 00:30:28.327034+04:00 jdbc[270]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_USERS" already exists; SQL statement:
+create global temporary table HTE_users(rn_ integer not null, createdAt timestamp(6), updatedAt timestamp(6), id uuid, email varchar(255), password varchar(255), role enum ('ADMIN','COMPANY','USER'), primary key (rn_)) transactional [42101-240]
+2026-04-26 00:30:28.329359+04:00 jdbc[270]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_COMPANIES" already exists; SQL statement:
+create global temporary table HTE_companies(rn_ integer not null, createdAt timestamp(6), updatedAt timestamp(6), id uuid, companyName varchar(255), email varchar(255), password varchar(255), role enum ('ADMIN','COMPANY','USER'), primary key (rn_)) transactional [42101-240]
+2026-04-26 00:30:28.330610+04:00 jdbc[270]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_REGULAR_USERS" already exists; SQL statement:
+create global temporary table HTE_regular_users(rn_ integer not null, createdAt timestamp(6), updatedAt timestamp(6), id uuid, email varchar(255), password varchar(255), username varchar(255), role enum ('ADMIN','COMPANY','USER'), primary key (rn_)) transactional [42101-240]
+2026-04-26 00:30:30.770829+04:00 jdbc[280]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_USERS" already exists; SQL statement:
+create global temporary table HT_users(id uuid not null, primary key (id)) transactional [42101-240]
+2026-04-26 00:30:30.771604+04:00 jdbc[280]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_USERS" already exists; SQL statement:
+create global temporary table HTE_users(rn_ integer not null, createdAt timestamp(6), updatedAt timestamp(6), id uuid, email varchar(255), password varchar(255), role enum ('ADMIN','COMPANY','USER'), primary key (rn_)) transactional [42101-240]
+2026-04-26 00:30:30.772507+04:00 jdbc[280]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_COMPANIES" already exists; SQL statement:
+create global temporary table HTE_companies(rn_ integer not null, createdAt timestamp(6), updatedAt timestamp(6), id uuid, companyName varchar(255), email varchar(255), password varchar(255), role enum ('ADMIN','COMPANY','USER'), primary key (rn_)) transactional [42101-240]
+2026-04-26 00:30:30.772973+04:00 jdbc[280]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_REGULAR_USERS" already exists; SQL statement:
+create global temporary table HTE_regular_users(rn_ integer not null, createdAt timestamp(6), updatedAt timestamp(6), id uuid, email varchar(255), password varchar(255), username varchar(255), role enum ('ADMIN','COMPANY','USER'), primary key (rn_)) transactional [42101-240]
+2026-04-26 12:50:32.454664+04:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_USERS" already exists; SQL statement:
+create global temporary table HT_users(id uuid not null, primary key (id)) transactional [42101-240]
+2026-04-26 12:50:32.456804+04:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_USERS" already exists; SQL statement:
+create global temporary table HTE_users(rn_ integer not null, createdAt timestamp(6), updatedAt timestamp(6), id uuid, email varchar(255), password varchar(255), role enum ('ADMIN','COMPANY','USER'), primary key (rn_)) transactional [42101-240]
+2026-04-26 12:50:32.457419+04:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_COMPANIES" already exists; SQL statement:
+create global temporary table HTE_companies(rn_ integer not null, createdAt timestamp(6), updatedAt timestamp(6), id uuid, companyName varchar(255), email varchar(255), password varchar(255), role enum ('ADMIN','COMPANY','USER'), primary key (rn_)) transactional [42101-240]
+2026-04-26 12:50:32.458511+04:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_REGULAR_USERS" already exists; SQL statement:
+create global temporary table HTE_regular_users(rn_ integer not null, createdAt timestamp(6), updatedAt timestamp(6), id uuid, email varchar(255), password varchar(255), username varchar(255), role enum ('ADMIN','COMPANY','USER'), primary key (rn_)) transactional [42101-240]
+2026-04-26 13:12:04.624825+04:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_USERS" already exists; SQL statement:
+create global temporary table HT_users(id uuid not null, primary key (id)) transactional [42101-240]
+2026-04-26 13:12:04.626855+04:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_USERS" already exists; SQL statement:
+create global temporary table HTE_users(rn_ integer not null, createdAt timestamp(6), updatedAt timestamp(6), id uuid, email varchar(255), password varchar(255), role enum ('ADMIN','COMPANY','USER'), primary key (rn_)) transactional [42101-240]
+2026-04-26 13:12:04.627473+04:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_COMPANIES" already exists; SQL statement:
+create global temporary table HTE_companies(rn_ integer not null, createdAt timestamp(6), updatedAt timestamp(6), id uuid, companyName varchar(255), email varchar(255), password varchar(255), role enum ('ADMIN','COMPANY','USER'), primary key (rn_)) transactional [42101-240]
+2026-04-26 13:12:04.627946+04:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_REGULAR_USERS" already exists; SQL statement:
+create global temporary table HTE_regular_users(rn_ integer not null, createdAt timestamp(6), updatedAt timestamp(6), id uuid, email varchar(255), password varchar(255), username varchar(255), role enum ('ADMIN','COMPANY','USER'), primary key (rn_)) transactional [42101-240]
+2026-04-26 13:13:54.532252+04:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HT_USERS" already exists; SQL statement:
+create global temporary table HT_users(id uuid not null, primary key (id)) transactional [42101-240]
+2026-04-26 13:13:54.533262+04:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_USERS" already exists; SQL statement:
+create global temporary table HTE_users(rn_ integer not null, createdAt timestamp(6), updatedAt timestamp(6), id uuid, email varchar(255), password varchar(255), role enum ('ADMIN','COMPANY','USER'), primary key (rn_)) transactional [42101-240]
+2026-04-26 13:13:54.534072+04:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_COMPANIES" already exists; SQL statement:
+create global temporary table HTE_companies(rn_ integer not null, createdAt timestamp(6), updatedAt timestamp(6), id uuid, companyName varchar(255), email varchar(255), password varchar(255), role enum ('ADMIN','COMPANY','USER'), primary key (rn_)) transactional [42101-240]
+2026-04-26 13:13:54.534831+04:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "HTE_REGULAR_USERS" already exists; SQL statement:
+create global temporary table HTE_regular_users(rn_ integer not null, createdAt timestamp(6), updatedAt timestamp(6), id uuid, email varchar(255), password varchar(255), username varchar(255), role enum ('ADMIN','COMPANY','USER'), primary key (rn_)) transactional [42101-240]
