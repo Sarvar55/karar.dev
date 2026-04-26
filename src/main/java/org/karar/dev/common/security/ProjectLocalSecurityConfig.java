@@ -40,28 +40,28 @@ public class ProjectLocalSecurityConfig {
 
                         // Decisions (List and Get are public, modifications are secured)
                         .requestMatchers(HttpMethod.GET, "/api/v1/decisions/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/decisions").hasAnyRole(Role.USER.name(), Role.COMPANY.name(), Role.ADMIN.name())
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/decisions/**").hasAnyRole(Role.USER.name(), Role.COMPANY.name(), Role.ADMIN.name())
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/decisions/**").hasAnyRole(Role.USER.name(), Role.COMPANY.name(), Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.POST, "/api/v1/decisions").hasAnyRole(Roles.USER, Roles.COMPANY, Roles.ADMIN)
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/decisions/**").hasAnyRole(Roles.USER, Roles.COMPANY, Roles.ADMIN)
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/decisions/**").hasAnyRole(Roles.USER, Roles.COMPANY, Roles.ADMIN)
 
                         // Tags (Public read, Admin only write)
                         .requestMatchers(HttpMethod.GET, "/api/v1/tags/**").permitAll()
-                        .requestMatchers("/api/v1/tags/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers("/api/v1/tags/**").hasRole(Roles.ADMIN)
 
                         // Comments (Read public, Write secured)
                         .requestMatchers(HttpMethod.GET, "/api/v1/comments/**").permitAll()
-                        .requestMatchers("/api/v1/comments/**").hasAnyRole(Role.USER.name(), Role.COMPANY.name(), Role.ADMIN.name())
+                        .requestMatchers("/api/v1/comments/**").hasAnyRole(Roles.USER, Roles.COMPANY, Roles.ADMIN)
 
                         // Votes (Public check/count, Secured voting/deleting)
                         .requestMatchers(HttpMethod.GET, "/api/v1/votes/check", "/api/v1/votes/decision/**").permitAll()
-                        .requestMatchers("/api/v1/votes/**").hasAnyRole(Role.USER.name(), Role.COMPANY.name(), Role.ADMIN.name())
+                        .requestMatchers("/api/v1/votes/**").hasAnyRole(Roles.USER, Roles.COMPANY, Roles.ADMIN)
 
                         // Users
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/**").permitAll()
-                        .requestMatchers("/api/v1/users/**").hasAnyRole(Role.USER.name(), Role.COMPANY.name(), Role.ADMIN.name())
+                        .requestMatchers("/api/v1/users/**").hasAnyRole(Roles.USER, Roles.COMPANY, Roles.ADMIN)
 
                         // Base Admin only endpoints
-                        .requestMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers("/api/v1/admin/**").hasRole(Roles.ADMIN)
 
                         .anyRequest().authenticated()
                 );
@@ -92,5 +92,11 @@ public class ProjectLocalSecurityConfig {
                 .build();
 
         return new InMemoryUserDetailsManager(user, admin, company);
+    }
+
+    public static class Roles {
+        public static final String ADMIN = Role.ADMIN.name();
+        public static final String USER = Role.USER.name();
+        public static final String COMPANY = Role.COMPANY.name();
     }
 }
