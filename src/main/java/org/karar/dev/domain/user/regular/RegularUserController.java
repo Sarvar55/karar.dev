@@ -14,6 +14,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.karar.dev.domain.comment.dto.CommentResponse;
+
 import java.util.UUID;
 
 @RestController
@@ -23,6 +25,15 @@ import java.util.UUID;
 public class RegularUserController {
 
     private final RegularUserService regularUserService;
+    private final UserCommentService userCommentService;
+
+    @GetMapping("/{userId}/comments")
+    @Operation(summary = "Get comments for a user")
+    public ResponseEntity<BaseResponse<PageResponse<CommentResponse>>> getUserComments(
+            @PathVariable UUID userId,
+            @ParameterObject @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
+        return ResponseEntity.ok(userCommentService.getCommentsByUserId(userId, pageable));
+    }
 
     @GetMapping
     @Operation(summary = "Get all regular users")

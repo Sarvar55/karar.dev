@@ -25,6 +25,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.karar.dev.domain.comment.dto.CommentResponse;
+
 import java.util.UUID;
 
 @RestController
@@ -34,6 +36,15 @@ import java.util.UUID;
 public class DecisionController {
 
     private final DecisionService decisionService;
+    private final DecisionCommentService decisionCommentService;
+
+    @GetMapping("/{decisionId}/comments")
+    @Operation(summary = "List comments for a decision")
+    public ResponseEntity<BaseResponse<PageResponse<CommentResponse>>> getDecisionComments(
+            @PathVariable UUID decisionId,
+            @ParameterObject @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
+        return ResponseEntity.ok(decisionCommentService.getCommentsByDecisionId(decisionId, pageable));
+    }
 
     @Operation(
             summary = "List decisions",
