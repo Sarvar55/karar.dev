@@ -40,30 +40,28 @@ public class ProjectLocalSecurityConfig {
 
                         // Decisions (List and Get are public, modifications are secured)
                         .requestMatchers(HttpMethod.GET, "/api/v1/decisions/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/decisions").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/decisions/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/decisions/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/decisions").hasAnyRole(Role.USER.name(), Role.COMPANY.name(), Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/decisions/**").hasAnyRole(Role.USER.name(), Role.COMPANY.name(), Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/decisions/**").hasAnyRole(Role.USER.name(), Role.COMPANY.name(), Role.ADMIN.name())
 
-                        // Tags (Public read, Secured write)
+                        // Tags (Public read, Admin only write)
                         .requestMatchers(HttpMethod.GET, "/api/v1/tags/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/tags/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/tags/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/tags/**").authenticated()
+                        .requestMatchers("/api/v1/tags/**").hasRole(Role.ADMIN.name())
 
                         // Comments (Read public, Write secured)
                         .requestMatchers(HttpMethod.GET, "/api/v1/comments/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/comments/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/comments/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/comments/**").authenticated()
+                        .requestMatchers("/api/v1/comments/**").hasAnyRole(Role.USER.name(), Role.COMPANY.name(), Role.ADMIN.name())
 
                         // Votes (Public check/count, Secured voting/deleting)
                         .requestMatchers(HttpMethod.GET, "/api/v1/votes/check", "/api/v1/votes/decision/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/votes").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/votes/**").authenticated()
+                        .requestMatchers("/api/v1/votes/**").hasAnyRole(Role.USER.name(), Role.COMPANY.name(), Role.ADMIN.name())
 
-                        // Users (Profile management usually secured, but creating/listing might vary)
+                        // Users
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/**").permitAll()
-                        .requestMatchers("/api/v1/users/**").authenticated()
+                        .requestMatchers("/api/v1/users/**").hasAnyRole(Role.USER.name(), Role.COMPANY.name(), Role.ADMIN.name())
+
+                        // Base Admin only endpoints
+                        .requestMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.name())
 
                         .anyRequest().authenticated()
                 );
@@ -78,11 +76,21 @@ public class ProjectLocalSecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        UserDetails userDetails = SecurityUser
+        UserDetails user = SecurityUser
                 .builder()
-                .user(new RegularUser("sarvar", "{noop}12345", Role.USER))
+                .user(new RegularUser("user", "{noop}12345", Role.USER))
                 .build();
 
-        return new InMemoryUserDetailsManager(userDetails);
+        UserDetails admin = SecurityUser
+                .builder()
+                .user(new RegularUser("admin", "{noop}admin", Role.ADMIN))
+                .build();
+
+        UserDetails company = SecurityUser
+                .builder()
+                .user(new RegularUser("company", "{noop}company", Role.COMPANY))
+                .build();
+
+        return new InMemoryUserDetailsManager(user, admin, company);
     }
 }
