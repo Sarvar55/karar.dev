@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.karar.dev.common.exception.base.BaseException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 
 import java.time.LocalDateTime;
@@ -107,8 +108,17 @@ public class BaseResponse<T> {
     public static <T> BaseResponse<T> error(AuthenticationException ex) {
         return BaseResponse.<T>builder()
                 .success(false)
-                .error(ErrorData.of("UNAUTHORIZED", ex.getMessage()))
+                .error(ErrorData.of(HttpStatus.UNAUTHORIZED.toString(), ex.getMessage()))
                 .status(HttpStatus.UNAUTHORIZED)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    public static <T> BaseResponse<T> error(AccessDeniedException ex) {
+        return BaseResponse.<T>builder()
+                .success(false)
+                .error(ErrorData.of(HttpStatus.FORBIDDEN.toString(), ex.getMessage()))
+                .status(HttpStatus.FORBIDDEN)
                 .timestamp(LocalDateTime.now())
                 .build();
     }

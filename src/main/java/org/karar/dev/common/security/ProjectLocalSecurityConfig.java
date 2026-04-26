@@ -1,6 +1,7 @@
 package org.karar.dev.common.security;
 
 import org.karar.dev.common.enums.Role;
+import org.karar.dev.common.security.exception.CustomAccessDeniedHandler;
 import org.karar.dev.common.security.exception.CustomAuthenticationEntryPoint;
 import org.karar.dev.common.security.user.SecurityUser;
 import org.karar.dev.domain.user.regular.RegularUser;
@@ -23,9 +24,11 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class ProjectLocalSecurityConfig {
 
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
-    public ProjectLocalSecurityConfig(CustomAuthenticationEntryPoint authenticationEntryPoint) {
+    public ProjectLocalSecurityConfig(CustomAuthenticationEntryPoint authenticationEntryPoint, CustomAccessDeniedHandler customAccessDeniedHandler) {
         this.authenticationEntryPoint = authenticationEntryPoint;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
 
     @Bean
@@ -68,6 +71,7 @@ public class ProjectLocalSecurityConfig {
         http.formLogin(withDefaults());
         http.httpBasic(withDefaults());
         http.exceptionHandling(exh -> exh.authenticationEntryPoint(authenticationEntryPoint));
+        http.exceptionHandling(eadexh -> eadexh.accessDeniedHandler(customAccessDeniedHandler));
 
         return http.build();
     }
