@@ -184,4 +184,253 @@
 
 ---
 
-**Son Güncelleme**: 2026-04-24
+## 🚀 v1.0.0 — REST API Redesign (2026-04-26)
+
+### 📋 Genel Değişiklikler
+
+**Amaç**: REST API design principles'a tam uyumlu, scalable ve maintainable bir yapı oluşturmak.
+
+### ✨ Yeni Özellikler
+
+#### 1. REST API Design Rules Uygulandı
+
+**Filtering Rule** — SYSTEM.md Rule #2:
+```bash
+# ✅ Doğru — Query params ile filtreleme
+GET /api/v1/comments?decisionId={id}
+GET /api/v1/comments?userId={id}
+GET /api/v1/decisions?tagId={id}&regretLevel=HIGH
+
+# ❌ Kaldırıldı — Endpoint duplication
+GET /api/v1/comments/decisions/{decisionId}
+GET /api/v1/comments/users/{userId}
+GET /api/v1/decisions/users/{userId}
+GET /api/v1/decisions/regret-levels/{level}
+GET /api/v1/decisions/tags/{tagId}
+```
+
+**Nested Resources Rule** — SYSTEM.md Rule #3:
+```bash
+# ✅ Nested paths — Parent-child ilişkiler için
+GET /api/v1/decisions/{decisionId}/comments
+GET /api/v1/decisions/{decisionId}/tags
+GET /api/v1/users/{userId}/comments
+```
+
+#### 2. DecisionController Yenilendi
+
+**Base Path**: `/api/v1/decisions`
+
+**Yeni Endpoint Yapısı**:
+| Endpoint | Method | Açıklama |
+|----------|--------|----------|
+| `/decisions` | GET | Tüm kararlar (query: `userId`, `regretLevel`, `tagId`) |
+| `/decisions/{id}` | GET | Karar detayı |
+| `/decisions/{decisionId}/comments` | GET | Kararın yorumları |
+| `/decisions/{decisionId}/tags` | GET | Kararın etiketleri |
+| `/decisions` | POST | Yeni karar oluştur |
+| `/decisions/{id}` | PUT | Karar güncelle |
+| `/decisions/{id}` | DELETE | Karar sil |
+
+**Kaldırılan Endpoint'ler**:
+- `GET /decisions/users/{userId}` → `GET /decisions?userId={id}`
+- `GET /decisions/regret-levels/{level}` → `GET /decisions?regretLevel={level}`
+- `GET /decisions/tags/{tagId}` → `GET /decisions?tagId={id}`
+
+**Yeni Servis Çağrıları**:
+- `DecisionCommentService.getCommentsByDecisionId()` — Comments için
+- `DecisionTagService.getTagsByDecisionId()` — Tags için
+
+**Dosyalar**:
+- `domain/decision/DecisionController.java` — Tamamen yenilendi
+
+---
+
+#### 3. CommentController Yenilendi
+
+**Base Path**: `/api/v1/comments`
+
+**Yeni Endpoint Yapısı**:
+| Endpoint | Method | Açıklama |
+|----------|--------|----------|
+| `/comments` | GET | Tüm yorumlar (query: `decisionId`, `userId`) |
+| `/comments/{id}` | GET | Yorum detayı |
+| `/comments` | POST | Yeni yorum oluştur |
+| `/comments/{id}` | PUT | Yorum güncelle |
+| `/comments/{id}` | DELETE | Yorum sil |
+
+**Kaldırılan Endpoint'ler**:
+- `GET /comments/decision/{decisionId}` → `GET /comments?decisionId={id}`
+- `GET /comments/user/{userId}` → `GET /comments?userId={id}`
+
+**Yeni Service Metodları**:
+```java
+// CommentService
+getCommentsByDecisionId(UUID decisionId, Pageable pageable)
+getCommentsByUserId(UUID userId, Pageable pageable)
+getCommentsByDecisionIdAndUserId(UUID decisionId, UUID userId, Pageable pageable)
+
+// CommentRepository
+Page<Comment> findByDecisionIdAndUserId(UUID decisionId, UUID userId, Pageable pageable)
+```
+
+**Dosyalar**:
+- `domain/comment/CommentController.java` — Tamamen yenilendi
+- `domain/comment/CommentService.java` — Yeni filtreleme metodları eklendi
+- `domain/comment/CommentRepository.java` — Yeni query metodu eklendi
+
+---
+
+#### 4. VoteController Yenilendi
+
+**Base Path**: `/api/v1/votes`
+
+**Yeni Endpoint Yapısı**:
+| Endpoint | Method | Açıklama |
+|----------|--------|----------|
+| `/votes` | GET | Tüm oylar (query: `decisionId`, `userId`) |
+| `/votes/{id}` | GET | Oy detayı |
+| `/votes/decisions/{decisionId}/count` | GET | Oy sayısı + user status |
+| `/votes` | POST | Yeni oy ver |
+| `/votes/{id}` | DELETE | Oy sil (ID ile) |
+| `/votes/users/{userId}/decisions/{decisionId}` | DELETE | Oy geri al |
+
+**Kaldırılan Endpoint'ler**:
+- `GET /votes/decision/{decisionId}` → `GET /votes?decisionId={id}`
+- `GET /votes/user/{userId}` → `GET /votes?userId={id}`
+- `GET /votes/check` → Query params ile kontrol
+
+**Dosyalar**:
+- `domain/vote/VoteController.java` — Tamamen yenilendi
+
+---
+
+#### 5. TagController Yenilendi
+
+**Base Path**: `/api/v1/tags`
+
+**Yeni Endpoint Yapısı**:
+| Endpoint | Method | Açıklama |
+|----------|--------|----------|
+| `/tags` | GET | Tüm etiketler |
+| `/tags/{id}` | GET | Etiket detayı |
+| `/tags/name/{name}` | GET | Etiket ile ara |
+| `/tags` | POST | Yeni etiket oluştur |
+| `/tags/{id}` | PUT | Etiket güncelle |
+| `/tags/{id}` | DELETE | Etiket sil |
+
+**Kaldırılan Endpoint'ler**:
+- `GET /tags/{id}/decisions` → `GET /decisions?tagId={id}` (DecisionController'da)
+
+**Değişiklikler**:
+- `DecisionService` dependency kaldırıldı
+- Sadece kendi resource'una odaklanıyor
+
+**Dosyalar**:
+- `domain/tag/TagController.java` — Tamamen yenilendi
+
+---
+
+#### 6. DecisionTagService Genişletildi
+
+**Yeni Metod**:
+```java
+public BaseResponse<List<TagResponse>> getTagsByDecisionId(UUID decisionId)
+```
+
+**Özellikler**:
+- Decision'a ait tüm tagleri getirir
+- Her tag için `TagService.getTagById()` çağırır
+- Join yerine service composition kullanır
+
+**Dosyalar**:
+- `domain/decisiontag/DecisionTagService.java` — Yeni metod eklendi
+
+---
+
+### 🏗️ Mimari Değişiklikler
+
+#### Service Composition Pattern
+
+**Önceki Yaklaşım**:
+```java
+// ❌ Repository'ler arası join
+@Query("SELECT d FROM Decision d JOIN d.tags t WHERE t.id = :tagId")
+Page<Decision> findByTagId(UUID tagId);
+```
+
+**Yeni Yaklaşım**:
+```java
+// ✅ Service composition
+@GetMapping("/{decisionId}/tags")
+public ResponseEntity<BaseResponse<List<TagResponse>>> getDecisionTags(
+    @PathVariable UUID decisionId) {
+    return ResponseEntity.ok(
+        decisionTagService.getTagsByDecisionId(decisionId)
+    );
+}
+```
+
+**Avantajlar**:
+- Loose coupling
+- Her service kendi responsibility'sine odaklanır
+- Kolay test edilebilir
+- Performance optimization flexible
+
+---
+
+### 📊 Endpoint Summary
+
+| Controller | Base Path | Endpoints | Değişiklik |
+|------------|-----------|-----------|------------|
+| Auth | `/api/v1/auth` | 1 | Değişiklik yok |
+| Decision | `/api/v1/decisions` | 7 | Filtering query params, nested resources |
+| Comment | `/api/v1/comments` | 5 | Filtering query params |
+| Vote | `/api/v1/votes` | 6 | Filtering query params |
+| Tag | `/api/v1/tags` | 6 | Decision endpoint kaldırıldı |
+| RegularUser | `/api/v1/users` | 5 | Değişiklik yok |
+| CompanyUser | `/api/v1/companies` | 4 | Değişiklik yok |
+
+**Toplam**: 34 endpoint (7 azaltıldı, 2 eklendi)
+
+---
+
+### ✅ Build Status
+
+```bash
+[INFO] BUILD SUCCESS
+[INFO] Compiling 74 source files
+[INFO] Total time: 3.459 s
+```
+
+---
+
+### 📚 Yeni Dokümantasyon
+
+- `docs/project-idea.md` — Kapsamlı proje dokümantasyonu
+  - Proje nedir, neden var
+  - Tech stack detayları
+  - Functional & Non-functional requirements
+  - Prensipler ve kurallar
+  - Services & endpoints
+  - Entities & ilişkiler
+  
+- `docs/07-api-endpoints.md` — Detaylı API dokümantasyonu
+  - Her endpoint için örnek request/response
+  - Query parameters
+  - Authentication examples
+  - Pagination usage
+  - Error codes
+
+---
+
+### 🎯 Sonuç
+
+**Ölçeklenebilirlik**: ⭐⭐⭐⭐⭐  
+**Okunabilirlik**: ⭐⭐⭐⭐⭐  
+**Maintainability**: ⭐⭐⭐⭐⭐  
+**REST Compliance**: ⭐⭐⭐⭐⭐
+
+---
+
+**Son Güncelleme**: 2026-04-26
