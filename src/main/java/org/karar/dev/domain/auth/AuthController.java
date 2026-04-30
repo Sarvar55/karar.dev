@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.karar.dev.domain.auth.dto.AuthResponse;
+import org.karar.dev.domain.auth.dto.LoginRequest;
 import org.karar.dev.domain.auth.dto.RegisterRequest;
 import org.karar.dev.domain.base.BaseResponse;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +44,30 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<BaseResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
         BaseResponse<AuthResponse> response = authService.register(request);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @Operation(
+            summary = "Login with email and password",
+            description = "Authenticates the user and returns a JWT access token."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login successful",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid email or password",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Account locked or disabled",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            )
+    })
+    @PostMapping("/login")
+    public ResponseEntity<BaseResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
+        BaseResponse<AuthResponse> response = authService.login(request);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 }

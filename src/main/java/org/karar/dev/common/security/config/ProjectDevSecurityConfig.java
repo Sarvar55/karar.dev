@@ -1,5 +1,6 @@
-package org.karar.dev.common.security;
+package org.karar.dev.common.security.config;
 
+import org.karar.dev.common.security.SecurityPathConfig;
 import org.karar.dev.common.security.exception.CustomAccessDeniedHandler;
 import org.karar.dev.common.security.exception.CustomAuthenticationEntryPoint;
 import org.karar.dev.common.security.filter.AuthenticationTokenFilter;
@@ -16,6 +17,10 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @Profile("dev")
@@ -25,14 +30,16 @@ public class ProjectDevSecurityConfig {
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final AuthenticationTokenFilter authenticationTokenFilter;
+    private final CorsConfiguration corsConfiguration;
 
     public ProjectDevSecurityConfig(
             CustomAuthenticationEntryPoint authenticationEntryPoint,
-            CustomAccessDeniedHandler accessDeniedHandler, AuthenticationTokenFilter authenticationTokenFilter
+            CustomAccessDeniedHandler accessDeniedHandler, AuthenticationTokenFilter authenticationTokenFilter, CorsConfiguration corsConfiguration
     ) {
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.accessDeniedHandler = accessDeniedHandler;
         this.authenticationTokenFilter = authenticationTokenFilter;
+        this.corsConfiguration = corsConfiguration;
     }
 
     @Bean
@@ -41,7 +48,8 @@ public class ProjectDevSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(SecurityPathConfig::configure)
                 .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(sessionConfig ->
+                        sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler)
@@ -58,6 +66,19 @@ public class ProjectDevSecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
+        config.setAllowedHeaders(Arrays.asList("*"));
+        config.setAllowedMethods(Arrays.asList("*"));
+        config.setAllowedOrigins(Arrays.asList(corsConfiguration.getAllowedOrigins()));
+        config.setAllowCredentials(corsConfiguration.isAllowCredentials());
+        source.registerCorsConfiguration("/**", config);
+        config.setMaxAge(3600L);
+        return source;
     }
 
 }

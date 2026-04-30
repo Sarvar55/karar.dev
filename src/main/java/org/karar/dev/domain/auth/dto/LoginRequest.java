@@ -2,18 +2,13 @@ package org.karar.dev.domain.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import org.karar.dev.common.enums.Role;
 
-public record RegisterRequest(
+public record LoginRequest(
         @Email(message = "Email must be valid")
         @NotBlank(message = "Email is required")
         String email,
 
         @NotBlank(message = "Password is required")
-        String password,
-
-        Role role,
-        String username,
-        String companyName
+        String password
 ) {
 }

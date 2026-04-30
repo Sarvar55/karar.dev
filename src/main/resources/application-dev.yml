@@ -4,16 +4,28 @@ spring:
       on-profile: dev
 
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/karardb}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/karardb}
+    username: ${DB_USER:user}
+    password: ${DB_PASSWORD:12345}
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create
     show-sql: false
 
-
+app:
+  jwt:
+    secret: ${JWT_SECRET:devSecretKeyThatIsAtLeast32BytesLongForHS256!!}
+    expiration-time: ${JWT_EXPIRATION:3600000}
+    issuer: ${JWT_ISSUER:karar-dev}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
+    allow-credentials: true
+    allowed-methods:
+      - "*"
+    allowed-headers:
+      - "*"
 
 logging:
   level:

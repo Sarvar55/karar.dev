@@ -1,5 +1,7 @@
-package org.karar.dev.common.security;
+package org.karar.dev.common.security.config;
 
+import org.karar.dev.common.security.SecurityPathConfig;
+import org.karar.dev.common.security.SecurityRoles;
 import org.karar.dev.common.security.exception.CustomAccessDeniedHandler;
 import org.karar.dev.common.security.exception.CustomAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
