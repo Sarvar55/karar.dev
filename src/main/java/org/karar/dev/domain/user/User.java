@@ -7,6 +7,8 @@ import lombok.Setter;
 import org.karar.dev.common.entity.BaseEntity;
 import org.karar.dev.common.enums.Role;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -25,9 +27,36 @@ public abstract class User extends BaseEntity {
     @Column(nullable = false)
     private Role role;
 
+    private boolean emailVerified;
+
+    private boolean accountLocked;
+
+    @Column(nullable = false)
+    private int failedLoginAttempts = 0;
+
+    private LocalDateTime lockedUntil;
+
     protected User(String email, String password, Role role) {
         this.email = email;
         this.password = password;
         this.role = role;
     }
+
+    /**
+     * Account is locked if lockedUntil is set and still in the future.
+     * Auto-unlocks once the lockout period expires.
+     */
+    public boolean isAccountLocked() {
+        if (lockedUntil != null && lockedUntil.isAfter(LocalDateTime.now())) {
+            return true;
+        }
+        // Auto-unlock: clear stale lock
+        if (lockedUntil != null && lockedUntil.isBefore(LocalDateTime.now())) {
+            this.accountLocked = false;
+            this.lockedUntil = null;
+            this.failedLoginAttempts = 0;
+        }
+        return accountLocked;
+    }
 }
+
