@@ -4,107 +4,120 @@
 
 ## 🎯 Amaç
 
-Bu dosya, karar.dev projesinde **tutarlı, sürdürülebilir ve ölçeklenebilir** bir backend geliştirmek için tüm mühendislik kurallarını tanımlar.
+Bu doküman, karar.dev backend geliştirme sürecinde **tutarlılık, sürdürülebilirlik ve ölçeklenebilirlik** sağlamak için mühendislik kurallarını tanımlar.
 
 Bu kurallar:
 
-* Tartışmaya açık değildir (default olarak)
+* Varsayılan olarak tartışmaya kapalıdır
 * Tüm ekip tarafından uygulanmalıdır
-* Kod review’ların temelidir
+* Code review süreçlerinin temelini oluşturur
 
 ---
 
-# REST API Design Rules – Filtering & Resource Structure
+# 🌐 REST API Design Rules
 
 ## 1. General Principle
 
-Avoid creating multiple endpoints for the same resource when the difference is only filtering criteria.
+Aynı resource için sadece filtre farklı diye ayrı endpoint yazılmaz.
 
-Instead, prefer a single endpoint with query parameters.
+👉 Tek endpoint + query param yaklaşımı tercih edilir.
 
 ---
 
 ## 2. Filtering Rule (MUST)
 
-Use query parameters for filtering resources.
+### ✅ Doğru
 
-### ✅ Correct
-
+```
 GET /api/v1/comments
 GET /api/v1/comments?decisionId={id}
 GET /api/v1/comments?userId={id}
 GET /api/v1/comments?decisionId={id}&userId={id}
+```
 
-### ❌ Avoid
+### ❌ Kaçınılmalı
 
+```
 GET /api/v1/comments/decisions/{decisionId}
 GET /api/v1/comments/users/{userId}
+```
 
-Reason:
+### Neden?
 
-* Reduces endpoint duplication
-* Improves flexibility
-* Simplifies maintenance and security configuration
+* Endpoint duplication azaltır
+* Daha esnek yapı sağlar
+* Security config sadeleşir
 
 ---
 
 ## 3. Nested Resources Rule (ALLOWED)
 
-Use nested paths only when representing a true parent-child relationship.
+Gerçek parent-child ilişkilerinde kullanılabilir.
 
-### ✅ Acceptable
+### ✅ Doğru
 
+```
 GET /api/v1/decisions/{decisionId}/comments
 GET /api/v1/users/{userId}/comments
+```
 
-### ❌ Avoid incorrect nesting
+### ❌ Yanlış
 
+```
 GET /api/v1/comments/decisions/{decisionId}
+```
 
 ---
 
 ## 4. HTTP Method Semantics (MUST)
 
-GET     → Retrieve data
-POST    → Create resource
-PUT     → Full update
-PATCH   → Partial update
-DELETE  → Remove resource
+| Method | Açıklama           |
+| ------ | ------------------ |
+| GET    | Veri çekme         |
+| POST   | Resource oluşturma |
+| PUT    | Tam update         |
+| PATCH  | Kısmi update       |
+| DELETE | Silme              |
 
 ---
 
-## 5. Endpoint Simplicity (MUST)
+## 5. Endpoint Simplicity
 
-* Prefer fewer, more flexible endpoints
-* Do not duplicate logic across multiple URLs
-* Keep controllers minimal; move logic to service layer
+* Az ama güçlü endpoint yaz
+* Aynı logic’i farklı URL’lerde tekrar etme
+* Controller sade olmalı
 
 ---
 
-## 6. Security Compatibility Rule
+## 6. Security Compatibility
 
-Design endpoints so they can be easily secured using HTTP method + path.
+Endpoint’ler **kolay authorize edilebilir** olmalı.
 
-Example:
+### ✅ Doğru
 
+```java
 .requestMatchers(HttpMethod.GET, "/api/v1/comments/**").permitAll()
 .requestMatchers(HttpMethod.POST, "/api/v1/comments").authenticated()
+```
 
-Avoid designs that require custom filters to distinguish endpoints.
+### ❌ Kaçınılmalı
+
+* Endpoint’i ayırt etmek için custom logic gerektiren tasarımlar
 
 ---
 
 ## 7. Summary
 
-* Use query params for filtering
-* Use nested resources only for hierarchy
-* Avoid redundant endpoints
-* Keep API predictable and scalable
+* Filtreleme → query param
+* Hiyerarşi → nested path
+* Endpoint duplication → yasak
+* API → predictable olmalı
 
+---
 
-# 🧱 1. Mimari Prensipler
+# 🏗️ Mimari Prensipler
 
-## Katman Yapısı (Layered Architecture)
+## Katmanlı Mimari
 
 ```
 Controller → Service → Repository
@@ -112,77 +125,59 @@ Controller → Service → Repository
 
 ### Kurallar
 
-1. Controller sadece Service çağırır
-2. Service iş mantığını içerir
-3. Repository sadece veri erişimidir
+* Controller sadece Service çağırır
+* Service business logic içerir
+* Repository sadece data access yapar
 
-❌ Controller → Repository YASAK
-❌ Service → başka modül Repository YASAK
+### Yasaklar
+
+* ❌ Controller → Repository
+* ❌ Service → başka domain Repository
 
 ---
 
 ## Katman Kuralları
 
-* Entity **asla dışarı çıkmaz** → DTO döner
+* Entity dışarı çıkmaz → DTO döner
 * `@Transactional` sadece Service katmanında
 * Controller’da business logic yazılmaz
-* common/ paketi domain bağımsızdır
+* `common/` domain bağımsızdır
 
 ---
 
-# 🧠 2. Clean Code Prensipleri
+# 🧼 Clean Code Prensipleri
 
-## KISS (Keep It Simple)
+## KISS
 
-* Gereksiz abstraction YASAK
-* Basit çözüm varken complex çözüm YASAK
+* Basit çözüm varken kompleks çözüm YASAK
 
----
+## DRY
 
-## DRY (Don't Repeat Yourself)
+* Tekrar eden kod merkezi hale getirilir
 
-* Tekrarlanan kod → utility / mapper / base class
-* Aynı logic birden fazla yerde bulunamaz
+## YAGNI
 
----
-
-## YAGNI (You Aren’t Gonna Need It)
-
-* “Belki lazım olur” diye kod yazılmaz
+* “Belki lazım olur” kodu yazılmaz
 
 ---
 
 ## SOLID
 
-### S — Single Responsibility
-
-Her class tek iş yapar
-
-### O — Open/Closed
-
-Yeni feature → extend et, değiştirme
-
-### L — Liskov
-
-Subclass → parent yerine geçebilmeli
-
-### I — Interface Segregation
-
-Büyük interface YASAK
-
-### D — Dependency Inversion
-
-Somuta değil, abstraction’a bağlı ol
+* S → Single Responsibility
+* O → Open/Closed
+* L → Liskov
+* I → Interface Segregation
+* D → Dependency Inversion
 
 ---
 
-# 🏗️ 3. Kod Kalitesi Kuralları
+# 🧩 Kod Kalitesi
 
-* Method isimleri anlamlı olmalı (`createDecision`, `toggleVote`)
-* Method’lar küçük olmalı
-* Her public Service metodu **tek iş yapar**
+* Method isimleri anlamlı olmalı
+* Methodlar küçük olmalı
+* Her public service metodu tek iş yapmalı
 * Null dönülmez → Optional veya Exception
-* Magic number/string YASAK → AppConstants
+* Magic value kullanılmaz → constant
 
 ---
 
@@ -195,7 +190,7 @@ Somuta değil, abstraction’a bağlı ol
 
 ## Exception Handling
 
-Tüm hatalar bu formatta döner:
+Tüm hatalar standart formatta döner:
 
 ```json
 {
@@ -207,26 +202,16 @@ Tüm hatalar bu formatta döner:
 
 ---
 
-# 🧾 4. DTO Kuralları
+# 📦 DTO Kuralları
 
 * Her endpoint için ayrı DTO
 * DTO reuse YASAK
 * Request DTO → `record`
 * Response DTO → immutable
 
-```java
-public record CreateDecisionRequest(
-    String title,
-    String why,
-    String alternatives
-) {}
-```
-
 ---
 
-# 🧩 5. ENUM Kullanımı
-
-Sabit değerler ENUM olur:
+# 🔢 Enum Kullanımı
 
 ```java
 public enum Role {
@@ -238,7 +223,7 @@ public enum Role {
 
 ---
 
-# 🧮 6. Constants
+# 📌 Constants
 
 ```java
 public final class AppConstants {
@@ -248,9 +233,9 @@ public final class AppConstants {
 
 ---
 
-# 🔐 7. Security Kuralları
+# 🔐 Security Kuralları
 
-* Auth → JWT
+* Authentication → JWT
 * Authorization → `@PreAuthorize`
 * Role prefix → `ROLE_`
 
@@ -260,28 +245,28 @@ public final class AppConstants {
 
 ---
 
-# 📦 8. Folder Structure
+# 📁 Folder Structure
 
 ```
 com.karar.dev/
-├── common/
-│   ├── config/
-│   ├── exception/
-│   ├── response/
-│   └── util/
-│
-├── domain/
-│   ├── auth/
-│   ├── user/
-│   ├── decision/
-│   ├── vote/
-│   ├── comment/
-│   └── tag/
+ ├── common/
+ │   ├── config/
+ │   ├── exception/
+ │   ├── response/
+ │   └── util/
+ │
+ └── domain/
+     ├── auth/
+     ├── user/
+     ├── decision/
+     ├── vote/
+     ├── comment/
+     └── tag/
 ```
 
 ---
 
-# 🗄️ 9. Configuration Yönetimi
+# ⚙️ Configuration
 
 ## application.yml
 
@@ -294,9 +279,9 @@ app:
 
 ---
 
-## Profile Bazlı Config
+## Profiles
 
-### application-local.yml
+### local
 
 ```yaml
 spring:
@@ -306,9 +291,7 @@ spring:
     show-sql: true
 ```
 
----
-
-### application-dev.yml
+### dev
 
 ```yaml
 spring:
@@ -316,9 +299,7 @@ spring:
     url: jdbc:postgresql://localhost/dev
 ```
 
----
-
-### application-prod.yml
+### prod
 
 ```yaml
 spring:
@@ -328,28 +309,18 @@ spring:
 
 ---
 
-# 🪵 10. Logging
-
-## Pattern
-
-```yaml
-logging:
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%level] [%X{traceId}] %logger - %msg%n"
-```
-
-## Kurallar
+# 📊 Logging
 
 * Controller → INFO
 * Service → DEBUG
 * Error → ERROR
-* Stack trace dışarı çıkmaz
+* Stack trace client’a dönülmez
 
 ---
 
-# 🧪 11. Test Stratejisi
+# 🧪 Test Stratejisi
 
-| Katman     | Test        |
+| Katman     | Test Türü   |
 | ---------- | ----------- |
 | Service    | Unit        |
 | Controller | WebMvcTest  |
@@ -357,63 +328,49 @@ logging:
 
 ---
 
-# 🐳 12. Docker Yapısı
+# 🐳 Docker
 
-## docker-compose.local.yml
+### local
 
 ```yaml
-services:
-  app:
-    build: .
-    environment:
-      - SPRING_PROFILES_ACTIVE=local
+SPRING_PROFILES_ACTIVE=local
+```
+
+### dev
+
+```yaml
+SPRING_PROFILES_ACTIVE=dev
+```
+
+### prod
+
+```yaml
+SPRING_PROFILES_ACTIVE=prod
 ```
 
 ---
 
-## docker-compose.dev.yml
+# 🧱 Modülerlik
 
-```yaml
-services:
-  app:
-    environment:
-      - SPRING_PROFILES_ACTIVE=dev
-```
-
----
-
-## docker-compose.prod.yml
-
-```yaml
-services:
-  app:
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
-```
-
----
-
-# 🧩 13. Modülerlik
-
-* Her domain bağımsızdır
+* Domain’ler bağımsızdır
 * Cross dependency minimum
-* Ortak kod → common/
+* Ortak kod → common
 
 ---
 
-# 🚫 14. Yasaklar
+# 🚫 Yasaklar
 
-❌ Controller’da business logic
-❌ Entity return etmek
-❌ Magic string/number
-❌ Null return
-❌ Copy-paste kod
-❌ God class
-❌ Çok uzun method
+* Controller’da business logic
+* Entity return etmek
+* Magic value
+* Null return
+* Copy-paste kod
+* God class
+* Uzun method
 
 ---
 
-# ✅ 15. Doğru Kod Örneği
+# ✅ Doğru Kod Örneği
 
 ```java
 @PreAuthorize("hasRole('USER')")
@@ -429,7 +386,7 @@ public ResponseEntity<DecisionResponse> createDecision(
 
 ---
 
-# 🚀 Final
+# 🎯 Final
 
 Bu sistem:
 
@@ -438,8 +395,8 @@ Bu sistem:
 * Test edilebilir
 * Maintainable
 
-Kod yazarken her zaman şunu sor:
+Kod yazarken sor:
 
-👉 “Bu kod 6 ay sonra okunabilir mi?”
+👉 “Bu kod 6 ay sonra anlaşılır mı?”
 
-Eğer cevap hayırsa → yeniden yaz.
+Cevap hayırsa → yeniden yaz.

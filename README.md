@@ -1,27 +1,106 @@
-# Karar.dev API
+# 🎯 Karar.dev API
 
-A REST API for sharing decisions and regrets. Users can post decisions they've made, rate their regret level, vote on others' decisions, and categorize them with tags.
+> **Karar** (Turkish for "Decision") — A social platform for sharing decisions, regrets, and community feedback.
 
-## Overview
+[![Java](https://img.shields.io/badge/Java-17-blue.svg)](https://openjdk.java.net/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.3-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-Karar.dev ("Karar" means "Decision" in Turkish) is a social platform where users can:
-- Share decisions they've made and their outcomes
-- Indicate regret levels (LOW, MEDIUM, HIGH)
-- Vote on other users' decisions
-- Comment on decisions
-- Categorize decisions with tags
+---
 
-## Technology Stack
+## 📖 Quick Links
 
-- **Java 17**
-- **Spring Boot 4.0.3**
-- **Spring Data JPA**
-- **H2 Database** (development)
-- **Lombok**
-- **OpenAPI (Swagger) 3.0.2**
-- **Maven**
+| Resource | Link |
+|----------|------|
+| 📘 **Full Documentation** | [docs/README.md](docs/README.md) |
+| 🎯 **Project Overview** | [docs/project-idea.md](docs/project-idea.md) |
+| 🔌 **API Endpoints** | [docs/07-api-endpoints.md](docs/07-api-endpoints.md) |
+| 🏗️ **Architecture** | [docs/02-architecture.md](docs/02-architecture.md) |
+| 🗄️ **Database Schema** | [docs/04-database-schema.md](docs/04-database-schema.md) |
+| 📝 **Changelog** | [docs/10-changelog.md](docs/10-changelog.md) |
+| 🌐 **Swagger UI** | http://localhost:8080/swagger-ui.html |
 
-## Features
+---
+
+## 🎯 Overview
+
+**Karar.dev** is a social platform where users can:
+
+- 📝 **Share Decisions** — Post decisions with reasoning and alternatives
+- 😔 **Track Regret** — Indicate regret levels (LOW, MEDIUM, HIGH)
+- 👍 **Vote** — Vote on other users' decisions
+- 💬 **Comment** — Provide feedback and comments
+- 🏷️ **Categorize** — Use tags for organization
+- 🔍 **Filter** — Search by user, tag, regret level
+
+### ✨ Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **User Management** | Regular & Company users with role-based access |
+| **Decision CRUD** | Full create, read, update, delete operations |
+| **Voting System** | One vote per user per decision, with statistics |
+| **Comment System** | Threaded comments with filtering |
+| **Tag System** | Categorization with many-to-many relationships |
+| **RESTful API** | Consistent, well-documented endpoints |
+| **Exception Handling** | Centralized error management |
+| **Swagger Docs** | Interactive API documentation |
+
+---
+
+## 🛠️ Technology Stack
+
+| Category | Technology | Version | Purpose |
+|----------|------------|---------|---------|
+| **Language** | Java | 17 LTS | Backend development |
+| **Framework** | Spring Boot | 4.0.3 | Application framework |
+| **Web** | Spring MVC | 4.0.3 | RESTful API |
+| **Data** | Spring Data JPA | 4.0.3 | ORM & data access |
+| **Validation** | Hibernate Validator | 8.x | Input validation |
+| **Database (Dev)** | H2 | 2.x | Development database |
+| **Database (Prod)** | PostgreSQL | 15.x | Production database |
+| **Documentation** | SpringDoc OpenAPI | 3.0.2 | Swagger UI |
+| **Build Tool** | Maven | 3.9.x | Dependency management |
+| **Utilities** | Lombok | 1.18.x | Boilerplate reduction |
+
+**Why These Technologies?**
+
+- **Java 17**: LTS version, modern features (records, sealed classes), strong type safety
+- **Spring Boot**: Rapid development, convention over configuration, production-ready
+- **JPA/Hibernate**: Object-relational mapping, lazy loading, caching support
+- **PostgreSQL**: ACID compliant, JSONB support, high performance
+
+---
+
+## 📚 Comprehensive Documentation
+
+For detailed information, visit our **[Documentation Hub](docs/README.md)**:
+
+### 🎯 Getting Started
+
+1. **[Project Idea](docs/project-idea.md)** — What is Karar.dev, why it exists
+2. **[Overview](docs/01-overview.md)** — Project features and scope
+3. **[Technology Stack](docs/03-technology-stack.md)** — Tech choices and reasons
+4. **[Development Guide](docs/09-development.md)** — Setup and best practices
+
+### 🏗️ Architecture & Design
+
+1. **[Architecture](docs/02-architecture.md)** — Layered architecture, principles
+2. **[Database Schema](docs/04-database-schema.md)** — ERD, entity relationships
+3. **[Entities](docs/project-idea.md#entities--ilişkiler)** — Detailed entity descriptions
+
+### 🔌 API Reference
+
+1. **[API Endpoints](docs/07-api-endpoints.md)** — Complete endpoint reference
+2. **[DTOs](docs/08-dtos.md)** — Request/Response DTO structures
+3. **[BaseResponse](docs/05-baseresponse.md)** — Standard response format
+4. **[Exception Handling](docs/06-exception-handling.md)** — Error management
+
+### 📝 Additional Resources
+
+1. **[Changelog](docs/10-changelog.md)** — Version history and changes
+2. **[Swagger Guide](docs/11-swagger.md)** — API testing with Swagger
+3. **[Modules](docs/12-modules.md)** — Domain module structure
 
 ### User Management
 - Support for Regular (individual) and Company users
@@ -68,7 +147,9 @@ All API responses follow a unified structure using `BaseResponse<T>`:
 }
 ```
 
-## Getting Started
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
 - Java 17
@@ -97,65 +178,86 @@ Once the application is running, access:
 - **Swagger UI**: http://localhost:8080/swagger-ui.html
 - **OpenAPI JSON**: http://localhost:8080/v3/api-docs
 
-## API Endpoints
+---
+
+## 🔌 API Endpoints Summary
+
+### Base URL
+
+```
+http://localhost:8080/api/v1
+```
 
 ### Authentication
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/auth/register` | Register new user/company |
 
-### Users
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/users` | Get all regular users |
-| GET | `/api/v1/users/{id}` | Get user by ID |
-| PUT | `/api/v1/users/{id}` | Update user |
-| DELETE | `/api/v1/users/{id}` | Delete user |
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/auth/register` | Register new user/company | ❌ Public |
 
-### Decisions
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/decisions` | Get all decisions |
-| GET | `/api/v1/decisions/{id}` | Get decision by ID |
-| GET | `/api/v1/decisions/user/{userId}` | Get user's decisions |
-| GET | `/api/v1/decisions/regret-level/{level}` | Filter by regret level |
-| POST | `/api/v1/decisions` | Create decision |
-| PUT | `/api/v1/decisions/{id}` | Update decision |
-| DELETE | `/api/v1/decisions/{id}` | Delete decision |
+### Decisions (`/decisions`)
 
-### Tags
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/tags` | Get all tags |
-| GET | `/api/v1/tags/{id}` | Get tag by ID |
-| GET | `/api/v1/tags/name/{name}` | Get tag by name |
-| POST | `/api/v1/tags` | Create tag |
-| PUT | `/api/v1/tags/{id}` | Update tag |
-| DELETE | `/api/v1/tags/{id}` | Delete tag |
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/decisions` | List all (query: `userId`, `regretLevel`, `tagId`) | ❌ |
+| GET | `/decisions/{id}` | Get decision by ID | ❌ |
+| GET | `/decisions/{decisionId}/comments` | Get decision's comments | ❌ |
+| GET | `/decisions/{decisionId}/tags` | Get decision's tags | ❌ |
+| POST | `/decisions` | Create decision | ✅ |
+| PUT | `/decisions/{id}` | Update decision | ✅ |
+| DELETE | `/decisions/{id}` | Delete decision | ✅ |
 
-### Comments
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/comments` | Get all comments |
-| GET | `/api/v1/comments/{id}` | Get comment by ID |
-| GET | `/api/v1/comments/decision/{decisionId}` | Get decision's comments |
-| GET | `/api/v1/comments/user/{userId}` | Get user's comments |
-| POST | `/api/v1/comments` | Create comment |
-| PUT | `/api/v1/comments/{id}` | Update comment |
-| DELETE | `/api/v1/comments/{id}` | Delete comment |
+### Comments (`/comments`)
 
-### Votes
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/votes` | Get all votes |
-| GET | `/api/v1/votes/{id}` | Get vote by ID |
-| GET | `/api/v1/votes/decision/{decisionId}` | Get decision's votes |
-| GET | `/api/v1/votes/user/{userId}` | Get user's votes |
-| GET | `/api/v1/votes/decision/{decisionId}/count` | Get vote count & user status |
-| GET | `/api/v1/votes/check` | Check if user has voted |
-| POST | `/api/v1/votes` | Cast a vote |
-| DELETE | `/api/v1/votes/{id}` | Delete vote by ID |
-| DELETE | `/api/v1/votes` | Delete vote (unvote by user & decision) |
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/comments` | List all (query: `decisionId`, `userId`) | ❌ |
+| GET | `/comments/{id}` | Get comment by ID | ❌ |
+| POST | `/comments` | Create comment | ✅ |
+| PUT | `/comments/{id}` | Update comment | ✅ |
+| DELETE | `/comments/{id}` | Delete comment | ✅ |
+
+### Votes (`/votes`)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/votes` | List all (query: `decisionId`, `userId`) | ❌ |
+| GET | `/votes/{id}` | Get vote by ID | ❌ |
+| GET | `/votes/decisions/{decisionId}/count` | Vote count + user status | ❌ |
+| POST | `/votes` | Cast a vote | ✅ |
+| DELETE | `/votes/{id}` | Delete vote by ID | ✅ |
+| DELETE | `/votes/users/{userId}/decisions/{decisionId}` | Unvote | ✅ |
+
+### Tags (`/tags`)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/tags` | List all tags | ❌ |
+| GET | `/tags/{id}` | Get tag by ID | ❌ |
+| GET | `/tags/name/{name}` | Get tag by name | ❌ |
+| POST | `/tags` | Create tag | ✅ |
+| PUT | `/tags/{id}` | Update tag | ✅ |
+| DELETE | `/tags/{id}` | Delete tag | ✅ |
+
+### Users (`/users`)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/users` | List all regular users | ❌ |
+| GET | `/users/{id}` | Get user by ID | ❌ |
+| GET | `/users/{userId}/comments` | Get user's comments | ❌ |
+| PUT | `/users/{id}` | Update user | ✅ |
+| DELETE | `/users/{id}` | Delete user | ✅ |
+
+### Companies (`/companies`)
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/companies` | List all companies | ❌ |
+| GET | `/companies/{id}` | Get company by ID | ❌ |
+| PUT | `/companies/{id}` | Update company | ✅ |
+| DELETE | `/companies/{id}` | Delete company | ✅ |
+
+📖 **Full API documentation**: [docs/07-api-endpoints.md](docs/07-api-endpoints.md)
 
 ## Project Structure
 
@@ -200,26 +302,47 @@ org.karar.dev/
         └── VoteRepository.java
 ```
 
-## Database Schema
+---
+
+## 🗄️ Database Schema
 
 ### Entity Relationships
 
 ```
-RegularUser 1:N Decision
-Decision 1:N Comment
-Decision 1:N Vote
-Decision N:M Tag (via DecisionTag)
+┌─────────────┐     ┌─────────────┐
+│RegularUser  │     │CompanyUser  │
+└──────┬──────┘     └─────────────┘
+       │
+       │ 1:N
+       ▼
+┌─────────────┐     ┌─────────────┐
+│  Decision   │◄────│    Vote     │
+└──────┬──────┘     └─────────────┘
+       │
+   ┌───┼───┬────────────┐
+   │   │   │            │
+   ▼   ▼   ▼            ▼
+┌─────┐ │ ┌─────┐  ┌──────────┐
+│Comment│ │ │Tag  │  │DecisionTag│
+└─────┘ │ └──┬──┘  └──────────┘
+        │    │
+        └────┘ (N:M)
 ```
 
 ### Key Entities
 
-- **User**: Base entity for authentication
-- **RegularUser**: Individual users with username
-- **CompanyUser**: Corporate users with company name
-- **Decision**: User decisions with title, reasoning, regret level
-- **Tag**: Categorization labels
-- **Vote**: User votes on decisions
-- **Comment**: Comments on decisions
+| Entity | Description |
+|--------|-------------|
+| **User** | Abstract base entity for authentication |
+| **RegularUser** | Individual users with username |
+| **CompanyUser** | Corporate users with company name |
+| **Decision** | User decisions with title, reasoning, regret level |
+| **Tag** | Categorization labels (unique names) |
+| **DecisionTag** | Junction table for Decision-Tag N:M relationship |
+| **Vote** | User votes on decisions (unique: user + decision) |
+| **Comment** | Comments on decisions |
+
+📖 **Full schema**: [docs/04-database-schema.md](docs/04-database-schema.md) | [docs/project-idea.md](docs/project-idea.md#entities--ilişkiler)
 
 ## Exception Handling
 
@@ -280,19 +403,40 @@ server:
 For detailed API documentation, see:
 - [docs/api-documentation.md](docs/api-documentation.md)
 
-## Recent Changes
+---
 
-### Version 0.0.1-SNAPSHOT
+## 📝 Recent Changes
 
-- ✅ Improved BaseResponse structure with error data support
-- ✅ Integrated BaseResponse into Auth module
-- ✅ Added complete CRUD for Decision module
-- ✅ Added complete CRUD for Tag module
-- ✅ Added complete CRUD for Comment module
-- ✅ Added complete CRUD for Vote module (with automatic vote count updates)
-- ✅ **Fixed Decision-Tag relationship** (now properly creates associations via DecisionTag junction table)
-- ✅ Fixed entity mappings and timestamp persistence
-- ✅ Added comprehensive API documentation
+### v1.0.0 — REST API Redesign (2026-04-26) 🎉
+
+**Major Changes**:
+- ✅ **REST Design Principles Applied** — Filtering via query params, nested resources
+- ✅ **Endpoint Consolidation** — Removed duplicate endpoints, unified filtering
+- ✅ **Service Composition** — Controllers call appropriate services for related resources
+- ✅ **Comprehensive Documentation** — New project-idea.md, updated API docs
+
+**Breaking Changes**:
+```bash
+# Old (Removed)
+GET /api/v1/decisions/users/{userId}
+GET /api/v1/decisions/regret-levels/{level}
+GET /api/v1/decisions/tags/{tagId}
+GET /api/v1/comments/decision/{decisionId}
+GET /api/v1/comments/user/{userId}
+
+# New (Query Params)
+GET /api/v1/decisions?userId={id}
+GET /api/v1/decisions?regretLevel={level}
+GET /api/v1/decisions?tagId={id}
+GET /api/v1/comments?decisionId={id}
+GET /api/v1/comments?userId={id}
+```
+
+**New Features**:
+- ✅ `GET /api/v1/decisions/{decisionId}/tags` — Get decision's tags
+- ✅ `GET /api/v1/comments?decisionId={id}&userId={id}` — Combined filtering
+
+📖 **Full changelog**: [docs/10-changelog.md](docs/10-changelog.md)
 
 ## Future Enhancements
 
@@ -304,19 +448,46 @@ For detailed API documentation, see:
 - Rate limiting
 - Soft delete implementation
 
-## Contributing
+---
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+## 🤝 Contributing
 
-## License
+Contributions are welcome! Please follow these steps:
 
-This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## Contact
+### Development Guidelines
 
-- **Email**: contact@karar.dev
-- **Project**: https://github.com/karar-dev/karar.dev
+- Follow [SYSTEM.md](.pi/SYSTEM.md) engineering guidelines
+- Write unit tests for new features
+- Update documentation for API changes
+- Use meaningful commit messages
+
+📖 **Development guide**: [docs/09-development.md](docs/09-development.md)
 
 ---
 
-Built with ❤️ using Spring Boot
+## 📞 Contact
+
+| Resource | Link |
+|----------|------|
+| **Website** | https://karar.dev |
+| **Email** | contact@karar.dev |
+| **GitHub** | https://github.com/karar-dev/karar.dev |
+| **Documentation** | [docs/README.md](docs/README.md) |
+
+---
+
+## 📄 License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+---
+
+**Built with ❤️ using Spring Boot**
+
+© 2026 Karar.dev Team
