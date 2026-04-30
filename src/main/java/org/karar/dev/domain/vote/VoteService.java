@@ -43,6 +43,17 @@ public class VoteService {
     }
 
     @Transactional(readOnly = true)
+    public BaseResponse<VoteCountResponse> getVoteCountByDecisionId(UUID decisionId, UUID currentUserId) {
+        if (!decisionService.existsById(decisionId)) {
+            throw new ResourceNotFoundException("Decision", "id", decisionId);
+        }
+        long count = voteRepository.countByDecisionId(decisionId);
+        boolean hasVoted = currentUserId != null && 
+                voteRepository.existsByUserIdAndDecisionId(currentUserId, decisionId);
+        return BaseResponse.success(new VoteCountResponse(decisionId, count, hasVoted));
+    }
+
+    @Transactional(readOnly = true)
     public BaseResponse<List<VoteResponse>> getVotesByDecisionId(UUID decisionId) {
         if (!decisionService.existsById(decisionId)) {
             throw new ResourceNotFoundException("Decision", "id", decisionId);
@@ -64,17 +75,6 @@ public class VoteService {
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
         return BaseResponse.success(responseList);
-    }
-
-    @Transactional(readOnly = true)
-    public BaseResponse<VoteCountResponse> getVoteCountByDecisionId(UUID decisionId, UUID currentUserId) {
-        if (!decisionService.existsById(decisionId)) {
-            throw new ResourceNotFoundException("Decision", "id", decisionId);
-        }
-        long count = voteRepository.countByDecisionId(decisionId);
-        boolean hasVoted = currentUserId != null && 
-                voteRepository.existsByUserIdAndDecisionId(currentUserId, decisionId);
-        return BaseResponse.success(new VoteCountResponse(decisionId, count, hasVoted));
     }
 
     @Transactional(readOnly = true)

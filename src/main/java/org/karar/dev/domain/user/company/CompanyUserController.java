@@ -12,6 +12,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -41,6 +42,7 @@ public class CompanyUserController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update company user")
+    @PreAuthorize("@securityService.isAdminOrSelf(authentication, #id)")
     public ResponseEntity<BaseResponse<CompanyUserResponse>> update(@PathVariable UUID id, @Valid @RequestBody CompanyUserUpdateRequest request) {
         BaseResponse<CompanyUserResponse> response = companyUserService.update(id, request);
         return ResponseEntity.status(response.getStatus()).body(response);
@@ -48,6 +50,7 @@ public class CompanyUserController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete company user")
+    @PreAuthorize("@securityService.isAdminOrSelf(authentication, #id)")
     public ResponseEntity<BaseResponse<Void>> delete(@PathVariable UUID id) {
         BaseResponse<Void> response = companyUserService.delete(id);
         return ResponseEntity.status(response.getStatus()).body(response);

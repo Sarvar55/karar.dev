@@ -1,6 +1,11 @@
 package org.karar.dev.domain.comment;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,47 +18,154 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/comments")
 @RequiredArgsConstructor
 @Tag(name = "Comment Management", description = "RESTful API for Comment resources")
 public class CommentController {
 
     private final CommentService commentService;
 
+    @Operation(
+            summary = "List comments",
+            description = "Retrieve paginated comments with optional filtering. Examples:\n" +
+                    "- /api/v1/comments?page=0&size=10&sort=createdAt,desc\n" +
+                    "- /api/v1/comments?decisionId={id}\n" +
+                    "- /api/v1/comments?userId={id}\n" +
+                    "- /api/v1/comments?decisionId={id}&userId={id}"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved comments",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            )
+    })
     @GetMapping
-    @Operation(summary = "List comments")
     public ResponseEntity<BaseResponse<PageResponse<CommentResponse>>> getComments(
+            @Parameter(description = "Filter by decision ID")
+            @RequestParam(required = false) UUID decisionId,
+            @Parameter(description = "Filter by user ID")
+            @RequestParam(required = false) UUID userId,
             @ParameterObject @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
-        return ResponseEntity.ok(commentService.getAllComments(pageable));
+        BaseResponse<PageResponse<CommentResponse>> response;
+        if (decisionId != null && userId != null) {
+            response = commentService.getCommentsByDecisionIdAndUserId(decisionId, userId, pageable);
+        } else if (decisionId != null) {
+            response = commentService.getCommentsByDecisionId(decisionId, pageable);
+        } else if (userId != null) {
+            response = commentService.getCommentsByUserId(userId, pageable);
+        } else {
+            response = commentService.getAllComments(pageable);
+        }
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @GetMapping("/comments/{id}")
-    @Operation(summary = "Get comment by ID")
-    public ResponseEntity<BaseResponse<CommentResponse>> getById(@PathVariable UUID id) {
-        return ResponseEntity.ok(commentService.getCommentById(id));
+    @Operation(
+            summary = "Get comment by ID",
+            description = "Retrieve a specific comment by its unique identifier"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Comment found successfully",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Comment not found",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            )
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<BaseResponse<CommentResponse>> getCommentById(
+            @Parameter(description = "UUID of the comment to retrieve", required = true)
+            @PathVariable UUID id) {
+        BaseResponse<CommentResponse> response = commentService.getCommentById(id);
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @PostMapping("/comments")
-    @Operation(summary = "Create comment")
-    public ResponseEntity<BaseResponse<CommentResponse>> create(@Valid @RequestBody CommentRequest request) {
+    @Operation(
+            summary = "Create a new comment",
+            description = "Create a new comment with content for a specific decision"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Comment created successfully",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid input data",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User or Decision not found",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            )
+    })
+    @PostMapping
+    public ResponseEntity<BaseResponse<CommentResponse>> createComment(
+            @Valid @RequestBody CommentRequest request) {
         BaseResponse<CommentResponse> response = commentService.createComment(request);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @PutMapping("/comments/{id}")
-    @Operation(summary = "Update comment")
-    public ResponseEntity<BaseResponse<CommentResponse>> update(@PathVariable UUID id, @Valid @RequestBody CommentUpdateRequest request) {
-        return ResponseEntity.ok(commentService.updateComment(id, request));
+    @Operation(
+            summary = "Update an existing comment",
+            description = "Update the content of an existing comment by its ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Comment updated successfully",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Comment not found",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            )
+    })
+    @PutMapping("/{id}")
+    @PreAuthorize("@securityService.isAdminOrOwnerOfComment(authentication, #id)")
+    public ResponseEntity<BaseResponse<CommentResponse>> updateComment(
+            @Parameter(description = "UUID of the comment to update", required = true)
+            @PathVariable UUID id,
+            @Valid @RequestBody CommentUpdateRequest request) {
+        BaseResponse<CommentResponse> response = commentService.updateComment(id, request);
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @DeleteMapping("/comments/{id}")
-    @Operation(summary = "Delete comment")
-    public ResponseEntity<BaseResponse<Void>> delete(@PathVariable UUID id) {
-        return ResponseEntity.ok(commentService.deleteComment(id));
+    @Operation(
+            summary = "Delete a comment",
+            description = "Remove a comment from the system by its ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Comment deleted successfully",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Comment not found",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            )
+    })
+    @DeleteMapping("/{id}")
+    @PreAuthorize("@securityService.isAdminOrOwnerOfComment(authentication, #id)")
+    public ResponseEntity<BaseResponse<Void>> deleteComment(
+            @Parameter(description = "UUID of the comment to delete", required = true)
+            @PathVariable UUID id) {
+        BaseResponse<Void> response = commentService.deleteComment(id);
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 }

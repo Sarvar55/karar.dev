@@ -12,6 +12,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import org.karar.dev.domain.comment.dto.CommentResponse;
@@ -52,6 +53,7 @@ public class RegularUserController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update regular user")
+    @PreAuthorize("@securityService.isAdminOrSelf(authentication, #id)")
     public ResponseEntity<BaseResponse<RegularUserResponse>> update(@PathVariable UUID id, @Valid @RequestBody RegularUserUpdateRequest request) {
         BaseResponse<RegularUserResponse> response = regularUserService.update(id, request);
         return ResponseEntity.status(response.getStatus()).body(response);
@@ -59,6 +61,7 @@ public class RegularUserController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete regular user")
+    @PreAuthorize("@securityService.isAdminOrSelf(authentication, #id)")
     public ResponseEntity<BaseResponse<Void>> delete(@PathVariable UUID id) {
         BaseResponse<Void> response = regularUserService.delete(id);
         return ResponseEntity.status(response.getStatus()).body(response);

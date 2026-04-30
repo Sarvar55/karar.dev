@@ -1,7 +1,10 @@
 package org.karar.dev.domain.decision;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.karar.dev.common.entity.BaseEntity;
 import org.karar.dev.common.enums.RegretLevel;
 import org.karar.dev.domain.comment.Comment;
@@ -22,6 +25,7 @@ public class Decision extends BaseEntity {
     private String title;
     private String why;
     private String alternative;
+    @Enumerated(EnumType.STRING)
     private RegretLevel regretLevel;
     private int voteCount;
 

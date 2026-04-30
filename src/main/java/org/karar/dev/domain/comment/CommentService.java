@@ -36,6 +36,39 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
+    public BaseResponse<PageResponse<CommentResponse>> getCommentsByDecisionId(UUID decisionId, Pageable pageable) {
+        if (!decisionService.existsById(decisionId)) {
+            throw new ResourceNotFoundException("Decision", "id", decisionId);
+        }
+        Page<CommentResponse> responses = commentRepository.findByDecisionId(decisionId, pageable)
+                .map(this::mapToResponse);
+        return BaseResponse.success(new PageResponse<>(responses));
+    }
+
+    @Transactional(readOnly = true)
+    public BaseResponse<PageResponse<CommentResponse>> getCommentsByUserId(UUID userId, Pageable pageable) {
+        if (!regularUserService.existsById(userId)) {
+            throw new ResourceNotFoundException("User", "id", userId);
+        }
+        Page<CommentResponse> responses = commentRepository.findByUserId(userId, pageable)
+                .map(this::mapToResponse);
+        return BaseResponse.success(new PageResponse<>(responses));
+    }
+
+    @Transactional(readOnly = true)
+    public BaseResponse<PageResponse<CommentResponse>> getCommentsByDecisionIdAndUserId(UUID decisionId, UUID userId, Pageable pageable) {
+        if (!decisionService.existsById(decisionId)) {
+            throw new ResourceNotFoundException("Decision", "id", decisionId);
+        }
+        if (!regularUserService.existsById(userId)) {
+            throw new ResourceNotFoundException("User", "id", userId);
+        }
+        Page<CommentResponse> responses = commentRepository.findByDecisionIdAndUserId(decisionId, userId, pageable)
+                .map(this::mapToResponse);
+        return BaseResponse.success(new PageResponse<>(responses));
+    }
+
+    @Transactional(readOnly = true)
     public BaseResponse<CommentResponse> getCommentById(UUID id) {
         Comment comment = findCommentOrThrow(id);
         return BaseResponse.success(mapToResponse(comment));

@@ -11,22 +11,23 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.karar.dev.common.enums.RegretLevel;
 import org.karar.dev.common.exception.dto.PageResponse;
-import org.karar.dev.common.exception.dto.PageableRequest;
-import org.karar.dev.common.exception.dto.PageResponse;
 import org.karar.dev.domain.base.BaseResponse;
+import org.karar.dev.domain.comment.dto.CommentResponse;
 import org.karar.dev.domain.decision.dto.DecisionRequest;
 import org.karar.dev.domain.decision.dto.DecisionResponse;
 import org.karar.dev.domain.decision.dto.DecisionUpdateRequest;
+import org.karar.dev.domain.decisiontag.DecisionTagService;
+import org.karar.dev.domain.tag.dto.TagResponse;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import org.karar.dev.domain.comment.dto.CommentResponse;
-
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -37,18 +38,32 @@ public class DecisionController {
 
     private final DecisionService decisionService;
     private final DecisionCommentService decisionCommentService;
+    private final DecisionTagService decisionTagService;
 
     @GetMapping("/{decisionId}/comments")
-    @Operation(summary = "List comments for a decision")
+    @Operation(summary = "List comments for a decision", description = "Retrieve paginated comments for a specific decision")
     public ResponseEntity<BaseResponse<PageResponse<CommentResponse>>> getDecisionComments(
+            @Parameter(description = "Decision UUID", required = true)
             @PathVariable UUID decisionId,
             @ParameterObject @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
         return ResponseEntity.ok(decisionCommentService.getCommentsByDecisionId(decisionId, pageable));
     }
 
+    @GetMapping("/{decisionId}/tags")
+    @Operation(summary = "List tags for a decision", description = "Retrieve all tags associated with a specific decision")
+    public ResponseEntity<BaseResponse<List<TagResponse>>> getDecisionTags(
+            @Parameter(description = "Decision UUID", required = true)
+            @PathVariable UUID decisionId) {
+        return ResponseEntity.ok(decisionTagService.getTagsByDecisionId(decisionId));
+    }
+
     @Operation(
             summary = "List decisions",
-            description = "Example: /decisions?page=0&size=10&sort=createdAt,desc"
+            description = "Retrieve paginated decisions with optional filtering. Examples:\n" +
+                    "- /api/v1/decisions?page=0&size=10&sort=createdAt,desc\n" +
+                    "- /api/v1/decisions?userId={id}\n" +
+                    "- /api/v1/decisions?regretLevel=HIGH\n" +
+                    "- /api/v1/decisions?tagId={id}"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -59,9 +74,25 @@ public class DecisionController {
     })
     @GetMapping
     public ResponseEntity<BaseResponse<PageResponse<DecisionResponse>>> getDecisions(
+            @Parameter(description = "Filter by user ID")
+            @RequestParam(required = false) UUID userId,
+            @Parameter(description = "Filter by regret level")
+            @RequestParam(required = false) RegretLevel regretLevel,
+            @Parameter(description = "Filter by tag ID")
+            @RequestParam(required = false) UUID tagId,
             @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return ResponseEntity.ok(decisionService.getAllDecisions(pageable));
+        BaseResponse<PageResponse<DecisionResponse>> response;
+        if (userId != null) {
+            response = decisionService.getDecisionsByUserId(userId, pageable);
+        } else if (regretLevel != null) {
+            response = decisionService.getDecisionsByRegretLevel(regretLevel, pageable);
+        } else if (tagId != null) {
+            response = decisionService.getDecisionsByTagId(tagId, pageable);
+        } else {
+            response = decisionService.getAllDecisions(pageable);
+        }
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     @Operation(
@@ -85,58 +116,6 @@ public class DecisionController {
             @Parameter(description = "UUID of the decision to retrieve", required = true)
             @PathVariable UUID id) {
         BaseResponse<DecisionResponse> response = decisionService.getDecisionById(id);
-        return ResponseEntity.status(response.getStatus()).body(response);
-    }
-
-    @Operation(
-            summary = "List decisions by user",
-            description = "Retrieve a paginated list of decisions created by a specific user"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Successfully retrieved user's decisions",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "User not found",
-                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
-            )
-    })
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<BaseResponse<PageResponse<DecisionResponse>>> getDecisionsByUser(
-            @PathVariable UUID userId,
-            @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
-            Pageable pageable) {
-        BaseResponse<PageResponse<DecisionResponse>> response = decisionService.getDecisionsByUserId(userId, pageable);
-        return ResponseEntity.status(response.getStatus()).body(response);
-    }
-
-    @Operation(
-            summary = "List decisions by regret level",
-            description = "Retrieve a paginated list of decisions filtered by regret level"
-    )
-    @GetMapping("/regret-levels/{level}")
-    public ResponseEntity<BaseResponse<PageResponse<DecisionResponse>>> getDecisionsByRegretLevel(
-            @PathVariable RegretLevel level,
-            @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) 
-            Pageable pageable
-    ) {
-        BaseResponse<PageResponse<DecisionResponse>> response = decisionService.getDecisionsByRegretLevel(level, pageable);
-        return ResponseEntity.status(response.getStatus()).body(response);
-    }
-
-    @Operation(
-            summary = "List decisions by tag",
-            description = "Retrieve a paginated list of decisions associated with a specific tag"
-    )
-    @GetMapping("/tags/{tagId}")
-    public ResponseEntity<BaseResponse<PageResponse<DecisionResponse>>> getDecisionsByTag(
-            @PathVariable UUID tagId,
-            @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) 
-            Pageable pageable) {
-        BaseResponse<PageResponse<DecisionResponse>> response = decisionService.getDecisionsByTagId(tagId, pageable);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
@@ -200,6 +179,7 @@ public class DecisionController {
             )
     })
     @PutMapping("/{id}")
+    @PreAuthorize("@securityService.isAdminOrOwnerOfDecision(authentication, #id)")
     public ResponseEntity<BaseResponse<DecisionResponse>> updateDecision(
             @Parameter(description = "UUID of the decision to update", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable UUID id,
@@ -225,6 +205,7 @@ public class DecisionController {
             )
     })
     @DeleteMapping("/{id}")
+    @PreAuthorize("@securityService.isAdminOrOwnerOfDecision(authentication, #id)")
     public ResponseEntity<BaseResponse<Void>> deleteDecision(
             @Parameter(description = "UUID of the decision to delete", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable UUID id) {
