@@ -16,7 +16,7 @@ public class SecurityUser implements UserDetails {
     private final String email;
     private final String password;
     private final boolean emailVerified;
-    private final boolean accountLocked;
+    private final boolean accountLocked; 
     private final LocalDateTime lockedUntil;
     private final Collection<? extends GrantedAuthority> authorities;
 

@@ -39,5 +39,4 @@ public interface DecisionRepository extends JpaRepository<Decision, UUID> {
     @Modifying
     @Query("UPDATE Decision d SET d.voteCount = CASE WHEN d.voteCount > 0 THEN d.voteCount - 1 ELSE 0 END WHERE d.id = :id")
     void decrementVoteCount(@Param("id") UUID id);
-
 }
