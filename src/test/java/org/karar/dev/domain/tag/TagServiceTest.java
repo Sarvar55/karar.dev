@@ -1,20 +1,21 @@
 package org.karar.dev.domain.tag;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.karar.dev.common.exception.conflict.ConflictException;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
+import org.karar.dev.domain.annotation.UnitTest;
 import org.karar.dev.domain.base.BaseResponse;
+import org.karar.dev.domain.extensions.TagServiceParameterResolver;
 import org.karar.dev.domain.tag.dto.TagRequest;
 import org.karar.dev.domain.tag.dto.TagResponse;
 import org.karar.dev.domain.tag.dto.TagUpdateRequest;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
@@ -22,12 +23,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-class TagServiceTest {
+@UnitTest
+@ExtendWith(TagServiceParameterResolver.class)
+class TagServiceTest extends TagTestFixture {
 
     @Mock
     private TagRepository tagRepository;
@@ -35,41 +37,35 @@ class TagServiceTest {
     @InjectMocks
     private TagService tagService;
 
-    private static final String TAG_NAME = "tag";
-
-    private UUID id;
-
-    @BeforeEach
-    void setUp() {
-        id = UUID.randomUUID();
-    }
-
-    private Tag createMockTag() {
-        Tag tag = new Tag();
-        tag.setId(id);
-        tag.setName(TAG_NAME);
-        return tag;
-    }
 
     @Nested
-    class GetAllTags {
+    @DisplayName("getAll()")
+    class GetAll {
         @Test
         @DisplayName("Should return all tags")
-        void getAllTagsShouldReturnAllTags() {
-            Tag tag = createMockTag();
+        void shouldReturnTagWhenTagsExists(Tag tag) {
+
+            final UUID id = tag.getId();
+
             when(tagRepository.findAll())
                     .thenReturn(List.of(tag));
 
             BaseResponse<List<TagResponse>> response =
                     tagService.getAllTags();
 
-            assertNotNull(response);
-            assertNotNull(response.getData());
-            assertEquals(1, response.getData().size());
-            assertEquals(id, response.getData().get(0).id());
-            assertEquals(TAG_NAME, response.getData().get(0).name());
+
+            assertThat(response.getData())
+                    .hasSize(1)
+                    .first().extracting(TagResponse::id, TagResponse::name)
+                    .containsExactly(id, tag.getName());
 
             verify(tagRepository).findAll();
+        }
+
+        @RepeatedTest(value = 10, name = RepeatedTest.LONG_DISPLAY_NAME)
+        @DisplayName("Dummy Test")
+        void test() {
+            throw new RuntimeException("Error");
         }
     }
 
@@ -77,30 +73,31 @@ class TagServiceTest {
     class GetTagById {
         @Test
         @DisplayName("Should return tag by ID successfully")
-        void getTagByIdShouldReturnTagWhenFound() {
-            Tag tag = createMockTag();
-            when(tagRepository.findById(id))
+        void shouldReturnTagWhenTagExists() {
+            Tag tag = TagMother.javaTag();
+
+            when(tagRepository.findById(tag.getId()))
                     .thenReturn(Optional.of(tag));
 
             BaseResponse<TagResponse> response =
-                    tagService.getTagById(id);
+                    tagService.getTagById(tag.getId());
 
-            assertNotNull(response);
-            assertNotNull(response.getData());
-            assertEquals(id, response.getData().id());
-            assertEquals(TAG_NAME, response.getData().name());
+            assertThat(response.getData())
+                    .extracting(TagResponse::id, TagResponse::name)
+                    .containsExactly(tag.getId(), tag.getName());
 
-            verify(tagRepository).findById(id);
+            verify(tagRepository).findById(tag.getId());
         }
 
         @Test
         @DisplayName("Should throws ResourceNotFoundException when tag doesn't exists")
-        void getTagByIdShouldThrowsResourceNotFoundExceptionWhenTagDoesntExists() {
-            Tag tag = createMockTag();
+        void shouldThrowsResourceNotFoundExceptionWhenTagDoesntExists(Tag tag) {
+            final UUID id = tag.getId();
             when(tagRepository.findById(id))
                     .thenReturn(Optional.empty());
 
-            assertThrows(ResourceNotFoundException.class, () -> tagService.getTagById(id));
+            assertThatThrownBy(() -> tagService.getTagById(id))
+                    .isInstanceOf(ResourceNotFoundException.class);
 
             verify(tagRepository).findById(id);
         }
@@ -110,74 +107,83 @@ class TagServiceTest {
     class GetTagByName {
         @Test
         @DisplayName("Should return tag by name successfully")
-        void getTagByNameShouldReturnTagWhenFound() {
-            Tag tag = createMockTag();
-            when(tagRepository.findByName(TAG_NAME))
+        void shouldReturnTagWhenTagNameExists(Tag tag) {
+            final String tagName = tag.getName();
+
+            when(tagRepository.findByName(tagName))
                     .thenReturn(Optional.of(tag));
 
             BaseResponse<TagResponse> response =
-                    tagService.getTagByName(TAG_NAME);
+                    tagService.getTagByName(tagName);
 
-            assertNotNull(response);
-            assertNotNull(response.getData());
-            assertEquals(id, response.getData().id());
-            assertEquals(TAG_NAME, response.getData().name());
-            verify(tagRepository).findByName(TAG_NAME);
+            assertThat(response.getData())
+                    .extracting(TagResponse::id, TagResponse::name)
+                    .containsExactly(tag.getId(), tag.getName());
+
+            verify(tagRepository).findByName(tagName);
         }
 
         @Test
         @DisplayName("Should throws ResourceNotFoundException when tag doesn't exists")
-        void getTagByNameShouldThrowsResourceNotFoundExceptionWhenTagDoesntExists() {
-            when(tagRepository.findByName(TAG_NAME))
+        void shouldThrowsResourceNotFoundExceptionWhenTagDoesntExists() {
+            final String tagName = "nonExistentTag";
+
+            when(tagRepository.findByName(tagName))
                     .thenReturn(Optional.empty());
 
-            assertThrows(ResourceNotFoundException.class, () -> tagService.getTagByName(TAG_NAME));
+            assertThatThrownBy(() -> tagService.getTagByName(tagName))
+                    .isInstanceOf(ResourceNotFoundException.class);
 
-            verify(tagRepository).findByName(TAG_NAME);
+            verify(tagRepository).findByName(tagName);
         }
     }
 
     @Nested
     class CreateTag {
-        @Test
+        @RepeatedTest(value = 10, name = RepeatedTest.LONG_DISPLAY_NAME)
         @DisplayName("Should return created tag successfully")
-        void shouldCreateTagSuccessfully() {
-            // Arrange
-            TagRequest request = new TagRequest(TAG_NAME);
+        void shouldCreateTagWhenValidRequest() {
 
-            Tag savedTag = new Tag();
-            savedTag.setId(id);
-            savedTag.setName(TAG_NAME);
+            final String tagName = "java";
+            Tag savedTag = TagMother.javaTag();
 
-            when(tagRepository.saveAndFlush(any(Tag.class)))
+            TagRequest request = new TagRequest(tagName);
+
+            when(tagRepository.existsByName(tagName))
+                    .thenReturn(false);
+
+            when(tagRepository.saveAndFlush(any()))
                     .thenReturn(savedTag);
 
             // Act
             BaseResponse<TagResponse> response = tagService.createTag(request);
 
             // Assert
-            assertThat(response).isNotNull();
-            assertThat(response.getData()).isNotNull();
-            assertThat(response.getData().id()).isEqualTo(id);
-            assertThat(response.getData().name()).isEqualTo(TAG_NAME);
+            assertThat(response.getData().name()).isEqualTo(tagName);
+            assertThat(response.getData().id()).isEqualTo(savedTag.getId());
 
             // Verify behavior
             ArgumentCaptor<Tag> tagCaptor = ArgumentCaptor.forClass(Tag.class);
             verify(tagRepository).saveAndFlush(tagCaptor.capture());
 
             Tag capturedTag = tagCaptor.getValue();
-            assertThat(capturedTag.getName()).isEqualTo(TAG_NAME);
+            assertThat(capturedTag.getName()).isEqualTo(tagName);
         }
 
         @Test
         @DisplayName("Should throws ConflictException when tag already exists")
-        void createTagShouldThrowsConflictExceptionWhenTagAlreadyExists() {
-            TagRequest request = new TagRequest(TAG_NAME);
-            when(tagRepository.existsByName(TAG_NAME))
+        void shouldThrowsConflictExceptionWhenTagAlreadyExists() {
+            final String tagName = "java";
+
+            TagRequest request = new TagRequest(tagName);
+
+            when(tagRepository.existsByName(tagName))
                     .thenReturn(true);
 
-            assertThrows(ConflictException.class, () -> tagService.createTag(request));
-            verify(tagRepository).existsByName(TAG_NAME);
+            assertThatThrownBy(() -> tagService.createTag(request))
+                    .isInstanceOf(ConflictException.class);
+
+            verify(tagRepository).existsByName(anyString());
             verify(tagRepository, never()).saveAndFlush(any(Tag.class));
 
         }
@@ -188,9 +194,12 @@ class TagServiceTest {
 
         @Test
         @DisplayName("Should return updated tag successfully")
-        void updateTagShouldReturnUpdatedTagSuccessfully() {
-            TagUpdateRequest updateRequest = new TagUpdateRequest(TAG_NAME);
-            Tag tag = createMockTag();
+        void shouldUpdateTagWhenValidRequest(Tag tag) {
+            final String tagName = "java";
+            final UUID id = tag.getId();
+
+            TagUpdateRequest updateRequest = new TagUpdateRequest(tagName);
+
             when(tagRepository.findById(id))
                     .thenReturn(Optional.of(tag));
 
@@ -201,25 +210,32 @@ class TagServiceTest {
 
             assertThat(response).isNotNull();
             assertThat(response.getData().id()).isEqualTo(id);
-            assertThat(response.getData().name()).isEqualTo(TAG_NAME);
-            verify(tagRepository).findById(id);
+            assertThat(response.getData().name()).isEqualTo(tagName);
+
+            verify(tagRepository).findById(any());
             verify(tagRepository).saveAndFlush(any(Tag.class));
         }
 
         @Test
         @DisplayName("Should throws ConflictException when tag already exists")
-        void updateTagShouldThrowsConflictExceptionWhenTagAlreadyExists() {
-            TagUpdateRequest updateRequest = new TagUpdateRequest(TAG_NAME);
-            Tag tag = createMockTag();
-            when(tagRepository.findById(id))
-                    .thenReturn(Optional.of(tag));
+        void shouldThrowsConflictExceptionWhenTagAlreadyExists(Tag existingTag) {
+            UUID id = existingTag.getId();
+            String newTagName = "spring";
 
-            when(tagRepository.existsByNameAndIdNot(tag.getName(), id))
+            TagUpdateRequest request = new TagUpdateRequest(newTagName);
+
+            when(tagRepository.findById(id))
+                    .thenReturn(Optional.of(existingTag));
+
+            when(tagRepository.existsByNameAndIdNot(newTagName, id))
                     .thenReturn(true);
 
+            // Act & Assert
+            assertThatThrownBy(() -> tagService.updateTag(id, request))
+                    .isInstanceOf(ConflictException.class);
 
-            assertThrows(ConflictException.class, () -> tagService.updateTag(id, updateRequest));
-            verify(tagRepository).existsByNameAndIdNot(TAG_NAME, id);
+            // Verify
+            verify(tagRepository).existsByNameAndIdNot(newTagName, id);
             verify(tagRepository, never()).saveAndFlush(any(Tag.class));
         }
     }
@@ -228,23 +244,29 @@ class TagServiceTest {
     class DeleteTag {
         @Test
         @DisplayName("Should delete tag successfully")
-        void deleteTagShouldDeleteTagWhenFound() {
-            Tag tag = createMockTag();
+        void shouldDeleteTagWhenTagExists(Tag tag) {
+            final UUID id = tag.getId();
+
             when(tagRepository.existsById(id))
                     .thenReturn(true);
 
             BaseResponse<Void> response = tagService.deleteTag(id);
+
             assertThat(response.getStatus()).isEqualTo(HttpStatus.NO_CONTENT);
             verify(tagRepository).deleteById(id);
         }
 
         @Test
         @DisplayName("Should throws ResourceNotFoundException when tag doesn't exists")
-        void deleteTagShouldThroesResourceNotFoundExceptionWhenTagDoestNotExists() {
+        void shouldThrowsResourceNotFoundExceptionWhenTagDoesntExists(Tag tag) {
+            final UUID id = tag.getId();
+
             when(tagRepository.existsById(id))
                     .thenReturn(false);
 
-            assertThrows(ResourceNotFoundException.class, () -> tagService.deleteTag(id));
+            assertThatThrownBy(() -> tagService.deleteTag(id))
+                    .isInstanceOf(ResourceNotFoundException.class);
+
             verify(tagRepository).existsById(id);
             verify(tagRepository, never()).deleteById(id);
         }
@@ -255,10 +277,13 @@ class TagServiceTest {
 
         @Test
         @DisplayName("Should return true when tag exists")
-        void existsByIdShouldReturnTrueWhenTagExists() {
-            when(tagRepository.existsById(id)).thenReturn(true);
+        void shouldReturnTrueWhenTagExists() {
+            final UUID id = id();
+            when(tagRepository.existsById(id))
+                    .thenReturn(true);
 
             boolean result = tagService.existsById(id);
+
             assertThat(result).isTrue();
             verify(tagRepository).existsById(id);
         }
@@ -268,24 +293,29 @@ class TagServiceTest {
     class GetById {
         @Test
         @DisplayName("Should return tag when found")
-        void getByIdShouldReturnTagWhenFound() {
-            Tag tag = createMockTag();
+        void shouldReturnTagWhenFound(Tag tag) {
+            final UUID id = tag.getId();
+
             when(tagRepository.findById(id))
                     .thenReturn(Optional.of(tag));
 
-            Tag tagFromDb = tagService.getById(id);
-            assertThat(tagFromDb).isNotNull();
-            assertThat(tagFromDb.getId()).isEqualTo(id);
-            assertThat(tagFromDb.getName()).isEqualTo(TAG_NAME);
+            Tag response = tagService.getById(id);
+            assertThat(response).isNotNull();
+            assertThat(response.getId()).isEqualTo(id);
+            assertThat(response.getName()).isEqualTo(tag.getName());
+            assertThat(response.getCreatedAt()).isEqualTo(tag.getCreatedAt());
             verify(tagRepository).findById(id);
         }
 
         @Test
         @DisplayName("Should throws ResourceNotFoundException when tag doesn't exists")
-        void getByIdShouldThrowsResourceNotFoundExceptionWhenTagDoesntExists() {
+        void shouldThrowsResourceNotFoundExceptionWhenTagDoesntExists() {
+            final UUID id = id();
             when(tagRepository.findById(id))
                     .thenReturn(Optional.empty());
-            assertThrows(ResourceNotFoundException.class, () -> tagService.getById(id));
+
+            assertThatThrownBy(() -> tagService.getById(id))
+                    .isInstanceOf(ResourceNotFoundException.class);
             verify(tagRepository).findById(id);
         }
     }

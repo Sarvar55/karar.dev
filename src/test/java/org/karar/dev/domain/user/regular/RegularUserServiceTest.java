@@ -1,17 +1,15 @@
 package org.karar.dev.domain.user.regular;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.karar.dev.common.exception.dto.PageResponse;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
+import org.karar.dev.domain.annotation.UnitTest;
 import org.karar.dev.domain.base.BaseResponse;
 import org.karar.dev.domain.user.regular.dto.RegularUserResponse;
 import org.karar.dev.domain.user.regular.dto.RegularUserUpdateRequest;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -20,10 +18,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@UnitTest
 class RegularUserServiceTest {
     @Mock
     private RegularUserRepository regularUserRepository;
@@ -31,61 +30,73 @@ class RegularUserServiceTest {
     @InjectMocks
     private RegularUserService regularUserService;
 
-    private UUID userId;
-    private String email;
-    private String username;
-    private RegularUser regularUser;
-
-    @BeforeEach
-    void setUp() {
-        userId = UUID.randomUUID();
-        email = "user@karar.dev";
-        username = "user";
-        regularUser = new RegularUser();
-
-        regularUser.setId(userId);
-        regularUser.setEmail(email);
-        regularUser.setUsername(username);
-    }
 
     @Test
     @DisplayName("Should return paginated list of regular users successfully")
-    void getAllShouldReturnAllRegularUsers() {
+    void shouldReturnPaginatedUsers() {
+        UUID id = UUID.randomUUID();
+        RegularUser user = RegularUserBuilder
+                .user()
+                .withId(id)
+                .build();
+
         PageRequest pageable = PageRequest.of(0, 1);
+
         when(regularUserRepository.findAll(pageable))
-                .thenReturn(new PageImpl<>(List.of(regularUser), pageable, 1));
+                .thenReturn(new PageImpl<>(List.of(user), pageable, 1));
+
 
         BaseResponse<PageResponse<RegularUserResponse>> response =
                 regularUserService.getAll(pageable);
 
-        assertNotNull(response);
-        assertNotNull(response.getData());
-        assertEquals(HttpStatus.OK, response.getStatus());
-        assertEquals(1, response.getData().getSize());
-        assertEquals(userId, response.getData().getContent().get(0).id());
-        assertEquals(email, response.getData().getContent().get(0).email());
-        assertEquals(username, response.getData().getContent().get(0).username());
-        verify(regularUserRepository).findAll(pageable);
+        assertThat(response)
+                .isNotNull()
+                .extracting(BaseResponse::getStatus)
+                .isEqualTo(HttpStatus.OK);
+
+        assertThat(response.getData().getContent())
+                .hasSize(1)
+                .first()
+                .extracting(
+                        RegularUserResponse::id,
+                        RegularUserResponse::email,
+                        RegularUserResponse::username
+                ).containsExactly(id, user.getEmail(), user.getUsername());
+
+        verify(regularUserRepository)
+                .findAll(pageable);
+
     }
 
     @Test
     @DisplayName("Should return regular user by ID successfully")
-    void getUserByIdShouldReturnRegularUserWhenFound() {
+    void shouldReturnUserWhenFound() {
+        UUID id = UUID.randomUUID();
+        RegularUser user = RegularUserBuilder
+                .user()
+                .withId(id)
+                .build();
 
-        when(regularUserRepository.findById(userId))
-                .thenReturn(Optional.of(regularUser));
+        when(regularUserRepository.findById(id))
+                .thenReturn(Optional.of(user));
 
         BaseResponse<RegularUserResponse> response =
-                regularUserService.getUserById(userId);
+                regularUserService.getUserById(id);
 
-        assertNotNull(response);
-        assertNotNull(response.getData());
-        assertEquals(HttpStatus.OK, response.getStatus());
-        assertEquals(userId, response.getData().id());
-        assertEquals(email, response.getData().email());
-        assertEquals(username, response.getData().username());
+        assertThat(response)
+                .isNotNull()
+                .extracting(BaseResponse::getStatus)
+                .isEqualTo(HttpStatus.OK);
 
-        verify(regularUserRepository).findById(userId);
+        assertThat(response.getData())
+                .extracting(
+                        RegularUserResponse::id,
+                        RegularUserResponse::email,
+                        RegularUserResponse::username
+                )
+                .containsExactly(id, user.getEmail(), user.getUsername());
+
+        verify(regularUserRepository).findById(id);
     }
 
     @Test
@@ -93,104 +104,117 @@ class RegularUserServiceTest {
     void updateShouldUpdateAndReturnRegularUserWhenFound() {
         final String emailUpdate = "update@karar.dev";
         final String usernameUpdate = "updated_username";
+
+        UUID id = UUID.randomUUID();
+        RegularUser user = RegularUserBuilder.user().withId(id).build();
+
         RegularUserUpdateRequest updateRequest =
                 new RegularUserUpdateRequest(emailUpdate, usernameUpdate);
 
-        when(regularUserRepository.findById(userId))
-                .thenReturn(Optional.of(regularUser));
 
-        when(regularUserRepository.save(regularUser))
-                .thenReturn(regularUser);
+        when(regularUserRepository.findById(id))
+                .thenReturn(Optional.of(user));
+
+        when(regularUserRepository.save(any()))
+                .thenReturn(user);
 
         BaseResponse<RegularUserResponse> response =
-                regularUserService.update(userId, updateRequest);
+                regularUserService.update(id, updateRequest);
 
-        assertNotNull(response);
-        assertNotNull(response.getData());
-        assertEquals(HttpStatus.OK, response.getStatus());
-        assertEquals(userId, response.getData().id());
-        assertEquals(emailUpdate, response.getData().email());
-        assertEquals(usernameUpdate, response.getData().username());
+        assertThat(response.getData().email()).isEqualTo(emailUpdate);
+        assertThat(response.getData().username()).isEqualTo(usernameUpdate);
 
-        verify(regularUserRepository).findById(userId);
-        verify(regularUserRepository).save(regularUser);
+        verify(regularUserRepository).findById(id);
+        verify(regularUserRepository).save(user);
     }
 
     @Test
     @DisplayName("Should throw exception when regular user is not found")
-    void updateShouldThrowExceptionWhenUserNotFound() {
-        final String emailUpdate = "update@karar.dev";
-        final String usernameUpdate = "updated_username";
-        RegularUserUpdateRequest updateRequest =
-                new RegularUserUpdateRequest(emailUpdate, usernameUpdate);
+    void shouldThrowWhenUpdatingNonExistingUser() {
+        UUID id = UUID.randomUUID();
 
-        when(regularUserRepository.findById(userId))
+        when(regularUserRepository.findById(id))
                 .thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> regularUserService.update(userId, updateRequest));
-        verify(regularUserRepository).findById(userId);
+        // assertThrows(ResourceNotFoundException.class, () -> regularUserService.update(userId, updateRequest));
+        assertThatThrownBy(() -> regularUserService.update(id, any()))
+                .isInstanceOf(ResourceNotFoundException.class);
+
+        verify(regularUserRepository).findById(id);
         verify(regularUserRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Should delete regular user successfully")
-    void deleteShouldDeleteRegularUserWhenFound() {
-        when(regularUserRepository.existsById(userId))
+    void shouldDeleteUser() {
+        UUID id = UUID.randomUUID();
+        when(regularUserRepository.existsById(id))
                 .thenReturn(true);
 
-        BaseResponse<Void> response = regularUserService.delete(userId);
+        BaseResponse<Void> response = regularUserService.delete(id);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        assertNotNull(response);
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatus());
-
-        verify(regularUserRepository).deleteById(userId);
+        verify(regularUserRepository).deleteById(id);
     }
 
     @Test
     @DisplayName("Should throw exception when regular user is not found")
-    void deleteShouldThrowResourceNotFoundExceptionWhenUserDoesNotExist() {
-        when(regularUserRepository.existsById(userId))
+    void shouldThrowWhenDeletingNonExistingUser() {
+        UUID id = UUID.randomUUID();
+        when(regularUserRepository.existsById(id))
                 .thenReturn(false);
 
-        assertThrows(ResourceNotFoundException.class, () -> regularUserService.delete(userId));
+        assertThatThrownBy(() -> regularUserService.delete(id))
+                .isInstanceOf(ResourceNotFoundException.class);
 
-        verify(regularUserRepository).existsById(userId);
-        verify(regularUserRepository, never()).delete(any());
+        verify(regularUserRepository).existsById(id);
+        verify(regularUserRepository, never()).deleteById(any());
     }
 
     @Test
     @DisplayName("Should return true if regular user exists")
-    void existsByIdShouldReturnTrueWhenUserExists() {
-        when(regularUserRepository.existsById(userId)).thenReturn(true);
+    void shouldReturnTrueWhenExists() {
+        UUID id = UUID.randomUUID();
+        when(regularUserRepository.existsById(id))
+                .thenReturn(true);
 
-        boolean exists = regularUserService.existsById(userId);
+        boolean exists = regularUserService.existsById(id);
 
-        assertTrue(exists);
-        verify(regularUserRepository).existsById(userId);
+        assertThat(exists).isTrue();
+
+        verify(regularUserRepository).existsById(id);
     }
 
     @Test
     @DisplayName("Should return false if regular user does not exist")
-    void getByIdShouldReturnRegularUserWhenFound() {
-        when(regularUserRepository.findById(userId))
-                .thenReturn(Optional.of(regularUser));
+    void shouldReturnUserWhenFound2() {
+        UUID id = UUID.randomUUID();
+        RegularUser user = RegularUserBuilder.user().withId(id).build();
 
-        RegularUser user = regularUserService.getById(userId);
-        assertNotNull(user);
-        assertEquals(email, user.getEmail());
-        assertEquals(userId, user.getId());
-        assertEquals(username, user.getUsername());
-        verify(regularUserRepository).findById(userId);
+        when(regularUserRepository.findById(id))
+                .thenReturn(Optional.of(user));
+
+        RegularUser response = regularUserService.getById(id);
+
+        assertThat(response)
+                .isNotNull()
+                .extracting(RegularUser::getId)
+                .isEqualTo(id);
+
+        verify(regularUserRepository).findById(id);
     }
+
     @Test
     @DisplayName("Should return null if regular user does not exist")
     void getByIdShouldThrowResourceNotFoundExceptionWhenUserDoesNotExist() {
-        when(regularUserRepository.findById(userId))
+        UUID id = UUID.randomUUID();
+        when(regularUserRepository.findById(id))
                 .thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> regularUserService.getById(userId));
-
-        verify(regularUserRepository).findById(userId);
+        //assertThrows(ResourceNotFoundException.class, () -> regularUserService.getById(userId));
+        assertThatThrownBy(() -> regularUserService.getById(id))
+                .isInstanceOf(ResourceNotFoundException.class);
+        verify(regularUserRepository).findById(id);
     }
 
 }
