@@ -1,12 +1,16 @@
 package org.karar.dev.domain.decision;
 
 import org.karar.dev.common.enums.RegretLevel;
+import org.karar.dev.domain.decisiontag.DecisionTag;
+import org.karar.dev.domain.tag.Tag;
 import org.karar.dev.domain.user.regular.RegularUser;
 import org.karar.dev.domain.user.regular.RegularUserBuilder;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
-public class DecisionBuilder {
+public class DecisionBuilderTest {
     private UUID id = UUID.randomUUID();
     private String title = "Test Decision";
     private String why = "Because...";
@@ -14,33 +18,51 @@ public class DecisionBuilder {
     private RegretLevel regretLevel = RegretLevel.LOW;
     private RegularUser user = RegularUserBuilder.user().build();
     private int voteCount = 0;
+    private Set<DecisionTag> tags;
 
-    public DecisionBuilder withTitle(String title) {
+    public static DecisionBuilderTest decision() {
+        return new DecisionBuilderTest();
+    }
+
+    public DecisionBuilderTest withTag(Tag tag) {
+        DecisionTag decisionTag = new DecisionTag();
+        decisionTag.setTag(tag);
+        this.tags = new HashSet<>();
+        this.tags.add(decisionTag);
+        return this;
+    }
+
+    public DecisionBuilderTest withId(UUID id) {
+        this.id = id;
+        return this;
+    }
+
+    public DecisionBuilderTest withTitle(String title) {
         this.title = title;
         return this;
     }
 
-    public DecisionBuilder withWhy(String why) {
+    public DecisionBuilderTest withWhy(String why) {
         this.why = why;
         return this;
     }
 
-    public DecisionBuilder withAlternative(String alternative) {
+    public DecisionBuilderTest withAlternative(String alternative) {
         this.alternative = alternative;
         return this;
     }
 
-    public DecisionBuilder withRegretLevel(RegretLevel regretLevel) {
+    public DecisionBuilderTest withRegretLevel(RegretLevel regretLevel) {
         this.regretLevel = regretLevel;
         return this;
     }
 
-    public DecisionBuilder withUser(RegularUser user) {
+    public DecisionBuilderTest withUser(RegularUser user) {
         this.user = user;
         return this;
     }
 
-    public DecisionBuilder withVoteCount(int voteCount) {
+    public DecisionBuilderTest withVoteCount(int voteCount) {
         this.voteCount = voteCount;
         return this;
     }
@@ -54,6 +76,7 @@ public class DecisionBuilder {
         decision.setRegretLevel(regretLevel);
         decision.setUser(user);
         decision.setVoteCount(voteCount);
+        decision.setTags(tags);
         return decision;
     }
 
