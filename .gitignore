@@ -33,3 +33,7 @@ build/
 .vscode/
 .ant-colony/
 /data/
+
+### Environment Variables ###
+.env
+.env.*

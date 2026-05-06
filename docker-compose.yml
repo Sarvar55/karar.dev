@@ -1,15 +1,36 @@
-version: '3.7'
 services:
+
+  # ── Application ──────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: karar-app
+    restart: unless-stopped
+    env_file:
+      - .env.dev
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ── Database ─────────────────────────────────
   db:
     image: postgres:18
+    container_name: karar-db
     restart: always
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: 12345
-      POSTGRES_DB: karardb
+    env_file:
+      - .env.db
     ports:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U user -d karardb" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   postgres_data:

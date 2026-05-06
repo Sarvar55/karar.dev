@@ -1,6 +1,6 @@
 package org.karar.dev.common.security;
 
-import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
+
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
@@ -37,7 +37,8 @@ public final class SecurityPathConfig {
         requests.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
 
 
-        requests.requestMatchers(PathRequest.toH2Console()).permitAll();
+        // H2 Console — only active on 'local' profile (safe fallback for dev/prod)
+        requests.requestMatchers("/h2-console/**").permitAll();
 
         // --- Decisions (read-only) ---
         requests.requestMatchers(HttpMethod.GET, "/api/v1/decisions").permitAll();

@@ -1,0 +1,35 @@
+# ============================================
+# Karar.dev — Docker Ignore
+# ============================================
+
+# Build output
+target/
+
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+
+# Git
+.git/
+.gitattributes
+
+# Environment files (secrets — pass via docker-compose or --env-file)
+.env
+.env.*
+
+# Documentation
+docs/
+README.md
+HELP.md
+
+# Misc
+.ant-colony/
+.pi/
+data/
