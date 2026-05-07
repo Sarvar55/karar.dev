@@ -1,10 +1,3 @@
-# ============================================
-# Karar.dev — Multi-Stage Dockerfile
-# ============================================
-
-# ──────────────────────────────────────────────
-# Stage 1: Build
-# ──────────────────────────────────────────────
 FROM eclipse-temurin:17-jdk-alpine AS builder
 
 WORKDIR /build
@@ -39,7 +32,7 @@ COPY --from=builder /build/target/*.jar app.jar
 RUN chown -R appuser:appgroup /app && \
     chmod -R 555 /app
 
-# Switch to non-root user
+# Switch to non-root user   
 USER appuser
 
 # Expose the application port

@@ -1,10 +1,10 @@
 services:
 
-  # ── Application ──────────────────────────────
   app:
     build:
       context: .
       dockerfile: Dockerfile
+    image: sarvar55/karar-app:v1.0.0
     container_name: karar-app
     restart: unless-stopped
     env_file:
@@ -15,19 +15,18 @@ services:
       db:
         condition: service_healthy
 
-  # ── Database ─────────────────────────────────
   db:
     image: postgres:18
     container_name: karar-db
     restart: always
     env_file:
-      - .env.db
+      - .env.db.dev
     ports:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U user -d karardb" ]
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
       interval: 10s
       timeout: 5s
       retries: 5
