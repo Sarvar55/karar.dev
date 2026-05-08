@@ -1,18 +1,20 @@
 package org.karar.dev.domain.decision;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.karar.dev.common.enums.RegretLevel;
 import org.karar.dev.common.exception.conflict.ConflictException;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
 import org.karar.dev.domain.annotation.UnitTest;
+import org.karar.dev.domain.base.BaseResponse;
 import org.karar.dev.domain.decision.dto.DecisionRequest;
 import org.karar.dev.domain.decision.dto.DecisionResponse;
+import org.karar.dev.domain.decision.dto.DecisionUpdateRequest;
 import org.karar.dev.domain.decisiontag.DecisionTagService;
 import org.karar.dev.domain.extensions.DecisionParameterResolver;
 import org.karar.dev.domain.tag.Tag;
@@ -21,6 +23,7 @@ import org.karar.dev.domain.tag.TagService;
 import org.karar.dev.domain.user.regular.RegularUserBuilder;
 import org.karar.dev.domain.user.regular.RegularUserService;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.data.domain.Page;
@@ -33,10 +36,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assumptions.assumeThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -392,38 +395,327 @@ class DecisionServiceTest {
 
         @Test
         @DisplayName("Should update decision successfully")
-        void should_update_decision() {
+        void shouldUpdateDecisionWhenRequestIsValid() {
+            UUID decisionId = UUID.randomUUID();
+            DecisionUpdateRequest request =
+                    new DecisionUpdateRequest(
+                            "new-title",
+                            "new-why",
+                            "new-alternative",
+                            RegretLevel.HIGH,
+                            Set.of()
+                    );
+
+            Decision decision = DecisionBuilderTest.decision()
+                    .withId(decisionId)
+                    .withTitle("old-title")
+                    .withWhy("old-why")
+                    .withAlternative("old-alternative")
+                    .withRegretLevel(RegretLevel.LOW)
+                    .build();
+
+            when(decisionRepository.findById(decisionId))
+                    .thenReturn(Optional.of(decision));
+
+            when(decisionRepository.existsByTitleAndUserId(request.title(), decision.getUser().getId()))
+                    .thenReturn(false);
+
+            when(decisionRepository.save(any(Decision.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+
+
+            BaseResponse<DecisionResponse> response =
+                    decisionService.updateDecision(decisionId, request);
+
+
+            assertThat(response).isNotNull();
+
+            assertThat(decision.getTitle())
+                    .isEqualTo(request.title());
+
+            assertThat(decision.getWhy())
+                    .isEqualTo(request.why());
+
+            assertThat(decision.getAlternative())
+                    .isEqualTo(request.alternative());
+
+            assertThat(decision.getRegretLevel())
+                    .isEqualTo(request.regretLevel());
+
+
+            verify(decisionRepository).findById(decisionId);
+            verify(decisionRepository).existsByTitleAndUserId(request.title(), decision.getUser().getId());
+            verify(decisionRepository).save(decision);
+
         }
 
         @Test
-        @DisplayName("Should update and replace tags correctly")
-        void should_replace_tags_correctly() {
+        @DisplayName("Should replace existing tags with new tags")
+        void shouldReplaceExistingTagsWithNewTags() {
+
+            // Arrange
+            UUID decisionId = UUID.randomUUID();
+
+            UUID oldTagId = UUID.randomUUID();
+            UUID newTagId1 = UUID.randomUUID();
+            UUID newTagId2 = UUID.randomUUID();
+
+            Tag oldTag = TagBuilder.tag()
+                    .withId(oldTagId)
+                    .build();
+
+            Tag newTag1 = TagBuilder.tag()
+                    .withId(newTagId1)
+                    .build();
+
+            Tag newTag2 = TagBuilder.tag()
+                    .withId(newTagId2)
+                    .build();
+
+            Decision decision = DecisionBuilderTest.decision()
+                    .withId(decisionId)
+                    .withTitle("old-title")
+                    .withTag(oldTag)
+                    .build();
+
+            DecisionUpdateRequest request =
+                    new DecisionUpdateRequest(
+                            "new-title",
+                            "why",
+                            "alternative",
+                            RegretLevel.HIGH,
+                            Set.of(newTagId1, newTagId2)
+                    );
+
+            when(decisionRepository.findById(decisionId))
+                    .thenReturn(Optional.of(decision));
+
+            when(decisionRepository.existsByTitleAndUserId(
+                    request.title(),
+                    decision.getUser().getId()
+            )).thenReturn(false);
+
+            when(tagService.getById(newTagId1))
+                    .thenReturn(newTag1);
+
+            when(tagService.getById(newTagId2))
+                    .thenReturn(newTag2);
+
+            when(decisionRepository.save(any(Decision.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+
+            // Act
+            BaseResponse<DecisionResponse> response =
+                    decisionService.updateDecision(decisionId, request);
+
+            // Assert
+            assertThat(response).isNotNull();
+
+            Set<UUID> updatedTagIds = decision.getTags()
+                    .stream()
+                    .map(dt -> dt.getTag().getId())
+                    .collect(Collectors.toSet());
+
+            assertThat(updatedTagIds)
+                    .containsExactlyInAnyOrder(newTagId1, newTagId2);
+
+            assertThat(updatedTagIds)
+                    .doesNotContain(oldTagId);
+
+            verify(tagService).getById(newTagId1);
+            verify(tagService).getById(newTagId2);
+
+            verify(decisionRepository).save(decision);
         }
 
         @Test
         @DisplayName("Should add new tags without duplicating existing ones")
-        void should_add_new_tags_only() {
+        void shouldAddNewTag() {
+
+            // Arrange
+            UUID decisionId = UUID.randomUUID();
+
+            UUID existingTagId = UUID.randomUUID();
+            UUID newTagId = UUID.randomUUID();
+
+            Tag existingTag = TagBuilder.tag()
+                    .withId(existingTagId)
+                    .build();
+
+            Tag newTag = TagBuilder.tag()
+                    .withId(newTagId)
+                    .build();
+
+            Decision decision = DecisionBuilderTest.decision()
+                    .withId(decisionId)
+                    .withTitle("old-title")
+                    .withTag(existingTag)
+                    .build();
+
+            DecisionUpdateRequest request =
+                    new DecisionUpdateRequest(
+                            "new-title",
+                            "why",
+                            "alternative",
+                            RegretLevel.HIGH,
+                            Set.of(existingTagId, newTagId)
+                    );
+
+            when(decisionRepository.findById(decisionId))
+                    .thenReturn(Optional.of(decision));
+
+            when(decisionRepository.existsByTitleAndUserId(
+                    request.title(),
+                    decision.getUser().getId()
+            )).thenReturn(false);
+
+            when(tagService.getById(newTagId))
+                    .thenReturn(newTag);
+
+            when(decisionRepository.save(any(Decision.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+
+            // Act
+            decisionService.updateDecision(decisionId, request);
+
+            // Assert
+            Set<UUID> updatedTagIds = decision.getTags()
+                    .stream()
+                    .map(dt -> dt.getTag().getId())
+                    .collect(Collectors.toSet());
+
+            assertThat(updatedTagIds)
+                    .containsExactlyInAnyOrder(existingTagId, newTagId);
+
+            assertThat(decision.getTags())
+                    .hasSize(2);
+
+            verify(tagService, never()).getById(existingTagId);
+
+            verify(tagService).getById(newTagId);
+
+            verify(decisionRepository).save(decision);
         }
 
         @Test
         @DisplayName("Should remove old tags not present in request")
-        void should_remove_old_tags() {
+        void shouldRemoveOldTagsNotPresentInRequest() {
+
+            // Arrange
+            UUID decisionId = UUID.randomUUID();
+
+            UUID keptTagId = UUID.randomUUID();
+            UUID removedTagId = UUID.randomUUID();
+
+            Tag keptTag = TagBuilder.tag()
+                    .withId(keptTagId)
+                    .build();
+
+            Tag removedTag = TagBuilder.tag()
+                    .withId(removedTagId)
+                    .build();
+
+            Decision decision = DecisionBuilderTest.decision()
+                    .withId(decisionId)
+                    .withTitle("old-title")
+                    .withTag(keptTag)
+                    .withTag(removedTag)
+                    .build();
+
+            DecisionUpdateRequest request =
+                    new DecisionUpdateRequest(
+                            "new-title",
+                            "why",
+                            "alternative",
+                            RegretLevel.HIGH,
+                            Set.of(keptTagId)
+                    );
+
+            when(decisionRepository.findById(decisionId))
+                    .thenReturn(Optional.of(decision));
+
+            when(decisionRepository.existsByTitleAndUserId(
+                    request.title(),
+                    decision.getUser().getId()
+            )).thenReturn(false);
+
+            when(decisionRepository.save(any(Decision.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+
+            // Act
+            decisionService.updateDecision(decisionId, request);
+
+            // Assert
+            Set<UUID> updatedTagIds = decision.getTags()
+                    .stream()
+                    .map(dt -> dt.getTag().getId())
+                    .collect(Collectors.toSet());
+
+            assertThat(updatedTagIds)
+                    .containsExactly(keptTagId);
+
+            assertThat(updatedTagIds)
+                    .doesNotContain(removedTagId);
+
+            assertThat(decision.getTags())
+                    .hasSize(1);
+
+            verify(tagService, never()).getById(any());
+
+            verify(decisionRepository).save(decision);
         }
 
         @Test
         @DisplayName("Should throw conflict when updating title to existing one")
-        void should_throw_conflict_on_title_update() {
+        void shouldThrowConflictWhenUpdatingTitleToExistingOne() {
+            UUID decisionId = UUID.randomUUID();
+            DecisionUpdateRequest request =
+                    new DecisionUpdateRequest(
+                            "new-title",
+                            "why",
+                            "alternative",
+                            RegretLevel.HIGH,
+                            Set.of()
+                    );
+
+            Decision decision = DecisionBuilderTest.decision()
+                    .withId(decisionId)
+                    .withTitle("old-title")
+                    .build();
+
+            when(decisionRepository.findById(decisionId))
+                    .thenReturn(Optional.of(decision));
+
+
+            when(decisionRepository.existsByTitleAndUserId(request.title(), decision.getUser().getId()))
+                    .thenReturn(true);
+
+            assertThatThrownBy(() -> decisionService.updateDecision(decisionId, request))
+                    .isInstanceOf(ConflictException.class)
+                    .hasMessage("Decision with this title already exists for this user");
+
+            verify(decisionRepository).findById(decisionId);
+            verify(decisionRepository, never()).save(any());
         }
 
         @Test
         @DisplayName("Should throw when decision not found")
-        void should_throw_when_decision_not_found() {
+        void shouldThrowResourceNotFoundExceptionWhenDecisionDoesNotExist() {
+            UUID decisionId = UUID.randomUUID();
+
+
+            when(decisionRepository.findById(decisionId))
+                    .thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> decisionService.updateDecision(decisionId, any()))
+                    .isInstanceOf(ResourceNotFoundException.class);
+
+            verify(decisionRepository).findById(any());
+            verify(decisionRepository, never()).save(any());
+            verifyNoInteractions(tagService);
         }
     }
 
-    // -----------------------------
-    // DELETE
-    // -----------------------------
     @Nested
     @DisplayName("Delete Decision")
     class DeleteDecision {
@@ -469,76 +761,139 @@ class DecisionServiceTest {
     @Nested
     @DisplayName("Vote Operations")
     class VoteOperations {
+        private UUID decisionId;
 
+        @BeforeEach
+        public void setUp() {
+            decisionId = UUID.randomUUID();
+        }
 
-        void should_handle_vote_operations(String operation) {
+        @Test
+        @DisplayName("Should increment vote count when decision exists")
+        void shouldIncrementVoteCountWhenDecisionExists() {
 
-            UUID id = UUID.randomUUID();
+            when(decisionRepository.existsById(decisionId))
+                    .thenReturn(true);
 
-            Decision decision = DecisionBuilderTest.decision()
-                    .withVoteCount(1)
-                    .build();
-            ArgumentCaptor<UUID> decisionCaptor = ArgumentCaptor.forClass(UUID.class);
+            decisionService.incrementVoteCount(decisionId);
 
-            assumeThat(operation).isIn("increment", "decrement");
+            InOrder inOrder = inOrder(decisionRepository);
+            inOrder.verify(decisionRepository).existsById(decisionId);
+            inOrder.verify(decisionRepository).incrementVoteCount(decisionId);
+        }
 
-            when(decisionRepository.existsById(id)).thenReturn(true);
-            when(decisionRepository.save(any(Decision.class))).thenReturn(decision);
+        @Test
+        void shouldDecrementVoteCountWhenDecisionExists() {
+            when(decisionRepository.existsById(decisionId))
+                    .thenReturn(true);
+            decisionService.decrementVoteCount(decisionId);
 
-            if (operation.equals("increment")) {
-                decisionService.incrementVoteCount(id);
-            } else {
-                decisionService.decrementVoteCount(id);
-            }
-
-            verify(decisionRepository).incrementVoteCount(decisionCaptor.capture());
-
-            int expectedVoteCount = operation.equals("increment") ? 2 : 0;
-            assertThat(decisionCaptor.getValue()).isEqualTo(expectedVoteCount);
-
+            InOrder inOrder = inOrder(decisionRepository);
+            inOrder.verify(decisionRepository).existsById(decisionId);
+            inOrder.verify(decisionRepository).decrementVoteCount(decisionId);
         }
 
         @Test
         @DisplayName("Should throw when decision not found for increment")
-        void should_throw_when_increment_not_found() {
+        void shouldThrowWhenDecisionNotFoundForIncrement() {
+            when(decisionRepository.existsById(decisionId))
+                    .thenReturn(false);
+
+            assertThatThrownBy(() -> decisionService.incrementVoteCount(decisionId))
+                    .isInstanceOf(ResourceNotFoundException.class);
+
+            verify(decisionRepository).existsById(decisionId);
+            verify(decisionRepository, never()).incrementVoteCount(decisionId);
         }
 
         @Test
         @DisplayName("Should throw when decision not found for decrement")
-        void should_throw_when_decrement_not_found() {
+        void shouldThrowWhenDecisionNotFoundForDecrement() {
+            when(decisionRepository.existsById(decisionId))
+                    .thenReturn(false);
+
+            assertThatThrownBy(() -> decisionService.decrementVoteCount(decisionId))
+                    .isInstanceOf(ResourceNotFoundException.class);
+
+            verify(decisionRepository).existsById(decisionId);
+            verify(decisionRepository, never()).decrementVoteCount(decisionId);
         }
     }
 
-    // -----------------------------
-    // UTIL METHODS
-    // -----------------------------
     @Nested
     @DisplayName("Utility Methods")
     class UtilityMethods {
 
         @Test
         @DisplayName("Should return true when decision exists")
-        void should_return_true_when_exists() {
+        void shouldReturnTrueWhenDecisionExists() {
+            Decision decision = DecisionBuilderTest.decision().build();
+
+            when(decisionRepository.existsById(decision.getId())).thenReturn(true);
+
+            assertThat(decisionService.existsById(decision.getId())).isTrue();
+
+            verify(decisionRepository).existsById(decision.getId());
         }
 
         @Test
         @DisplayName("Should return false when decision does not exist")
-        void should_return_false_when_not_exists() {
+        void shouldReturnFalseWhenDecisionDoesNotExist() {
+            UUID decisionId = UUID.randomUUID();
+            when(decisionRepository.existsById(decisionId)).thenReturn(false);
+
+            assertThat(decisionService.existsById(decisionId)).isFalse();
+            verify(decisionRepository).existsById(decisionId);
         }
 
         @Test
         @DisplayName("Should return decision when exists")
-        void should_get_by_id() {
+        void shouldReturnDecisionWhenExists() {
+            Decision decision = DecisionBuilderTest.decision().build();
+            when(decisionRepository.findById(decision.getId()))
+                    .thenReturn(Optional.of(decision));
+
+            assertThat(decisionService.getById(decision.getId()))
+                    .isEqualTo(decision);
+
+            verify(decisionRepository).findById(decision.getId());
         }
 
         @Test
         @DisplayName("Should throw when getById fails")
-        void should_throw_when_get_by_id_not_found() {
+        void shouldThrowResourceNotFoundExceptionWhenDecisionDoesNotExist() {
+            UUID decisionId = UUID.randomUUID();
+            when(decisionRepository.findById(decisionId))
+                    .thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> decisionService.getById(decisionId))
+                    .isInstanceOf(ResourceNotFoundException.class);
+
+            verify(decisionRepository).findById(decisionId);
         }
 
         @Test
         @DisplayName("Should save decision")
-        void should_save_decision() {
+        void shouldSaveDecision() {
+            UUID decisionId = UUID.randomUUID();
+            Decision decision = DecisionBuilderTest
+                    .decision().withId(decisionId).build();
+
+            ArgumentCaptor<Decision> decisionCaptor = ArgumentCaptor.forClass(Decision.class);
+
+            when(decisionRepository.save(any(Decision.class)))
+                    .thenAnswer(invocation -> {
+                        Decision savedDecision = invocation.getArgument(0);
+                        savedDecision.setId(decisionId);
+                        return savedDecision;
+                    });
+
+            decisionService.save(decision);
+
+            verify(decisionRepository).save(decisionCaptor.capture());
+
+            assertThat(decisionCaptor.getValue().getId()).isEqualTo(decisionId);
+
         }
     }
 

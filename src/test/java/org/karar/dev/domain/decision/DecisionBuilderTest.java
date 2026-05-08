@@ -18,7 +18,7 @@ public class DecisionBuilderTest {
     private RegretLevel regretLevel = RegretLevel.LOW;
     private RegularUser user = RegularUserBuilder.user().build();
     private int voteCount = 0;
-    private Set<DecisionTag> tags;
+    private Set<DecisionTag> tags = new HashSet<>();
 
     public static DecisionBuilderTest decision() {
         return new DecisionBuilderTest();
@@ -27,7 +27,6 @@ public class DecisionBuilderTest {
     public DecisionBuilderTest withTag(Tag tag) {
         DecisionTag decisionTag = new DecisionTag();
         decisionTag.setTag(tag);
-        this.tags = new HashSet<>();
         this.tags.add(decisionTag);
         return this;
     }
