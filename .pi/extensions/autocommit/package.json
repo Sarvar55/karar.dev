@@ -1,0 +1,9 @@
+{
+  "name": "autocommit",
+  "version": "1.0.0",
+  "description": "AI-powered automatic git commits",
+  "main": "index.js",
+  "bin": {
+    "pi-commit": "./bin/pi-commit"
+  }
+}
