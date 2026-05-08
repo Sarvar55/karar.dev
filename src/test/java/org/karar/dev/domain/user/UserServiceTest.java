@@ -1,9 +1,14 @@
 package org.karar.dev.domain.user;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
+import org.karar.dev.domain.annotation.UnitTest;
+import org.karar.dev.domain.extensions.GlobalTestExtension;
 import org.karar.dev.domain.user.regular.RegularUser;
+import org.karar.dev.domain.extensions.UserTestDataExtension;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -16,7 +21,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({ UserTestDataExtension.class})
+@UnitTest
 class UserServiceTest {
 
     @Mock
@@ -25,21 +31,13 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    private UUID id;
-
-    @BeforeEach
-    void setUp() {
-        id = UUID.randomUUID();
-    }
-
     @Nested
     @DisplayName("existsById")
     class ExistsById {
 
         @Test
-        @Tag("bank")
         @DisplayName("should return true when user exists")
-        void shouldReturnTrue() {
+        void shouldReturnTrue(UUID id) {
             when(userRepository.existsById(id)).thenReturn(true);
 
             boolean result = userService.existsById(id);
@@ -50,11 +48,10 @@ class UserServiceTest {
 
         @Test
         @DisplayName("should return false when user does not exist")
-        void shouldReturnFalse() {
+        void shouldReturnFalse(UUID id) {
             when(userRepository.existsById(id)).thenReturn(false);
 
             boolean result = userService.existsById(id);
-
             assertThat(result).isFalse();
             verify(userRepository).existsById(id);
         }
@@ -64,43 +61,31 @@ class UserServiceTest {
     @DisplayName("getById")
     class GetById {
 
-        private RegularUser user;
-
-        @BeforeEach
-        public void setUp() {
-            user = new RegularUser();
-            user.setId(id);
-            when(userRepository.findById(id))
-                    .thenReturn(Optional.of(user));
-        }
-
         @Test
         @DisplayName("should return user when found")
-        void shouldReturnUser() {
+        void shouldReturnUser(UUID id) {
+            User user = new RegularUser();
+            user.setId(id);
+
+            when(userRepository.findById(id))
+                    .thenReturn(Optional.of(user));
 
             User result = userService.getById(id);
 
-            assertThat(result).isNotNull();
-            assertThat(id).isEqualTo(result.getId());
+            assertThat(result)
+                    .isNotNull()
+                    .extracting(User::getId)
+                    .isEqualTo(id);
 
             verify(userRepository).findById(id);
         }
 
-    }
-
-    @Nested
-    @DisplayName("getByIdException")
-    class GetByIdException {
-
-        @BeforeEach
-        public void setUp() {
-            when(userRepository.findById(id))
-                    .thenReturn(Optional.empty());
-        }
-
         @Test
         @DisplayName("should throw exception when user not found")
-        void shouldThrowExceptionWhenUserNotFound() {
+        void shouldThrowException(UUID id) {
+            when(userRepository.findById(id))
+                    .thenReturn(Optional.empty());
+
             assertThatThrownBy(() -> userService.getById(id))
                     .isInstanceOf(ResourceNotFoundException.class);
 

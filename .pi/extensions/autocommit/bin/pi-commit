@@ -1,0 +1,35 @@
+#!/bin/bash
+# Description: Stages changes and generates a commit message using an AI subagent.
+
+# Function to display help
+show_help() {
+    echo "Usage: pi commit"
+    echo ""
+    echo "Automatically stages all changes, analyzes the diff, generates"
+    echo "a conventional commit message, and performs the git commit."
+}
+
+if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    show_help
+    exit 0
+fi
+
+# 1. Check if we're in a git repo
+if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+    echo "❌ Error: Not a git repository."
+    exit 1
+fi
+
+# 2. Check for changes (tracked and untracked)
+if [ -z "$(git status --porcelain)" ]; then
+    echo "ℹ️ Nothing to commit."
+    exit 0
+fi
+
+echo "🚀 Analyzing changes and preparing commit..."
+
+# 3. Use pi subagent to handle the commit logic
+# We tell the subagent to stage everything and commit with a generated message.
+pi subagent committer "Stage all changes (including untracked), generate a high-quality conventional commit message from the diff, and execute 'git commit -m \"<message>\"'."
+
+echo "✅ Git commit process completed."

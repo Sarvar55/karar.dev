@@ -1,6 +1,7 @@
 package org.karar.dev.domain.comment;
 
 import lombok.RequiredArgsConstructor;
+import org.karar.dev.common.exception.ExceptionMessages;
 import org.karar.dev.common.exception.dto.PageResponse;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
 import org.karar.dev.domain.base.BaseResponse;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -79,6 +79,10 @@ public class CommentService {
         RegularUser user = regularUserService.getById(request.userId());
 
         Decision decision = decisionService.getById(request.decisionId());
+
+        if (user == null || decision == null) {
+            throw new ResourceNotFoundException(ExceptionMessages.VALIDATION_FAILED.getMessage());
+        }
 
         Comment comment = new Comment();
         comment.setContent(request.content());
