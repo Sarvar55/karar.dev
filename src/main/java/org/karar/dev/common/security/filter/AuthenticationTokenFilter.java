@@ -48,10 +48,10 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
                         );
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.info("Authenticated user: {}", username);
+                log.debug("Authenticated user: {}", username);
             }
         } catch (Exception e) {
-            log.info("Failed to authenticate token: {}", e.getMessage());
+            log.warn("Failed to authenticate token: {}", e.getMessage());
         }
         filterChain.doFilter(request, response);
     }
@@ -63,8 +63,9 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 
     private Optional<String> parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader(AUTHORIZATION_HEADER);
-        log.info("Authorization header: {}", headerAuth);
+        log.debug("Authorization header: {}", headerAuth);
         if (headerAuth != null && headerAuth.startsWith(BEARER_PREFIX)) {
+            log.debug("Bearer token found");
             return Optional.of(headerAuth.substring(7));
         }
         return Optional.empty();

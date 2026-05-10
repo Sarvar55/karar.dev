@@ -21,12 +21,14 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        log.debug("Loading user by username: {}", username);
         User user = getUser(username);
-        log.info("User loaded successfully: id={}, username={}", user.getId(), user.getEmail());
+        log.debug("User loaded successfully: id={}, username={}", user.getId(), user.getEmail());
         return new SecurityUser(user);
     }
 
     private User getUser(String username) {
+        log.debug("Getting user by username: {}", username);
         return userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException(
                         ExceptionMessages.RESOURCE_NOT_FOUND.format("User", "username", username)));

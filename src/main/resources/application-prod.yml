@@ -18,5 +18,14 @@ server:
 logging:
   level:
     root: WARN
+    org.karar.dev: INFO
     org.springframework: WARN
     org.hibernate: ERROR
+    org.hibernate.SQL: OFF
+  file:
+      name: logs/karar-prod.log
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 50
+      total-size-cap: 1GB

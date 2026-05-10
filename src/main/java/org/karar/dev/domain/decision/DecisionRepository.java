@@ -1,10 +1,9 @@
 package org.karar.dev.domain.decision;
 
 import org.karar.dev.common.enums.RegretLevel;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,7 +18,9 @@ public interface DecisionRepository extends JpaRepository<Decision, UUID> {
 
     Page<Decision> findByUserId(UUID userId, Pageable pageable);
 
+    @Query("SELECT d FROM Decision d JOIN FETCH d.user WHERE d.regretLevel = :regretLevel")
     Page<Decision> findByRegretLevel(RegretLevel regretLevel, Pageable pageable);
+
 
     @Query("SELECT d FROM Decision d JOIN d.tags dt WHERE dt.tag.id = :tagId")
     Page<Decision> findByTagId(@Param("tagId") UUID tagId, Pageable pageable);

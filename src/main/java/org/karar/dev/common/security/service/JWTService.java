@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
@@ -18,6 +19,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class JWTService {
+
+    private static final String USER_ID = "userId";
+    private static final String ROLE = "role";
 
     private final JWTConstants jwtConstants;
     private SecretKey key;
@@ -28,27 +32,26 @@ public class JWTService {
     }
 
     public String generateToken(String email, UUID userId, String role) {
+        log.debug("Generating token for user: {}", email);
         return Jwts.builder()
                 .setSubject(email)
-                .addClaims(Map.of(
-                        "userId", userId.toString(),
-                        "role", role
-                ))
+                .addClaims(prepareClaims(email, userId, role))
                 .setIssuer(jwtConstants.getIssuer())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtConstants.getExpirationTime()))
+                .setIssuedAt(Date.from(Instant.now()))
+                .setExpiration(prepareExpirationDate())
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public String getUsernameFromToken(String token) {
+        log.debug("Getting username from token");
         return Jwts.parserBuilder()
                 .setSigningKey(key).build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
     }
-    
+
     public boolean validateJwtToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
@@ -65,5 +68,15 @@ public class JWTService {
             log.warn("JWT claims string is empty: {}", e.getMessage());
         }
         return false;
+    }
+
+    private Map<String, Object> prepareClaims(String email, UUID userId, String role) {
+        return Map.of(
+                USER_ID, userId.toString(),
+                ROLE, role);
+    }
+
+    private Date prepareExpirationDate() {
+        return Date.from(Instant.now().plusMillis(jwtConstants.getExpirationTime()));
     }
 }

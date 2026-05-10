@@ -1,6 +1,8 @@
 package org.karar.dev.domain.comment;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.karar.dev.common.exception.ExceptionMessages;
 import org.karar.dev.common.exception.dto.PageResponse;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
@@ -22,6 +24,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CommentService {
 
     private final CommentRepository commentRepository;
@@ -30,57 +33,73 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public BaseResponse<PageResponse<CommentResponse>> getAllComments(Pageable pageable) {
+        log.debug("Getting all comments");
         Page<CommentResponse> responses = commentRepository.findAll(pageable)
                 .map(this::mapToResponse);
+        log.debug("Comments retrieved successfully: {}", responses);
         return BaseResponse.success(new PageResponse<>(responses));
     }
 
     @Transactional(readOnly = true)
     public BaseResponse<PageResponse<CommentResponse>> getCommentsByDecisionId(UUID decisionId, Pageable pageable) {
+        log.debug("Getting comments by decision id: {}", decisionId);
         if (!decisionService.existsById(decisionId)) {
+            log.warn("Decision not found: {}", decisionId);
             throw new ResourceNotFoundException("Decision", "id", decisionId);
         }
         Page<CommentResponse> responses = commentRepository.findByDecisionId(decisionId, pageable)
                 .map(this::mapToResponse);
+        log.debug("Comments retrieved successfully: {}", responses);
         return BaseResponse.success(new PageResponse<>(responses));
     }
 
     @Transactional(readOnly = true)
     public BaseResponse<PageResponse<CommentResponse>> getCommentsByUserId(UUID userId, Pageable pageable) {
         if (!regularUserService.existsById(userId)) {
+            log.warn("User not found: {}", userId);
             throw new ResourceNotFoundException("User", "id", userId);
         }
         Page<CommentResponse> responses = commentRepository.findByUserId(userId, pageable)
                 .map(this::mapToResponse);
+        log.debug("Comments retrieved successfully: {}", responses);
         return BaseResponse.success(new PageResponse<>(responses));
     }
 
     @Transactional(readOnly = true)
-    public BaseResponse<PageResponse<CommentResponse>> getCommentsByDecisionIdAndUserId(UUID decisionId, UUID userId, Pageable pageable) {
+    public BaseResponse<PageResponse<CommentResponse>> getCommentsByDecisionIdAndUserId(UUID decisionId, UUID userId,
+            Pageable pageable) {
+        log.debug("Getting comments by decision id and user id: {}, {}", decisionId, userId);
         if (!decisionService.existsById(decisionId)) {
+            log.warn("Decision not found: {}", decisionId);
             throw new ResourceNotFoundException("Decision", "id", decisionId);
         }
         if (!regularUserService.existsById(userId)) {
+            log.warn("User not found: {}", userId);
             throw new ResourceNotFoundException("User", "id", userId);
         }
         Page<CommentResponse> responses = commentRepository.findByDecisionIdAndUserId(decisionId, userId, pageable)
                 .map(this::mapToResponse);
+        log.debug("Comments retrieved successfully: {}", responses);
         return BaseResponse.success(new PageResponse<>(responses));
     }
 
     @Transactional(readOnly = true)
     public BaseResponse<CommentResponse> getCommentById(UUID id) {
+        log.debug("Getting comment by id: {}", id);
         Comment comment = findCommentOrThrow(id);
+        log.debug("Comment retrieved successfully: {}", comment);
         return BaseResponse.success(mapToResponse(comment));
     }
 
     @Transactional
     public BaseResponse<CommentResponse> createComment(CommentRequest request) {
+        log.debug("Creating comment: {}", request);
         RegularUser user = regularUserService.getById(request.userId());
-
+        log.debug("User retrieved successfully: {}", user);
         Decision decision = decisionService.getById(request.decisionId());
-
+        log.debug("Decision retrieved successfully: {}", decision);
         if (user == null || decision == null) {
+            log.warn("User or decision not found: {}, {}", request.userId(), request.decisionId());
             throw new ResourceNotFoundException(ExceptionMessages.VALIDATION_FAILED.getMessage());
         }
 
@@ -90,25 +109,31 @@ public class CommentService {
         comment.setDecision(decision);
 
         Comment savedComment = commentRepository.saveAndFlush(comment);
+        log.debug("Comment created successfully: {}", savedComment);
         return BaseResponse.success(mapToResponse(savedComment), HttpStatus.CREATED);
     }
 
     @Transactional
     public BaseResponse<CommentResponse> updateComment(UUID id, CommentUpdateRequest request) {
+        log.debug("Updating comment: {}, {}", id, request);
         Comment comment = findCommentOrThrow(id);
 
         comment.setContent(request.content());
 
         Comment updatedComment = commentRepository.saveAndFlush(comment);
+        log.debug("Comment updated successfully: {}", updatedComment);
         return BaseResponse.success(mapToResponse(updatedComment));
     }
 
     @Transactional
     public BaseResponse<Void> deleteComment(UUID id) {
+        log.debug("Deleting comment: {}", id);
         if (!commentRepository.existsById(id)) {
+            log.warn("Comment not found: {}", id);
             throw new ResourceNotFoundException("Comment", "id", id);
         }
         commentRepository.deleteById(id);
+        log.debug("Comment deleted successfully: {}", id);
         return BaseResponse.success(null, HttpStatus.NO_CONTENT);
     }
 
@@ -130,7 +155,6 @@ public class CommentService {
                 comment.getDecision() != null ? comment.getDecision().getId() : null,
                 comment.getDecision() != null ? comment.getDecision().getTitle() : null,
                 comment.getCreatedAt(),
-                comment.getUpdatedAt()
-        );
+                comment.getUpdatedAt());
     }
 }

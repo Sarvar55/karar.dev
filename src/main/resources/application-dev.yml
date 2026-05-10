@@ -12,12 +12,15 @@ spring:
   h2:
     console:
       enabled: false
-      
+
 
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
   
 
   flyway:
@@ -32,7 +35,15 @@ spring:
 logging:
   level:
     root: INFO
+    org.karar.dev.common.security: DEBUG
     org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
+  file:
+      name: logs/karar-dev.log
+  logback:
+    rollingpolicy:
+      max-file-size: 50MB
+      max-history: 10
 
 
 

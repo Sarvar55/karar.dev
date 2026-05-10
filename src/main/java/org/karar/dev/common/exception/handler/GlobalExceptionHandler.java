@@ -1,6 +1,8 @@
 package org.karar.dev.common.exception.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+
 import org.karar.dev.common.exception.base.BaseException;
 import org.karar.dev.domain.base.BaseResponse;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<BaseResponse<?>> handleValidationException(MethodArgumentNotValidException ex) {
         Map<String, String> validationErrors = new HashMap<>();
+
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
@@ -43,8 +46,7 @@ public class GlobalExceptionHandler {
         BaseResponse<?> response = BaseResponse.error(
                 "InternalServerError",
                 ex.getMessage() != null ? ex.getMessage() : DEFAULT_ERROR_MESSAGE,
-                HttpStatus.INTERNAL_SERVER_ERROR
-        );
+                HttpStatus.INTERNAL_SERVER_ERROR);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }
