@@ -106,6 +106,9 @@ public final class SecurityPathConfig {
         requests.requestMatchers(HttpMethod.PUT, "/api/v1/companies/{id}").hasAnyRole(SecurityRoles.ALL_USERS);
         requests.requestMatchers(HttpMethod.DELETE, "/api/v1/companies/{id}").hasAnyRole(SecurityRoles.ALL_USERS);
 
+        // --- Audit Logs (admin only) ---
+        requests.requestMatchers("/api/audit-logs/**").hasRole(SecurityRoles.ADMIN);
+
         // --- Admin panel ---
         requests.requestMatchers("/api/v1/admin/**").hasRole(SecurityRoles.ADMIN);
     }

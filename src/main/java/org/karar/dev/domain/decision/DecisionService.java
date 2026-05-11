@@ -3,6 +3,8 @@ package org.karar.dev.domain.decision;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.karar.dev.common.audit.AuditAction;
+import org.karar.dev.common.audit.Auditable;
 import org.karar.dev.common.enums.RegretLevel;
 import org.karar.dev.common.exception.conflict.ConflictException;
 import org.karar.dev.common.exception.dto.PageResponse;
@@ -87,6 +89,7 @@ public class DecisionService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.CREATE, entityName = "Decision")
     public BaseResponse<DecisionResponse> createDecision(DecisionRequest request) {
         log.debug("Creating decision for user: {}", request.userId());
         RegularUser user = regularUserService.getById(request.userId());
@@ -116,6 +119,7 @@ public class DecisionService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.UPDATE, entityName = "Decision")
     public BaseResponse<DecisionResponse> updateDecision(UUID id, DecisionUpdateRequest request) {
         Decision decision = findDecisionOrThrow(id);
         log.debug("Updating decision: {}", id);
@@ -156,6 +160,7 @@ public class DecisionService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.DELETE, entityName = "Decision")
     public BaseResponse<Void> deleteDecision(UUID id) {
         if (!decisionRepository.existsById(id)) {
             log.warn("Decision not found: {}", id);

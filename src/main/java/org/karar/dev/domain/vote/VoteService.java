@@ -3,6 +3,8 @@ package org.karar.dev.domain.vote;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.karar.dev.common.audit.AuditAction;
+import org.karar.dev.common.audit.Auditable;
 import org.karar.dev.common.exception.conflict.ConflictException;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
 import org.karar.dev.domain.base.BaseResponse;
@@ -109,6 +111,7 @@ public class VoteService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.CREATE, entityName = "Vote")
     public BaseResponse<VoteResponse> createVote(VoteRequest request) {
         RegularUser user = regularUserService.getById(request.userId());
 
@@ -134,6 +137,7 @@ public class VoteService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.DELETE, entityName = "Vote")
     public BaseResponse<Void> deleteVote(UUID id) {
         log.debug("Deleting vote: {}", id);
         Vote vote = findVoteOrThrow(id);
@@ -149,6 +153,7 @@ public class VoteService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.DELETE, entityName = "Vote")
     public BaseResponse<Void> deleteVoteByUserAndDecision(UUID userId, UUID decisionId) {
         log.debug("Deleting vote by user and decision: {}, {}", userId, decisionId);
         if (!regularUserService.existsById(userId)) {

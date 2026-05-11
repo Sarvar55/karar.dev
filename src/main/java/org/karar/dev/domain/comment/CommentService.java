@@ -3,6 +3,8 @@ package org.karar.dev.domain.comment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.karar.dev.common.audit.AuditAction;
+import org.karar.dev.common.audit.Auditable;
 import org.karar.dev.common.exception.ExceptionMessages;
 import org.karar.dev.common.exception.dto.PageResponse;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
@@ -92,6 +94,7 @@ public class CommentService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.CREATE, entityName = "Comment")
     public BaseResponse<CommentResponse> createComment(CommentRequest request) {
         log.debug("Creating comment: {}", request);
         RegularUser user = regularUserService.getById(request.userId());
@@ -114,6 +117,7 @@ public class CommentService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.UPDATE, entityName = "Comment")
     public BaseResponse<CommentResponse> updateComment(UUID id, CommentUpdateRequest request) {
         log.debug("Updating comment: {}, {}", id, request);
         Comment comment = findCommentOrThrow(id);
@@ -126,6 +130,7 @@ public class CommentService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.DELETE, entityName = "Comment")
     public BaseResponse<Void> deleteComment(UUID id) {
         log.debug("Deleting comment: {}", id);
         if (!commentRepository.existsById(id)) {
