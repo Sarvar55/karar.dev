@@ -1,10 +1,12 @@
 package org.karar.dev.domain.decision;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.karar.dev.common.enums.RegretLevel;
 import org.karar.dev.common.exception.conflict.ConflictException;
 import org.karar.dev.common.exception.dto.PageResponse;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
+import org.karar.dev.common.security.service.SecurityService;
 import org.karar.dev.domain.base.BaseResponse;
 import org.karar.dev.domain.base.DecisionTagId;
 import org.karar.dev.domain.decision.dto.DecisionRequest;
@@ -28,12 +30,14 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DecisionService {
 
     private final DecisionRepository decisionRepository;
     private final RegularUserService regularUserService;
     private final TagService tagService;
     private final DecisionTagService decisionTagService;
+    private final SecurityService securityService;
 
     @Transactional(readOnly = true)
     public BaseResponse<PageResponse<DecisionResponse>> getAllDecisions(Pageable pageable) {
@@ -73,9 +77,12 @@ public class DecisionService {
 
     @Transactional
     public BaseResponse<DecisionResponse> createDecision(DecisionRequest request) {
-        RegularUser user = regularUserService.getById(request.userId());
+        UUID currentUserId = securityService.getCurrentUserId();
+        log.debug("Creating decision for authenticated user: {}", currentUserId);
 
-        if (decisionRepository.existsByTitleAndUserId(request.title(), request.userId())) {
+        RegularUser user = regularUserService.getById(currentUserId);
+
+        if (decisionRepository.existsByTitleAndUserId(request.title(), currentUserId)) {
             throw new ConflictException("Decision with this title already exists for this user");
         }
 
@@ -94,6 +101,7 @@ public class DecisionService {
             associateTagsWithDecision(savedDecision, request.tagIds());
         }
 
+        log.info("Decision created successfully: {}", savedDecision.getId());
         return BaseResponse.success(mapToResponse(savedDecision), HttpStatus.CREATED);
     }
 

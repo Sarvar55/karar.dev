@@ -42,11 +42,29 @@ public class JWTService {
     }
 
     public String getUsernameFromToken(String token) {
+        return getClaims(token).getSubject();
+    }
+
+    /**
+     * Extracts the user ID stored in the JWT claims.
+     */
+    public UUID getUserIdFromToken(String token) {
+        String userId = getClaims(token).get("userId", String.class);
+        return UUID.fromString(userId);
+    }
+
+    /**
+     * Extracts the role stored in the JWT claims.
+     */
+    public String getRoleFromToken(String token) {
+        return getClaims(token).get("role", String.class);
+    }
+
+    private Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key).build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
     }
     
     public boolean validateJwtToken(String token) {

@@ -48,23 +48,24 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
                         );
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.info("Authenticated user: {}", username);
+                log.debug("Authenticated user: {}", username);
             }
         } catch (Exception e) {
-            log.info("Failed to authenticate token: {}", e.getMessage());
+            log.warn("Failed to authenticate token: {}", e.getMessage());
         }
         filterChain.doFilter(request, response);
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return request.getRequestURI().contains("/api/auth");
+        String path = request.getRequestURI();
+        return path.startsWith("/api/v1/auth/");
     }
 
     private Optional<String> parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader(AUTHORIZATION_HEADER);
-        log.info("Authorization header: {}", headerAuth);
         if (headerAuth != null && headerAuth.startsWith(BEARER_PREFIX)) {
+            log.debug("Bearer token found in request");
             return Optional.of(headerAuth.substring(7));
         }
         return Optional.empty();

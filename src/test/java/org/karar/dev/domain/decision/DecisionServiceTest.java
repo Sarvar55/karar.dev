@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.karar.dev.common.enums.RegretLevel;
 import org.karar.dev.common.exception.conflict.ConflictException;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
+import org.karar.dev.common.security.service.SecurityService;
 import org.karar.dev.domain.annotation.UnitTest;
 import org.karar.dev.domain.base.BaseResponse;
 import org.karar.dev.domain.decision.dto.DecisionRequest;
@@ -59,6 +60,9 @@ class DecisionServiceTest {
 
     @Mock
     DecisionTagService decisionTagService;
+
+    @Mock
+    SecurityService securityService;
 
     @InjectMocks
     private DecisionService decisionService;
@@ -249,21 +253,23 @@ class DecisionServiceTest {
         @Test
         @DisplayName("Should create decision successfully without tags")
         void shouldCreateDecisionWithoutTagsWhenValidRequest() {
+            UUID userId = UUID.randomUUID();
             DecisionRequest request = DecisionRequestBuilder.aRequest()
                     .withoutTags()
                     .build();
             var user = RegularUserBuilder.user()
-                    .withId(request.userId())
+                    .withId(userId)
                     .build();
 
             Decision decision = DecisionBuilderTest.decision()
                     .withUser(user)
                     .build();
 
-            when(regularUserService.getById(request.userId()))
+            when(securityService.getCurrentUserId()).thenReturn(userId);
+            when(regularUserService.getById(userId))
                     .thenReturn(user);
 
-            when(decisionRepository.existsByTitleAndUserId(request.title(), request.userId()))
+            when(decisionRepository.existsByTitleAndUserId(request.title(), userId))
                     .thenReturn(false);
 
             when(decisionRepository.saveAndFlush(any(Decision.class)))
@@ -277,8 +283,9 @@ class DecisionServiceTest {
             assertThat(response.getData().userId()).isEqualTo(decision.getUser().getId());
             assertThat(response.getData().voteCount()).isEqualTo(decision.getVoteCount());
 
-            verify(regularUserService).getById(request.userId());
-            verify(decisionRepository).existsByTitleAndUserId(request.title(), request.userId());
+            verify(securityService).getCurrentUserId();
+            verify(regularUserService).getById(userId);
+            verify(decisionRepository).existsByTitleAndUserId(request.title(), userId);
             verify(decisionRepository).saveAndFlush(any(Decision.class));
         }
 
@@ -286,12 +293,13 @@ class DecisionServiceTest {
         @DisplayName("Should create decision with tags")
         void shouldCreateDecisionWithTagWhenRequestHasTags() {
             UUID tagId = UUID.randomUUID();
+            UUID userId = UUID.randomUUID();
             DecisionRequest request = DecisionRequestBuilder.aRequest()
                     .withTags(Set.of(tagId))
                     .build();
 
             var user = RegularUserBuilder.user()
-                    .withId(request.userId())
+                    .withId(userId)
                     .build();
             var tag = TagBuilder.tag().withId(tagId).build();
 
@@ -300,10 +308,11 @@ class DecisionServiceTest {
                     .withTag(tag)
                     .build();
 
-            when(regularUserService.getById(request.userId()))
+            when(securityService.getCurrentUserId()).thenReturn(userId);
+            when(regularUserService.getById(userId))
                     .thenReturn(user);
 
-            when(decisionRepository.existsByTitleAndUserId(request.title(), request.userId()))
+            when(decisionRepository.existsByTitleAndUserId(request.title(), userId))
                     .thenReturn(false);
 
             when(decisionRepository.saveAndFlush(any(Decision.class)))
@@ -323,29 +332,32 @@ class DecisionServiceTest {
                     .first()
                     .isEqualTo(tag.getName());
 
-            verify(regularUserService).getById(request.userId());
+            verify(securityService).getCurrentUserId();
+            verify(regularUserService).getById(userId);
             verify(tagService).getById(tagId);
-            verify(decisionRepository).existsByTitleAndUserId(request.title(), request.userId());
+            verify(decisionRepository).existsByTitleAndUserId(request.title(), userId);
             verify(decisionRepository).saveAndFlush(any(Decision.class));
         }
 
         @Test
         @DisplayName("Should throw conflict when title already exists")
         void shouldThrowConflictWhenTitleAlreadyExists() {
-
+            UUID userId = UUID.randomUUID();
             DecisionRequest request = DecisionRequestBuilder.aRequest().build();
-            var user = RegularUserBuilder.user().withId(request.userId()).build();
+            var user = RegularUserBuilder.user().withId(userId).build();
 
-            when(regularUserService.getById(request.userId())).thenReturn(user);
-            when(decisionRepository.existsByTitleAndUserId(request.title(), request.userId()))
+            when(securityService.getCurrentUserId()).thenReturn(userId);
+            when(regularUserService.getById(userId)).thenReturn(user);
+            when(decisionRepository.existsByTitleAndUserId(request.title(), userId))
                     .thenReturn(true);
 
             assertThatThrownBy(() -> decisionService.createDecision(request))
                     .isInstanceOf(ConflictException.class)
                     .hasMessage("Decision with this title already exists for this user");
 
-            verify(regularUserService).getById(request.userId());
-            verify(decisionRepository).existsByTitleAndUserId(request.title(), request.userId());
+            verify(securityService).getCurrentUserId();
+            verify(regularUserService).getById(userId);
+            verify(decisionRepository).existsByTitleAndUserId(request.title(), userId);
             verifyNoInteractions(tagService);
             verify(decisionRepository, never()).saveAndFlush(any());
         }
@@ -353,19 +365,20 @@ class DecisionServiceTest {
         @Test
         @DisplayName("Should handle null tag list gracefully")
         void shouldHandleNullWhenTagsAreNull() {
-            UUID tagId = UUID.randomUUID();
+            UUID userId = UUID.randomUUID();
             DecisionRequest request = DecisionRequestBuilder.aRequest()
                     .withTags(null)
                     .build();
             var user = RegularUserBuilder
-                    .user().withId(request.userId()).build();
+                    .user().withId(userId).build();
 
             Decision decision = DecisionBuilderTest
                     .decision()
                     .withUser(user)
                     .build();
 
-            when(regularUserService.getById(request.userId()))
+            when(securityService.getCurrentUserId()).thenReturn(userId);
+            when(regularUserService.getById(userId))
                     .thenReturn(user);
             when(decisionRepository.existsByTitleAndUserId(any(), any()))
                     .thenReturn(false);
@@ -382,8 +395,9 @@ class DecisionServiceTest {
             assertThat(response.getData().userId()).isEqualTo(decision.getUser().getId());
             assertThat(response.getData().voteCount()).isEqualTo(decision.getVoteCount());
 
-            verify(regularUserService).getById(request.userId());
-            verify(decisionRepository).existsByTitleAndUserId(request.title(), request.userId());
+            verify(securityService).getCurrentUserId();
+            verify(regularUserService).getById(userId);
+            verify(decisionRepository).existsByTitleAndUserId(request.title(), userId);
             verify(decisionRepository).saveAndFlush(any(Decision.class));
             verifyNoInteractions(tagService);
         }

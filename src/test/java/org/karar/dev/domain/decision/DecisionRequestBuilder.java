@@ -17,16 +17,10 @@ public class DecisionRequestBuilder {
         private String why = "Default Why";
         private String alternative = "Default Alt";
         private RegretLevel regretLevel = RegretLevel.LOW;
-        private UUID userId = UUID.randomUUID();
         private Set<UUID> tagIds = Set.of(UUID.randomUUID());
 
         public Builder withTitle(String title) {
             this.title = title;
-            return this;
-        }
-
-        public Builder withUserId(UUID userId) {
-            this.userId = userId;
             return this;
         }
 
@@ -46,7 +40,6 @@ public class DecisionRequestBuilder {
                     why,
                     alternative,
                     regretLevel,
-                    userId,
                     tagIds
             );
         }

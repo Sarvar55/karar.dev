@@ -26,10 +26,6 @@ public record DecisionRequest(
         @NotNull(message = "Regret level is required")
         RegretLevel regretLevel,
 
-        @Schema(description = "ID of the user creating the decision", example = "550e8400-e29b-41d4-a716-446655440000")
-        @NotNull(message = "User ID is required")
-        UUID userId,
-
         @Schema(description = "Set of tag IDs to associate with this decision", example = "[\"550e8400-e29b-41d4-a716-446655440001\"]")
         Set<UUID> tagIds
 ) {

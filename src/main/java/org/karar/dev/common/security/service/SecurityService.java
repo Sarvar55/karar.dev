@@ -1,7 +1,9 @@
 package org.karar.dev.common.security.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
+import org.karar.dev.common.security.user.SecurityUser;
 import org.karar.dev.domain.comment.Comment;
 import org.karar.dev.domain.comment.CommentRepository;
 import org.karar.dev.domain.decision.Decision;
@@ -11,25 +13,59 @@ import org.karar.dev.domain.user.UserRepository;
 import org.karar.dev.domain.vote.Vote;
 import org.karar.dev.domain.vote.VoteRepository;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
 /**
  * Provides ownership-checking methods used by {@code @PreAuthorize} SpEL
- * expressions.
+ * expressions, and helper methods for extracting authenticated user info.
  * <p>
  * Convention: {@code authentication.getName()} returns the user's <b>email</b>
  * (see {@link org.karar.dev.common.security.user.SecurityUser#getUsername()}).
  */
 @Component("securityService")
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityService {
 
     private final DecisionRepository decisionRepository;
     private final CommentRepository commentRepository;
     private final VoteRepository voteRepository;
     private final UserRepository userRepository;
+
+    // ========================
+    // Authenticated User Helpers
+    // ========================
+
+    /**
+     * Returns the UUID of the currently authenticated user.
+     * Extracts it from the SecurityUser principal stored in SecurityContextHolder.
+     *
+     * @throws IllegalStateException if no authenticated user is found
+     */
+    public UUID getCurrentUserId() {
+        SecurityUser securityUser = getCurrentSecurityUser();
+        log.debug("Current authenticated user ID: {}", securityUser.getUserId());
+        return securityUser.getUserId();
+    }
+
+    /**
+     * Returns the email of the currently authenticated user.
+     */
+    public String getCurrentUserEmail() {
+        SecurityUser securityUser = getCurrentSecurityUser();
+        return securityUser.getUsername();
+    }
+
+    private SecurityUser getCurrentSecurityUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof SecurityUser)) {
+            throw new IllegalStateException("No authenticated user found in SecurityContext");
+        }
+        return (SecurityUser) authentication.getPrincipal();
+    }
 
     public boolean isOwnerOfDecision(Authentication authentication, UUID decisionId) {
         Decision decision = decisionRepository.findById(decisionId)

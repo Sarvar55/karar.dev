@@ -1,9 +1,10 @@
 package org.karar.dev.domain.comment;
 
 import lombok.RequiredArgsConstructor;
-import org.karar.dev.common.exception.ExceptionMessages;
+import lombok.extern.slf4j.Slf4j;
 import org.karar.dev.common.exception.dto.PageResponse;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
+import org.karar.dev.common.security.service.SecurityService;
 import org.karar.dev.domain.base.BaseResponse;
 import org.karar.dev.domain.comment.dto.CommentRequest;
 import org.karar.dev.domain.comment.dto.CommentResponse;
@@ -22,11 +23,13 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CommentService {
 
     private final CommentRepository commentRepository;
     private final RegularUserService regularUserService;
     private final DecisionService decisionService;
+    private final SecurityService securityService;
 
     @Transactional(readOnly = true)
     public BaseResponse<PageResponse<CommentResponse>> getAllComments(Pageable pageable) {
@@ -76,13 +79,11 @@ public class CommentService {
 
     @Transactional
     public BaseResponse<CommentResponse> createComment(CommentRequest request) {
-        RegularUser user = regularUserService.getById(request.userId());
+        UUID currentUserId = securityService.getCurrentUserId();
+        log.debug("Creating comment for authenticated user: {}", currentUserId);
 
+        RegularUser user = regularUserService.getById(currentUserId);
         Decision decision = decisionService.getById(request.decisionId());
-
-        if (user == null || decision == null) {
-            throw new ResourceNotFoundException(ExceptionMessages.VALIDATION_FAILED.getMessage());
-        }
 
         Comment comment = new Comment();
         comment.setContent(request.content());
@@ -90,6 +91,7 @@ public class CommentService {
         comment.setDecision(decision);
 
         Comment savedComment = commentRepository.saveAndFlush(comment);
+        log.info("Comment created successfully: {}", savedComment.getId());
         return BaseResponse.success(mapToResponse(savedComment), HttpStatus.CREATED);
     }
 

@@ -1,8 +1,10 @@
 package org.karar.dev.domain.vote;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.karar.dev.common.exception.conflict.ConflictException;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
+import org.karar.dev.common.security.service.SecurityService;
 import org.karar.dev.domain.base.BaseResponse;
 import org.karar.dev.domain.decision.Decision;
 import org.karar.dev.domain.decision.DecisionService;
@@ -21,11 +23,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class VoteService {
 
     private final VoteRepository voteRepository;
     private final RegularUserService regularUserService;
     private final DecisionService decisionService;
+    private final SecurityService securityService;
 
     @Transactional(readOnly = true)
     public BaseResponse<List<VoteResponse>> getAllVotes() {
@@ -91,12 +95,14 @@ public class VoteService {
 
     @Transactional
     public BaseResponse<VoteResponse> createVote(VoteRequest request) {
-        RegularUser user = regularUserService.getById(request.userId());
+        UUID currentUserId = securityService.getCurrentUserId();
+        log.debug("Creating vote for authenticated user: {}", currentUserId);
 
+        RegularUser user = regularUserService.getById(currentUserId);
         Decision decision = decisionService.getById(request.decisionId());
 
         // Check if user has already voted on this decision
-        if (voteRepository.existsByUserIdAndDecisionId(request.userId(), request.decisionId())) {
+        if (voteRepository.existsByUserIdAndDecisionId(currentUserId, request.decisionId())) {
             throw new ConflictException("User has already voted on this decision");
         }
 
@@ -110,6 +116,7 @@ public class VoteService {
         // Update vote count on the decision
         decisionService.incrementVoteCount(request.decisionId());
 
+        log.info("Vote created successfully: {}", savedVote.getId());
         return BaseResponse.success(mapToResponse(savedVote), HttpStatus.CREATED);
     }
 

@@ -13,10 +13,6 @@ public record CommentRequest(
         @NotBlank(message = "Content is required")
         String content,
 
-        @Schema(description = "ID of the user creating the comment", example = "550e8400-e29b-41d4-a716-446655440000")
-        @NotNull(message = "User ID is required")
-        UUID userId,
-
         @Schema(description = "ID of the decision being commented on", example = "550e8400-e29b-41d4-a716-446655440001")
         @NotNull(message = "Decision ID is required")
         UUID decisionId
