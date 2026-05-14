@@ -32,18 +32,31 @@ spring:
     baseline-version: 1
 
 
+# ============================================
+# DEV Logging — Console + File
+# ============================================
 logging:
   level:
     root: INFO
+    org.karar.dev: DEBUG
+    org.karar.dev.common.audit: DEBUG
     org.karar.dev.common.security: DEBUG
     org.springframework.security: INFO
     org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  # File output
   file:
-      name: logs/karar-dev.log
+    name: logs/karar-dev.log
   logback:
     rollingpolicy:
+      # Her dosya max 50MB
       max-file-size: 50MB
+      # Son 10 dosya tutulur
       max-history: 10
+      # Toplam disk limiti
+      total-size-cap: 500MB
+      # Arşiv dosya adı formatı
+      file-name-pattern: logs/karar-dev.%d{yyyy-MM-dd}.%i.log
 
 
 

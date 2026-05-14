@@ -2,9 +2,7 @@ package org.karar.dev.domain.decisiontag;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.karar.dev.domain.base.BaseResponse;
-import org.karar.dev.domain.tag.Tag;
 import org.karar.dev.domain.tag.TagService;
 import org.karar.dev.domain.tag.dto.TagResponse;
 import org.springframework.http.HttpStatus;

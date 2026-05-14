@@ -6,12 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
 import org.karar.dev.domain.annotation.UnitTest;
-import org.karar.dev.domain.extensions.GlobalTestExtension;
-import org.karar.dev.domain.user.regular.RegularUser;
 import org.karar.dev.domain.extensions.UserTestDataExtension;
+import org.karar.dev.domain.user.regular.RegularUser;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.UUID;

@@ -1,8 +1,8 @@
 package org.karar.dev.domain.decisiontag;
 
+import org.karar.dev.domain.base.DecisionTagId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import org.karar.dev.domain.base.DecisionTagId;
 
 import java.util.List;
 import java.util.UUID;

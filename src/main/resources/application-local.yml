@@ -24,9 +24,8 @@ logging:
   level:
     root: INFO
     org.karar.dev: DEBUG
-    org.springframework.security : DEBUG
-    org.springframework.orm.jpa: DEBUG
-    org.hibernate: DEBUG
+    org.springframework.security: DEBUG
+    
 
 app:
   jwt:

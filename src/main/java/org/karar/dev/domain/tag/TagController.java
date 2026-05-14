@@ -10,15 +10,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.karar.dev.domain.base.BaseResponse;
-import org.karar.dev.domain.decision.dto.DecisionResponse;
-import org.karar.dev.common.exception.dto.PageResponse;
 import org.karar.dev.domain.tag.dto.TagRequest;
 import org.karar.dev.domain.tag.dto.TagResponse;
 import org.karar.dev.domain.tag.dto.TagUpdateRequest;
-import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

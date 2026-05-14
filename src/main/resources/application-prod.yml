@@ -15,17 +15,27 @@ spring:
 server:
   port: 8080
 
+# ============================================
+# PROD Logging — Console (minimal) + File (primary)
+# ============================================
 logging:
   level:
     root: WARN
     org.karar.dev: INFO
+    org.karar.dev.common.audit: INFO
     org.springframework: WARN
     org.hibernate: ERROR
     org.hibernate.SQL: OFF
+  # File output — primary log sink in production
   file:
-      name: logs/karar-prod.log
+    name: logs/karar-prod.log
   logback:
     rollingpolicy:
+      # Her dosya max 100MB
       max-file-size: 100MB
+      # Son 50 dosya tutulur
       max-history: 50
-      total-size-cap: 1GB
+      # Toplam disk limiti
+      total-size-cap: 2GB
+      # Arşiv dosya adı formatı
+      file-name-pattern: logs/karar-prod.%d{yyyy-MM-dd}.%i.log

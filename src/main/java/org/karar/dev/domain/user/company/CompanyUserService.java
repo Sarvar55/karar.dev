@@ -2,20 +2,17 @@ package org.karar.dev.domain.user.company;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
-import org.karar.dev.domain.user.UserService;
 import org.karar.dev.common.exception.dto.PageResponse;
+import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
 import org.karar.dev.domain.base.BaseResponse;
+import org.karar.dev.domain.user.UserService;
 import org.karar.dev.domain.user.company.dto.CompanyUserResponse;
 import org.karar.dev.domain.user.company.dto.CompanyUserUpdateRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
