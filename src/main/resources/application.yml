@@ -4,9 +4,16 @@ spring:
   profiles:
     active: ${PROFILE:dev}
 
+# ============================================
+# Global Logging Configuration (SLF4J + Logback)
+# Profile-specific overrides in application-{profile}.yml
+# ============================================
 logging:
+  # Console pattern — colorized for terminal readability
   pattern:
-    console: ${LOG_PATTERN_CONSOLE:%green(%d{HH:mm:ss.SSS}) %red([%thread]) %highlight(%-5level) %yellow(%-40.40logger{39}:%L) - %msg%n}
+    console: "%green(%d{yyyy-MM-dd HH:mm:ss.SSS}) %red([%thread]) %highlight(%-5level) %yellow(%-40.40logger{39}:%L) - %msg%n"
+    # File pattern — no ANSI colors, includes date for grep-ability
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}:%L - %msg%n"
 
 server:
   port: ${PORT:8080}

@@ -48,10 +48,12 @@ public class AuthService {
 
     @Transactional
     public BaseResponse<AuthResponse> register(RegisterRequest request) {
+        log.debug("Registering user: {}", request);
         checkEmailUniqueness(request.email());
 
         Function<RegisterRequest, User> strategy = registrationStrategies.get(request.role());
         if (strategy == null) {
+            log.error("Unsupported role: {}", request.role());
             return BaseResponse.error(
                     "UnsupportedRole",
                     ExceptionMessages.UNSUPPORTED_ROLE.format(request.role()),
@@ -92,17 +94,20 @@ public class AuthService {
             return BaseResponse.success(mapToAuthResponse(user, token));
 
         } catch (BadCredentialsException e) {
+            log.error("Invalid credentials: {}", request.email());
             return BaseResponse.error(
                     "InvalidCredentials",
                     ExceptionMessages.INVALID_CREDENTIALS.getMessage(),
                     HttpStatus.UNAUTHORIZED);
         } catch (LockedException e) {
+            log.error("Account locked: {}", request.email());
             long remainingMinutes = getRemainingLockMinutes(request.email());
             return BaseResponse.error(
                     "AccountLocked",
                     ExceptionMessages.ACCOUNT_LOCKED.format(remainingMinutes),
                     HttpStatus.FORBIDDEN);
         } catch (DisabledException e) {
+            log.error("Account disabled: {}", request.email());
             return BaseResponse.error(
                     "AccountDisabled",
                     ExceptionMessages.ACCOUNT_DISABLED.getMessage(),
@@ -124,12 +129,14 @@ public class AuthService {
 
     private void checkEmailUniqueness(String email) {
         if (userRepository.existsByEmail(email)) {
+            log.error("Email already exists: {}", email);
             throw new EmailAlreadyExistsException(email);
         }
     }
 
     private void validateField(String value, String fieldName, String message) {
         if (value == null || value.isBlank()) {
+            log.error("Field is required: {}", fieldName);
             throw new ValidationException(Map.of(fieldName, message));
         }
     }

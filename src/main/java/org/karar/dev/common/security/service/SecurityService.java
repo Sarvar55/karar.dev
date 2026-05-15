@@ -2,6 +2,8 @@ package org.karar.dev.common.security.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
 import org.karar.dev.common.security.user.SecurityUser;
 import org.karar.dev.domain.comment.Comment;
@@ -68,48 +70,67 @@ public class SecurityService {
     }
 
     public boolean isOwnerOfDecision(Authentication authentication, UUID decisionId) {
+        log.debug("Checking if user is owner of decision: {}", decisionId);
         Decision decision = decisionRepository.findById(decisionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Decision", "id", decisionId));
+        log.debug("User is owner of decision: {}", isOwner(authentication, decision.getUser().getEmail()));
         return isOwner(authentication, decision.getUser().getEmail());
     }
 
     public boolean isOwnerOfComment(Authentication authentication, UUID commentId) {
+        log.debug("Checking if user is owner of comment: {}", commentId);
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment", "id", commentId));
+        log.debug("User is owner of comment: {}", isOwner(authentication, comment.getUser().getEmail()));
         return isOwner(authentication, comment.getUser().getEmail());
     }
 
     public boolean isOwnerOfVote(Authentication authentication, UUID voteId) {
+        log.debug("Checking if user is owner of vote: {}", voteId);
         Vote vote = voteRepository.findById(voteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Vote", "id", voteId));
+        log.debug("User is owner of vote: {}", isOwner(authentication, vote.getUser().getEmail()));
         return isOwner(authentication, vote.getUser().getEmail());
     }
 
     public boolean isOwnerOfVoteByUserAndDecision(Authentication authentication, UUID userId) {
+        log.debug("Checking if user is owner of vote by user and decision: {}", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        log.debug("User is owner of vote by user and decision: {}", isOwner(authentication, user.getEmail()));
         return isOwner(authentication, user.getEmail());
     }
 
     public boolean isSelf(Authentication authentication, UUID userId) {
+        log.debug("Checking if user is self: {}", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        log.debug("User is self: {}", isOwner(authentication, user.getEmail()));
         return isOwner(authentication, user.getEmail());
     }
 
     public boolean isAdminOrOwnerOfDecision(Authentication authentication, UUID decisionId) {
-        if (hasRole(authentication, "ROLE_ADMIN"))
+        log.debug("Checking if user is admin or owner of decision: {}", decisionId);
+        if (hasRole(authentication, "ROLE_ADMIN")) {
+            log.debug("User is admin");
             return true;
+        }
+        log.debug("User is admin or owner of decision: {}", isOwnerOfDecision(authentication, decisionId));
         return isOwnerOfDecision(authentication, decisionId);
     }
 
     public boolean isAdminOrOwnerOfComment(Authentication authentication, UUID commentId) {
-        if (hasRole(authentication, "ROLE_ADMIN"))
+        log.debug("Checking if user is admin or owner of comment: {}", commentId);
+        if (hasRole(authentication, "ROLE_ADMIN")) {
+            log.debug("User is admin");
             return true;
+        }
+        log.debug("User is admin or owner of comment: {}", isOwnerOfComment(authentication, commentId));
         return isOwnerOfComment(authentication, commentId);
     }
 
     public boolean isAdminOrSelf(Authentication authentication, UUID userId) {
+        log.debug("Checking if user is admin or self: {}", userId);
         if (hasRole(authentication, "ROLE_ADMIN"))
             return true;
         return isSelf(authentication, userId);

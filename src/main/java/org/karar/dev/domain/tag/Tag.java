@@ -15,7 +15,7 @@ import java.util.Set;
 
 @Data
 @Entity
-@Table
+@Table(name = "tags")
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)

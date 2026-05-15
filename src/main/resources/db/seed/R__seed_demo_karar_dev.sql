@@ -19,7 +19,7 @@ VALUES
     ('c11101b9-1db8-48e8-b2e7-057b7712df1c', 'user2')
     ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO companies (id, company_name)
+INSERT INTO company_users (id, company_name)
 VALUES
     ('d22201b9-2db8-48e8-b2e7-057b7712df1c', 'Karar Dev Ltd')
     ON CONFLICT (id) DO NOTHING;

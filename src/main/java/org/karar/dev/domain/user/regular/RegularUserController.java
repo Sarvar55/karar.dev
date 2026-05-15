@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.karar.dev.common.exception.dto.PageResponse;
 import org.karar.dev.domain.base.BaseResponse;
+import org.karar.dev.domain.comment.dto.CommentResponse;
 import org.karar.dev.domain.user.regular.dto.RegularUserResponse;
 import org.karar.dev.domain.user.regular.dto.RegularUserUpdateRequest;
 import org.springdoc.core.annotations.ParameterObject;
@@ -14,8 +15,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import org.karar.dev.domain.comment.dto.CommentResponse;
 
 import java.util.UUID;
 

@@ -64,6 +64,7 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 
     private Optional<String> parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader(AUTHORIZATION_HEADER);
+        log.debug("Authorization header: {}", headerAuth);
         if (headerAuth != null && headerAuth.startsWith(BEARER_PREFIX)) {
             log.debug("Bearer token found in request");
             return Optional.of(headerAuth.substring(7));

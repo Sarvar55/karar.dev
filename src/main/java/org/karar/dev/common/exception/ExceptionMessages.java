@@ -7,13 +7,14 @@ import lombok.RequiredArgsConstructor;
  * Centralised exception message constants.
  * <p>
  * Every user-facing error string lives here so that messages stay consistent
- * across the entire codebase and are easy to change in one place (e.g. for i18n).
+ * across the entire codebase and are easy to change in one place (e.g. for
+ * i18n).
  * <p>
  * Usage:
+ * 
  * <pre>
- *     throw new ResourceNotFoundException(
- *         ExceptionMessages.RESOURCE_NOT_FOUND.format("User", "id", userId)
- *     );
+ * throw new ResourceNotFoundException(
+ *         ExceptionMessages.RESOURCE_NOT_FOUND.format("User", "id", userId));
  * </pre>
  */
 @Getter

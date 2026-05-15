@@ -3,11 +3,14 @@ package org.karar.dev.domain.decisiontag;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.karar.dev.domain.base.DecisionTagId;
 import org.karar.dev.domain.decision.Decision;
 import org.karar.dev.domain.tag.Tag;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +18,7 @@ import java.time.LocalDateTime;
 @Table(name = "decision_tags")
 @Getter
 @Setter
+@EntityListeners(AuditingEntityListener.class)
 public class DecisionTag {
     @EmbeddedId
     private DecisionTagId id;
@@ -27,9 +31,17 @@ public class DecisionTag {
     @MapsId("tagId")
     private Tag tag;
 
-    @CreationTimestamp
+    @CreatedDate
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
+    @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @CreatedBy
+    @Column(updatable = false)
+    private String createdBy;
+
+    @LastModifiedBy
+    private String updatedBy;
 }
