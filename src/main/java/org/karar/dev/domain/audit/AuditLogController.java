@@ -9,12 +9,16 @@ import org.karar.dev.common.audit.AuditLogService;
 import org.karar.dev.common.audit.dto.AuditLogResponse;
 import org.karar.dev.common.exception.dto.PageResponse;
 import org.karar.dev.domain.base.BaseResponse;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST controller for querying audit logs.
@@ -32,7 +36,7 @@ public class AuditLogController {
     @GetMapping
     @Operation(summary = "Get all audit logs", description = "Returns paginated list of all audit log entries, sorted by newest first")
     public ResponseEntity<BaseResponse<PageResponse<AuditLogResponse>>> getAllLogs(
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @ParameterObject @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(auditLogService.getAllLogs(pageable));
     }
 
@@ -41,7 +45,7 @@ public class AuditLogController {
     public ResponseEntity<BaseResponse<PageResponse<AuditLogResponse>>> getLogsByEntity(
             @Parameter(description = "Name of the entity", example = "Decision")
             @PathVariable String entityName,
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @ParameterObject @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(auditLogService.getLogsByEntityName(entityName, pageable));
     }
 
@@ -52,7 +56,7 @@ public class AuditLogController {
             @PathVariable String entityName,
             @Parameter(description = "ID of the specific entity", example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable String entityId,
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @ParameterObject @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(auditLogService.getLogsByEntityInstance(entityName, entityId, pageable));
     }
 
@@ -61,7 +65,7 @@ public class AuditLogController {
     public ResponseEntity<BaseResponse<PageResponse<AuditLogResponse>>> getLogsByUser(
             @Parameter(description = "Email of the user", example = "admin@karar.dev")
             @PathVariable String email,
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @ParameterObject @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(auditLogService.getLogsByPerformedBy(email, pageable));
     }
 
@@ -70,7 +74,7 @@ public class AuditLogController {
     public ResponseEntity<BaseResponse<PageResponse<AuditLogResponse>>> getLogsByAction(
             @Parameter(description = "Type of action", example = "CREATE")
             @PathVariable AuditAction action,
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @ParameterObject @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(auditLogService.getLogsByAction(action, pageable));
     }
 }
