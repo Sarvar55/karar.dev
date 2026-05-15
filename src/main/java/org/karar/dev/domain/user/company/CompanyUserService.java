@@ -2,6 +2,8 @@ package org.karar.dev.domain.user.company;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.karar.dev.common.audit.AuditAction;
+import org.karar.dev.common.audit.Auditable;
 import org.karar.dev.common.exception.dto.PageResponse;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
 import org.karar.dev.domain.base.BaseResponse;
@@ -38,6 +40,7 @@ public class CompanyUserService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.UPDATE, entityName = "Company")
     public BaseResponse<CompanyUserResponse> update(UUID id, CompanyUserUpdateRequest request) {
         log.debug("Updating company: {}", id);
         CompanyUser company = findOrThrow(id);
@@ -51,6 +54,7 @@ public class CompanyUserService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.DELETE, entityName = "Company")
     public BaseResponse<Void> delete(UUID id) {
         if (!companyUserRepository.existsById(id)) {
             log.warn("Company not found: {}", id);

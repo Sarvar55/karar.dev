@@ -10,7 +10,7 @@ import org.karar.dev.domain.user.User;
 
 
 @Entity
-@Table(name = "companies")
+@Table(name = "company_users")
 @Getter
 @Setter
 @NoArgsConstructor

@@ -2,6 +2,8 @@ package org.karar.dev.domain.decisiontag;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.karar.dev.common.audit.AuditAction;
+import org.karar.dev.common.audit.Auditable;
 import org.karar.dev.domain.base.BaseResponse;
 import org.karar.dev.domain.tag.TagService;
 import org.karar.dev.domain.tag.dto.TagResponse;
@@ -44,6 +46,7 @@ public class DecisionTagService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.CREATE,entityName = "DecisionTag")
     public void save(DecisionTag decisionTag) {
         log.debug("Saving decision tag: {}", decisionTag);
         decisionTagRepository.save(decisionTag);

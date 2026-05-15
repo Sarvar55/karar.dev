@@ -3,6 +3,8 @@ package org.karar.dev.domain.tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.karar.dev.common.audit.AuditAction;
+import org.karar.dev.common.audit.Auditable;
 import org.karar.dev.common.exception.conflict.ConflictException;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
 import org.karar.dev.domain.base.BaseResponse;
@@ -52,6 +54,7 @@ public class TagService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.CREATE, entityName = "Tag")
     public BaseResponse<TagResponse> createTag(TagRequest request) {
         log.info("Creating tag: {}", request);
         if (tagRepository.existsByName(request.name().toLowerCase().trim())) {
@@ -68,6 +71,7 @@ public class TagService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.UPDATE, entityName = "Tag")
     public BaseResponse<TagResponse> updateTag(UUID id, TagUpdateRequest request) {
         log.debug("Updating tag: {}, {}", id, request);
         Tag tag = findTagOrThrow(id);
@@ -86,6 +90,7 @@ public class TagService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.DELETE, entityName = "Tag")
     public BaseResponse<Void> deleteTag(UUID id) {
         log.debug("Deleting tag: {}", id);
         if (!tagRepository.existsById(id)) {

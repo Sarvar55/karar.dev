@@ -2,6 +2,8 @@ package org.karar.dev.domain.user.regular;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.karar.dev.common.audit.AuditAction;
+import org.karar.dev.common.audit.Auditable;
 import org.karar.dev.common.exception.dto.PageResponse;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
 import org.karar.dev.domain.base.BaseResponse;
@@ -30,6 +32,7 @@ public class RegularUserService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.UPDATE,entityName = "RegularUser")
     public BaseResponse<RegularUserResponse> update(UUID id, RegularUserUpdateRequest request) {
         log.debug("Updating regular user: {}", id);
         RegularUser user = findOrThrow(id);
@@ -51,6 +54,7 @@ public class RegularUserService {
     }
 
     @Transactional
+    @Auditable(action = AuditAction.DELETE, entityName = "RegularUser")
     public BaseResponse<Void> delete(UUID id) {
         if (!regularUserRepository.existsById(id)) {
             log.warn("Regular user not found: {}", id);
