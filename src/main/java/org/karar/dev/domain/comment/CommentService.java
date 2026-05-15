@@ -83,7 +83,14 @@ public class CommentService {
         log.debug("Creating comment for authenticated user: {}", currentUserId);
 
         RegularUser user = regularUserService.getById(currentUserId);
+        if (user == null) {
+            throw new ResourceNotFoundException("User", "id", currentUserId);
+        }
+
         Decision decision = decisionService.getById(request.decisionId());
+        if (decision == null) {
+            throw new ResourceNotFoundException("Decision", "id", request.decisionId());
+        }
 
         Comment comment = new Comment();
         comment.setContent(request.content());

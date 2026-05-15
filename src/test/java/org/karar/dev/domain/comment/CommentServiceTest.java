@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.karar.dev.common.exception.dto.PageResponse;
 import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
+import org.karar.dev.common.security.service.SecurityService;
 import org.karar.dev.domain.annotation.UnitTest;
 import org.karar.dev.domain.base.BaseResponse;
 import org.karar.dev.domain.comment.dto.CommentRequest;
@@ -44,6 +45,9 @@ class CommentServiceTest {
 
     @Mock
     private DecisionService decisionService;
+
+    @Mock
+    private SecurityService securityService;
 
     @InjectMocks
     private CommentService commentService;
@@ -269,14 +273,14 @@ class CommentServiceTest {
         @Test
         @DisplayName("Should create comment successfully")
         void shouldCreateCommentWhenValidRequest(RegularUser user, Decision decision, Comment comment) {
-            UUID userId = randomId();
-            UUID decisionId = randomId();
-
-            CommentRequest request = createRequest(user.getId(), decision.getId());
+            CommentRequest request = createRequest(decision.getId());
 
             Comment savedComment = comment(user, decision);
 
-            when(regularUserService.getById(request.userId()))
+            when(securityService.getCurrentUserId())
+                    .thenReturn(user.getId());
+
+            when(regularUserService.getById(user.getId()))
                     .thenReturn(user);
 
             when(decisionService.getById(request.decisionId()))
@@ -294,7 +298,8 @@ class CommentServiceTest {
             assertThat(response.getData().content())
                     .isEqualTo(savedComment.getContent());
 
-            verify(regularUserService).getById(request.userId());
+            verify(securityService).getCurrentUserId();
+            verify(regularUserService).getById(user.getId());
             verify(decisionService).getById(request.decisionId());
             verify(commentRepository).saveAndFlush(any());
         }
@@ -302,21 +307,22 @@ class CommentServiceTest {
         @Test
         @DisplayName("Should throw ResourceNotFoundException when user or decision not found")
         void shouldThrowResourceNotFoundExceptionWhenUserOrDecisionDoesntExist() {
-            CommentRequest request = createRequest(randomId(), randomId());
+            CommentRequest request = createRequest(randomId());
+            UUID currentUserId = randomId();
 
-            when(regularUserService.getById(request.userId()))
-                    .thenReturn(null);
+            when(securityService.getCurrentUserId())
+                    .thenReturn(currentUserId);
 
-            when(decisionService.getById(request.decisionId()))
+            when(regularUserService.getById(currentUserId))
                     .thenReturn(null);
 
             assertThatThrownBy(() -> commentService.createComment(request))
                     .isInstanceOf(ResourceNotFoundException.class);
 
-            verify(regularUserService).getById(request.userId());
-            verify(decisionService).getById(request.decisionId());
+            verify(securityService).getCurrentUserId();
+            verify(regularUserService).getById(currentUserId);
+            verify(decisionService, never()).getById(any());
             verify(commentRepository, never()).saveAndFlush(any());
-
         }
     }
 

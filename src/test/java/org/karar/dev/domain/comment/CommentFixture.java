@@ -49,10 +49,8 @@ public class CommentFixture {
         return d;
     }
 
-    public static CommentRequest createRequest(UUID decisionId, UUID userId) {
-        Decision d = decision(decisionId);
-        RegularUser u = user(userId);
-        return new CommentRequest("content", u.getId(), d.getId());
+    public static CommentRequest createRequest(UUID decisionId) {
+        return new CommentRequest("content", decisionId);
     }
 
     public static CommentUpdateRequest createUpdateRequest(String content) {
