@@ -2,9 +2,11 @@ package org.karar.dev.domain.vote.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
 import java.util.UUID;
 
+@Builder
 @Schema(description = "Request object for creating a vote on a decision")
 public record VoteRequest(
 
