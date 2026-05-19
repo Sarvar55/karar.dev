@@ -5,7 +5,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.karar.dev.common.security.dto.JWTConstants;
+import org.karar.dev.common.security.service.token.config.JWTConstants;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -95,6 +95,6 @@ public class JWTService {
     }
 
     private Date prepareExpirationDate() {
-        return Date.from(Instant.now().plusMillis(jwtConstants.getExpirationTime()));
+        return Date.from(Instant.now().plusMillis(jwtConstants.getAccessTokenExpirationTime()));
     }
 }

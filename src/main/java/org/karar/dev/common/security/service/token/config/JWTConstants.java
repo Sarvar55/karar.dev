@@ -1,4 +1,4 @@
-package org.karar.dev.common.security.dto;
+package org.karar.dev.common.security.service.token.config;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,5 +12,6 @@ import org.springframework.stereotype.Component;
 public class JWTConstants {
     private String secret;
     private String issuer;
-    private long expirationTime;
+    private long accessTokenExpirationTime;
+    private long refreshTokenExpirationTime;
 }
