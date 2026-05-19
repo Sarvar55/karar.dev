@@ -61,12 +61,6 @@ class TagServiceTest extends TagTestFixture {
 
             verify(tagRepository).findAll();
         }
-
-        @RepeatedTest(value = 10, name = RepeatedTest.LONG_DISPLAY_NAME)
-        @DisplayName("Dummy Test")
-        void test() {
-            throw new RuntimeException("Error");
-        }
     }
 
     @Nested
