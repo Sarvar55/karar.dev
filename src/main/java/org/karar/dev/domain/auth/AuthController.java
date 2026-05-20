@@ -12,6 +12,7 @@ import org.karar.dev.domain.auth.dto.AuthResponse;
 import org.karar.dev.domain.auth.dto.LoginRequest;
 import org.karar.dev.domain.auth.dto.RegisterRequest;
 import org.karar.dev.domain.base.BaseResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,8 +44,8 @@ public class AuthController {
     })
     @PostMapping("/register")
     public ResponseEntity<BaseResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
-        BaseResponse<AuthResponse> response = authService.register(request);
-        return ResponseEntity.status(response.getStatus()).body(response);
+        AuthResponse authResponse = authService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.success(authResponse, HttpStatus.CREATED));
     }
 
     @Operation(
@@ -67,7 +68,7 @@ public class AuthController {
     })
     @PostMapping("/login")
     public ResponseEntity<BaseResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
-        BaseResponse<AuthResponse> response = authService.login(request);
-        return ResponseEntity.status(response.getStatus()).body(response);
+        AuthResponse authResponse = authService.login(request);
+        return ResponseEntity.ok(BaseResponse.success(authResponse));
     }
 }

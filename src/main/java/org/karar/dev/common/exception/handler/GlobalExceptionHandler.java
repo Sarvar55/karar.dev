@@ -3,11 +3,15 @@ package org.karar.dev.common.exception.handler;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.karar.dev.common.exception.ExceptionMessages;
 import org.karar.dev.common.exception.base.BaseException;
 import org.karar.dev.common.exception.resolver.ExceptionMessageResolver;
 import org.karar.dev.domain.base.BaseResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -44,6 +48,36 @@ public class GlobalExceptionHandler {
 
         BaseResponse<?> response = BaseResponse.validationError(DEFAULT_VALIDATION_MESSAGE, validationErrors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<BaseResponse<?>> handleBadCredentials(BadCredentialsException ex) {
+        log.warn("Authentication failed: invalid credentials");
+        BaseResponse<?> response = BaseResponse.error(
+                "InvalidCredentials",
+                ExceptionMessages.INVALID_CREDENTIALS.getMessage(),
+                HttpStatus.UNAUTHORIZED);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @ExceptionHandler(LockedException.class)
+    public ResponseEntity<BaseResponse<?>> handleLocked(LockedException ex) {
+        log.warn("Authentication failed: account locked");
+        BaseResponse<?> response = BaseResponse.error(
+                "AccountLocked",
+                ex.getMessage(),
+                HttpStatus.FORBIDDEN);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<BaseResponse<?>> handleDisabled(DisabledException ex) {
+        log.warn("Authentication failed: account disabled");
+        BaseResponse<?> response = BaseResponse.error(
+                "AccountDisabled",
+                ExceptionMessages.ACCOUNT_DISABLED.getMessage(),
+                HttpStatus.FORBIDDEN);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
     @ExceptionHandler(Exception.class)

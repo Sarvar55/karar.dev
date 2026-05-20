@@ -1,4 +1,4 @@
-package org.karar.dev.common.security.service.token;
+package org.karar.dev.common.security.service.token.factory;
 
 import org.karar.dev.common.security.service.token.base.TokenType;
 import org.karar.dev.common.security.service.token.strategy.TokenStrategy;

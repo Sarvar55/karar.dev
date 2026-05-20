@@ -12,6 +12,6 @@ import org.springframework.stereotype.Component;
 public class JWTConstants {
     private String secret;
     private String issuer;
-    private long accessTokenExpirationTime;
-    private long refreshTokenExpirationTime;
+    private Long accessTokenExpirationTime;
+    private Long refreshTokenExpirationTime;
 }

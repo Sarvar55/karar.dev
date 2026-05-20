@@ -31,9 +31,9 @@ import java.util.Map;
  * - Implements token type determination based on the provided or parsed claims.
  */
 public abstract class AbstractJwtTokenStrategy implements TokenStrategy {
+
     protected final JWTConstants props;
     protected SecretKey key;
-
 
     @PostConstruct
     public void init() {
@@ -69,17 +69,17 @@ public abstract class AbstractJwtTokenStrategy implements TokenStrategy {
         }
     }
 
-    protected String createToken(String username, TokenType type, long exp) {
+    protected String createToken(String username, TokenType type, Long exp) {
         return createToken(username, type, exp, Map.of());
     }
 
-    protected String createToken(String username, TokenType type, long exp, Map<String, Object> claims) {
+    protected String createToken(String username, TokenType type, Long exp, Map<String, Object> claims) {
         return Jwts.builder()
                 .setSubject(username)
                 .claim(JwtClaims.TYPE, type.name())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + exp))
-                .setClaims(claims)
+                .addClaims(claims)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
