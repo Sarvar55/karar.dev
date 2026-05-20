@@ -39,4 +39,8 @@ public class TokenManager {
         return refreshTokenManager.validate(token);
     }
 
+    public String extractRefreshUsername(String token) {
+        return refreshTokenManager.extractUsername(token);
+    }
+
 }

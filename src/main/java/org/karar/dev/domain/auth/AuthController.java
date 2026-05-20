@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.karar.dev.domain.auth.dto.AuthResponse;
 import org.karar.dev.domain.auth.dto.LoginRequest;
+import org.karar.dev.domain.auth.dto.RefreshTokenRequest;
 import org.karar.dev.domain.auth.dto.RegisterRequest;
 import org.karar.dev.domain.base.BaseResponse;
 import org.springframework.http.HttpStatus;
@@ -71,4 +72,24 @@ public class AuthController {
         AuthResponse authResponse = authService.login(request);
         return ResponseEntity.ok(BaseResponse.success(authResponse));
     }
+
+    @Operation(
+            summary = "Refresh access token",
+            description = "Accepts a valid refresh token and returns a new access token and refresh token pair."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Token refreshed successfully",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid or expired refresh token",
+                    content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            )
+    })
+    @PostMapping("/refresh")
+    public ResponseEntity<BaseResponse<AuthResponse>> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        AuthResponse authResponse = authService.refreshToken(request);
+        return ResponseEntity.ok(BaseResponse.success(authResponse));
+    }
 }
+

@@ -7,11 +7,10 @@ import org.karar.dev.common.exception.base.ValidationException;
 import org.karar.dev.common.exception.conflict.EmailAlreadyExistsException;
 import org.karar.dev.common.security.service.token.TokenManager;
 import org.karar.dev.common.security.service.token.base.JwtClaims;
-import org.karar.dev.common.security.service.token.facade.AccessTokenManager;
-import org.karar.dev.common.security.service.token.facade.RefreshTokenManager;
 import org.karar.dev.common.security.user.SecurityUser;
 import org.karar.dev.domain.auth.dto.AuthResponse;
 import org.karar.dev.domain.auth.dto.LoginRequest;
+import org.karar.dev.domain.auth.dto.RefreshTokenRequest;
 import org.karar.dev.domain.auth.dto.RegisterRequest;
 import org.karar.dev.domain.user.User;
 import org.karar.dev.domain.user.UserRepository;
@@ -66,6 +65,24 @@ public class AuthService {
         return buildAuthResponse(user);
     }
 
+    public AuthResponse refreshToken(RefreshTokenRequest request) {
+        String refreshToken = request.refreshToken();
+
+        if (!tokenManager.isValidRefreshToken(refreshToken)) {
+            throw new BadCredentialsException(
+                    ExceptionMessages.INVALID_REFRESH_TOKEN.getMessage());
+        }
+
+        String email = tokenManager.extractRefreshUsername(refreshToken);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BadCredentialsException(
+                        ExceptionMessages.INVALID_CREDENTIALS.getMessage()));
+
+        log.info("Token refreshed successfully for user: {}", user.getEmail());
+        return buildAuthResponse(user);
+    }
+
     private User createUser(RegisterRequest request) {
         if (request.isCompanyRegistration()) {
             return new CompanyUser(request.email(), request.password(), request.companyName());
@@ -91,3 +108,4 @@ public class AuthService {
         return new AuthResponse(user.getId(), user.getEmail(), user.getRole(), accessToken, refreshToken);
     }
 }
+

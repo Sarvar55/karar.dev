@@ -38,6 +38,7 @@ public enum ExceptionMessages {
     // ── Auth / Role ──────────────────────────────────────────────────────
     UNSUPPORTED_ROLE("Unsupported role: %s"),
     INVALID_CREDENTIALS("Invalid email or password"),
+    INVALID_REFRESH_TOKEN("Refresh token is invalid or expired"),
     ACCOUNT_LOCKED("Account is locked due to too many failed attempts. Try again after %s minutes"),
     ACCOUNT_DISABLED("Account is not verified"),
 
