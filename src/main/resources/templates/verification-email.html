@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+    <title th:text="${title}">karar.dev</title>
+</head>
+<body style="margin:0;padding:0;background-color:#07101e;
+             font-family:-apple-system,BlinkMacSystemFont,
+             'Segoe UI',Helvetica,Arial,sans-serif;">
+
+<!-- preheader -->
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;
+              font-size:1px;color:#07101e;line-height:1px;
+              max-width:0;opacity:0;"
+     th:text="${message}">
+    Verify your email address to get started on karar.dev
+</div>
+
+<!-- outer wrapper -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="background-color:#07101e;">
+    <tr>
+        <td align="center" style="padding:48px 16px 40px;">
+
+            <!-- ── CARD ─────────────────────────────────────── -->
+            <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0"
+                   style="max-width:560px;width:100%;">
+
+                <!-- top gradient bar -->
+                <tr>
+                    <td height="4"
+                        style="background-color:#6db8a8;
+                       border-radius:16px 16px 0 0;
+                       font-size:0;line-height:0;">&nbsp;</td>
+                </tr>
+
+                <!-- card body -->
+                <tr>
+                    <td style="background-color:#0f1e35;
+                       border-left:1px solid #1a3050;
+                       border-right:1px solid #1a3050;
+                       padding:0;">
+
+                        <!-- ── LOGO HEADER ───────────────────────── -->
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td align="center" style="padding:40px 48px 32px;">
+                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <!-- icon box -->
+                                            <td width="40" height="40"
+                                                style="width:40px;height:40px;
+                                   background-color:#0c2a40;
+                                   border:1px solid #1e4060;
+                                   border-radius:10px;
+                                   text-align:center;
+                                   vertical-align:middle;">
+                          <span style="font-size:18px;
+                                       font-weight:700;
+                                       color:#6db8a8;
+                                       line-height:40px;
+                                       font-family:Georgia,serif;">K</span>
+                                            </td>
+                                            <!-- wordmark -->
+                                            <td style="padding-left:12px;vertical-align:middle;white-space:nowrap;">
+                          <span style="font-size:20px;
+                                       font-weight:700;
+                                       color:#ffffff;
+                                       letter-spacing:-0.3px;
+                                       font-family:Georgia,'Times New Roman',serif;">karar</span><span
+                                                    style="font-size:20px;
+                                      font-weight:700;
+                                      color:#6db8a8;
+                                      letter-spacing:-0.3px;
+                                      font-family:Georgia,'Times New Roman',serif;">.dev</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- hairline -->
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="padding:0 48px;">
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td height="1"
+                                                style="background-color:#1a3050;
+                                   font-size:0;line-height:0;">&nbsp;</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- ── MAIN BODY ──────────────────────────── -->
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="padding:40px 48px 12px;">
+
+                                    <!-- verify icon badge -->
+                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0"
+                                           style="margin-bottom:28px;">
+                                        <tr>
+                                            <td width="52" height="52"
+                                                style="width:52px;height:52px;
+                                   background-color:#0c2a40;
+                                   border:1px solid #1e4a60;
+                                   border-radius:50%;
+                                   text-align:center;
+                                   vertical-align:middle;">
+                                                <!-- envelope using text for email safety -->
+                                                <span style="font-size:22px;
+                                       line-height:52px;
+                                       color:#6db8a8;">@</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- headline -->
+                                    <h1 th:text="${title}"
+                                        style="margin:0 0 14px;
+                               font-size:26px;
+                               font-weight:700;
+                               color:#ffffff;
+                               line-height:1.2;
+                               letter-spacing:-0.5px;
+                               font-family:Georgia,'Times New Roman',serif;">
+                                        Verify your email address
+                                    </h1>
+
+                                    <!-- body text -->
+                                    <p th:text="${message}"
+                                       style="margin:0 0 32px;
+                              font-size:15px;
+                              color:#7a9ab8;
+                              line-height:1.8;">
+                                        Thanks for signing up. Please verify your email address
+                                        to activate your account and start sharing engineering decisions.
+                                    </p>
+
+                                    <!-- ── CTA BUTTON ── -->
+                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0"
+                                           style="margin-bottom:32px;">
+                                        <tr>
+                                            <td style="border-radius:12px;
+                                   background-color:#6db8a8;">
+                                                <!--[if mso]>
+                                                <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml"
+                                                             xmlns:w="urn:schemas-microsoft-com:office:word"
+                                                             href="#" style="height:50px;v-text-anchor:middle;width:240px;"
+                                                             arcsize="24%" stroke="f" fillcolor="#6db8a8">
+                                                    <w:anchorlock/>
+                                                    <center style="color:#07101e;font-family:sans-serif;
+                                         font-size:15px;font-weight:bold;">
+                                                        Verify Email Address
+                                                    </center>
+                                                </v:roundrect>
+                                                <![endif]-->
+                                                <!--[if !mso]><!-->
+                                                <a th:href="${verificationUrl}"
+                                                   href="#"
+                                                   style="display:inline-block;
+                                    padding:15px 40px;
+                                    font-size:15px;
+                                    font-weight:700;
+                                    color:#07101e;
+                                    text-decoration:none;
+                                    letter-spacing:0.2px;
+                                    white-space:nowrap;
+                                    font-family:-apple-system,BlinkMacSystemFont,
+                                    'Segoe UI',Helvetica,Arial,sans-serif;">
+                                                    Verify Email Address &rarr;
+                                                </a>
+                                                <!--<![endif]-->
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <!-- ── FALLBACK URL BOX ── -->
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                                           style="margin-bottom:8px;">
+                                        <tr>
+                                            <td style="background-color:#0a1828;
+                                   border:1px solid #1a3050;
+                                   border-radius:10px;
+                                   padding:16px 20px;">
+                                                <p style="margin:0 0 8px;
+                                    font-size:10px;
+                                    font-family:'Courier New',Courier,monospace;
+                                    letter-spacing:2px;
+                                    text-transform:uppercase;
+                                    color:#3a6080;">
+                                                    OR COPY THIS LINK
+                                                </p>
+                                                <p th:text="${verificationUrl}"
+                                                   style="margin:0;
+                                    font-size:12px;
+                                    font-family:'Courier New',Courier,monospace;
+                                    color:#6db8a8;
+                                    word-break:break-all;
+                                    line-height:1.7;">
+                                                    https://karar.dev/verify?token=...
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- ── EXPIRY NOTICE ───────────────────────── -->
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="padding:8px 48px 36px;">
+                                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="background-color:#1a1200;
+                                   border:1px solid #2e2000;
+                                   border-left:3px solid #c9a96e;
+                                   border-radius:0 8px 8px 0;
+                                   padding:12px 18px;">
+                                                <p style="margin:0;
+                                    font-size:12px;
+                                    color:#8a7040;
+                                    line-height:1.7;">
+                                                    This link expires in
+                                                    <strong style="color:#c9a96e;">24 hours</strong>.
+                                                    If you did not create an account,
+                                                    you can safely ignore this email.
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </td>
+                </tr>
+
+                <!-- ── FOOTER ─────────────────────────────────── -->
+                <tr>
+                    <td style="background-color:#080f1c;
+                       border:1px solid #0f1e35;
+                       border-radius:0 0 16px 16px;
+                       padding:24px 48px;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <!-- left: legal -->
+                                <td style="vertical-align:top;">
+                                    <p style="margin:0 0 4px;
+                               font-size:11px;
+                               color:#2a4060;
+                               line-height:1.6;">
+                                        You received this because an account was
+                                        registered with this address on karar.dev.
+                                    </p>
+                                    <p style="margin:0;
+                               font-size:11px;
+                               color:#1e3050;">
+                                        &copy; 2026 karar.dev &mdash; Real decisions, real engineers
+                                    </p>
+                                </td>
+                                <!-- right: support link -->
+                                <td width="100" style="text-align:right;vertical-align:top;">
+                                    <a href="https://karar.dev/support"
+                                       style="font-size:11px;
+                              color:#3a6080;
+                              text-decoration:none;">
+                                        Get help &rarr;
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+            </table>
+            <!-- ── /CARD ─────────────────────────────────────── -->
+
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

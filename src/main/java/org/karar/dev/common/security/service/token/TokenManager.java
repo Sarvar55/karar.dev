@@ -43,4 +43,8 @@ public class TokenManager {
         return refreshTokenManager.extractUsername(token);
     }
 
+    public String extractAccessUsername(String token) {
+        return accessTokenManager.extractUsername(token);
+    }
+
 }

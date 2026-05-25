@@ -8,14 +8,15 @@ import org.karar.dev.common.exception.conflict.EmailAlreadyExistsException;
 import org.karar.dev.common.security.service.token.TokenManager;
 import org.karar.dev.common.security.service.token.base.JwtClaims;
 import org.karar.dev.common.security.user.SecurityUser;
-import org.karar.dev.domain.auth.dto.AuthResponse;
-import org.karar.dev.domain.auth.dto.LoginRequest;
-import org.karar.dev.domain.auth.dto.RefreshTokenRequest;
-import org.karar.dev.domain.auth.dto.RegisterRequest;
+import org.karar.dev.domain.auth.dto.*;
+import org.karar.dev.domain.auth.event.EmailVerificationEvent;
+import org.karar.dev.domain.auth.event.EmailVerificationProducer;
+import org.karar.dev.domain.auth.verification.VerificationTokenService;
 import org.karar.dev.domain.user.User;
 import org.karar.dev.domain.user.UserRepository;
 import org.karar.dev.domain.user.company.CompanyUser;
 import org.karar.dev.domain.user.regular.RegularUser;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,20 +36,35 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final TokenManager tokenManager;
+    private final VerificationTokenService verificationTokenService;
+    private final EmailVerificationProducer emailVerificationProducer;
+
+    @Value("${app.verification.base-url:http://localhost:8080}")
+    private String verificationBaseUrl;
 
     @Transactional
-    public AuthResponse register(RegisterRequest request) {
+    public RegisterResponse register(RegisterRequest request) {
         log.debug("Registering user: {}", request.email());
         checkEmailUniqueness(request.email());
 
         User user = createUser(request);
         user.setPassword(passwordEncoder.encode(request.password()));
-        user.setEmailVerified(true); // TODO: Set to false when email verification is implemented
+        user.setEmailVerified(false);
 
         User savedUser = userRepository.save(user);
         log.info("User registered successfully: {}", savedUser.getEmail());
 
-        return buildAuthResponse(savedUser);
+        // Create verification token and publish Kafka event
+        String token = verificationTokenService.createToken(savedUser.getEmail());
+        String verificationUrl = verificationBaseUrl + "/api/v1/auth/verify?token=" + token;
+
+        emailVerificationProducer.send(
+                new EmailVerificationEvent(savedUser.getEmail(), token, verificationUrl));
+
+        return new RegisterResponse(
+                savedUser.getId(),
+                savedUser.getEmail(),
+                "Registration successful. Please check your email to verify your account.");
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -83,6 +99,46 @@ public class AuthService {
         return buildAuthResponse(user);
     }
 
+    @Transactional
+    public String verifyEmail(String token) {
+        String email = verificationTokenService.verifyToken(token);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        ExceptionMessages.VERIFICATION_TOKEN_NOT_FOUND.getMessage()));
+
+        if (user.isEmailVerified()) {
+            return ExceptionMessages.EMAIL_ALREADY_VERIFIED.getMessage();
+        }
+
+        user.setEmailVerified(true);
+        userRepository.save(user);
+        log.info("Email verified successfully for user: {}", email);
+
+        return "Email verified successfully";
+    }
+
+    @Transactional
+    public String resendVerification(ResendVerificationRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new BadCredentialsException(
+                        ExceptionMessages.INVALID_CREDENTIALS.getMessage()));
+
+        if (user.isEmailVerified()) {
+            return ExceptionMessages.EMAIL_ALREADY_VERIFIED.getMessage();
+        }
+
+        // Delete old token and create new one
+        String token = verificationTokenService.createToken(user.getEmail());
+        String verificationUrl = verificationBaseUrl + "/api/v1/auth/verify?token=" + token;
+
+        emailVerificationProducer.send(
+                new EmailVerificationEvent(user.getEmail(), token, verificationUrl));
+
+        log.info("Verification email resent to: {}", user.getEmail());
+        return "Verification email resent";
+    }
+
     private User createUser(RegisterRequest request) {
         if (request.isCompanyRegistration()) {
             return new CompanyUser(request.email(), request.password(), request.companyName());
@@ -108,4 +164,3 @@ public class AuthService {
         return new AuthResponse(user.getId(), user.getEmail(), user.getRole(), accessToken, refreshToken);
     }
 }
-

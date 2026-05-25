@@ -8,10 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.karar.dev.domain.auth.dto.AuthResponse;
-import org.karar.dev.domain.auth.dto.LoginRequest;
-import org.karar.dev.domain.auth.dto.RefreshTokenRequest;
-import org.karar.dev.domain.auth.dto.RegisterRequest;
+import org.karar.dev.domain.auth.dto.*;
 import org.karar.dev.domain.base.BaseResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,9 +41,9 @@ public class AuthController {
             )
     })
     @PostMapping("/register")
-    public ResponseEntity<BaseResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
-        AuthResponse authResponse = authService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.success(authResponse, HttpStatus.CREATED));
+    public ResponseEntity<BaseResponse<RegisterResponse>> register(@Valid @RequestBody RegisterRequest request) {
+        RegisterResponse registerResponse = authService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.success(registerResponse, HttpStatus.CREATED));
     }
 
     @Operation(
@@ -91,5 +88,33 @@ public class AuthController {
         AuthResponse authResponse = authService.refreshToken(request);
         return ResponseEntity.ok(BaseResponse.success(authResponse));
     }
-}
 
+    @Operation(
+            summary = "Verify email address",
+            description = "Verifies user email using the token sent via email."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Email verified successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid or expired token")
+    })
+    @GetMapping("/verify")
+    public ResponseEntity<BaseResponse<String>> verifyEmail(@RequestParam String token) {
+        String message = authService.verifyEmail(token);
+        return ResponseEntity.ok(BaseResponse.success(message));
+    }
+
+    @Operation(
+            summary = "Resend verification email",
+            description = "Resends verification email to the user. Old token is invalidated."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Verification email resent"),
+            @ApiResponse(responseCode = "400", description = "Invalid email or already verified")
+    })
+    @PostMapping("/resend-verification")
+    public ResponseEntity<BaseResponse<String>> resendVerification(
+            @Valid @RequestBody ResendVerificationRequest request) {
+        String message = authService.resendVerification(request);
+        return ResponseEntity.ok(BaseResponse.success(message));
+    }
+}

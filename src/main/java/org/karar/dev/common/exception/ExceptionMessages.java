@@ -42,6 +42,12 @@ public enum ExceptionMessages {
     ACCOUNT_LOCKED("Account is locked due to too many failed attempts. Try again after %s minutes"),
     ACCOUNT_DISABLED("Account is not verified"),
 
+    // ── Email Verification ──────────────────────────────────────────────
+    EMAIL_NOT_VERIFIED("Please verify your email before logging in"),
+    VERIFICATION_TOKEN_EXPIRED("Verification token has expired, please request a new one"),
+    VERIFICATION_TOKEN_NOT_FOUND("Invalid verification token"),
+    EMAIL_ALREADY_VERIFIED("Email is already verified"),
+
     // ── Generic ──────────────────────────────────────────────────────────
     INTERNAL_SERVER_ERROR("An unexpected error occurred");
 

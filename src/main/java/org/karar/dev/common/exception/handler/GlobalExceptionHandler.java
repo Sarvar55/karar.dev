@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,8 +28,11 @@ public class GlobalExceptionHandler {
 
     private static final String DEFAULT_VALIDATION_MESSAGE = "Validation failed";
     private static final String DEFAULT_ERROR_MESSAGE = "An unexpected error occurred";
+    private static final String INTERNAL_SERVER_ERROR_MESSAGE = "InternalServerError";
+    private static final String INVALID_CREDENTIALS_MESSAGE = "InvalidCredentials";
+    private static final String ACCOUNT_DISABLED_MESSAGE = "AccountDisabled";
+    private static final String ACCOUNT_LOCKED_MESSAGE = "AccountLocked";
     private final ExceptionMessageResolver exceptionMessageResolver;
-
 
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<BaseResponse<?>> handleBaseException(BaseException ex) {
@@ -54,7 +58,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponse<?>> handleBadCredentials(BadCredentialsException ex) {
         log.warn("Authentication failed: invalid credentials");
         BaseResponse<?> response = BaseResponse.error(
-                "InvalidCredentials",
+                INVALID_CREDENTIALS_MESSAGE,
                 ExceptionMessages.INVALID_CREDENTIALS.getMessage(),
                 HttpStatus.UNAUTHORIZED);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
@@ -64,7 +68,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponse<?>> handleLocked(LockedException ex) {
         log.warn("Authentication failed: account locked");
         BaseResponse<?> response = BaseResponse.error(
-                "AccountLocked",
+                ACCOUNT_LOCKED_MESSAGE,
                 ex.getMessage(),
                 HttpStatus.FORBIDDEN);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
@@ -74,10 +78,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponse<?>> handleDisabled(DisabledException ex) {
         log.warn("Authentication failed: account disabled");
         BaseResponse<?> response = BaseResponse.error(
-                "AccountDisabled",
-                ExceptionMessages.ACCOUNT_DISABLED.getMessage(),
+                ACCOUNT_DISABLED_MESSAGE,
+                exceptionMessageResolver.resolve(ex),
                 HttpStatus.FORBIDDEN);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<BaseResponse<?>> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+        log.warn("Authentication failed: username not found");
+        BaseResponse<?> response = BaseResponse.error(
+                INVALID_CREDENTIALS_MESSAGE,
+                exceptionMessageResolver.resolve(ex),
+                HttpStatus.UNAUTHORIZED);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
     @ExceptionHandler(Exception.class)
@@ -86,10 +100,9 @@ public class GlobalExceptionHandler {
                 "Unexpected error occurred. Path: {}, Method: {}",
                 request.getRequestURI(),
                 request.getMethod(),
-                ex
-        );
+                ex);
         BaseResponse<?> response = BaseResponse.error(
-                "InternalServerError",
+                INTERNAL_SERVER_ERROR_MESSAGE,
                 exceptionMessageResolver.resolve(ex),
                 HttpStatus.INTERNAL_SERVER_ERROR);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);

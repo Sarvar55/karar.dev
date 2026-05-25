@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.karar.dev.common.security.service.CustomUserDetailsService;
-import org.karar.dev.common.security.service.JWTService;
+import org.karar.dev.common.security.service.token.TokenManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,7 +26,7 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
     private final CustomUserDetailsService userDetailsService;
-    private final JWTService jwtService;
+    private final TokenManager tokenManager;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -36,8 +36,8 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 
         try {
             Optional<String> jwtOpt = parseJwt(request);
-            if (jwtOpt.isPresent() && jwtService.validateJwtToken(jwtOpt.get())) {
-                String username = jwtService.getUsernameFromToken(jwtOpt.get());
+            if (jwtOpt.isPresent() && tokenManager.isValidAccessToken(jwtOpt.get())) {
+                String username = tokenManager.extractAccessUsername(jwtOpt.get());
     
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken authentication =
@@ -72,3 +72,4 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
         return Optional.empty();
     }
 }
+

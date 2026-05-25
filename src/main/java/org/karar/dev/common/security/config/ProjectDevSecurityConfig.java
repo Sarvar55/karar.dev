@@ -4,11 +4,14 @@ import org.karar.dev.common.security.SecurityPathConfig;
 import org.karar.dev.common.security.exception.CustomAccessDeniedHandler;
 import org.karar.dev.common.security.exception.CustomAuthenticationEntryPoint;
 import org.karar.dev.common.security.filter.AuthenticationTokenFilter;
+import org.karar.dev.common.security.provider.CustomAuthenticationProvider;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -21,6 +24,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @Profile("dev")
@@ -65,8 +69,15 @@ public class ProjectDevSecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(
+            CustomAuthenticationProvider provider,
+            ApplicationEventPublisher eventPublisher) {
+
+        ProviderManager providerManager = new ProviderManager(List.of(provider));
+        
+        providerManager.setAuthenticationEventPublisher(
+                new DefaultAuthenticationEventPublisher(eventPublisher));
+        return providerManager;
     }
 
     @Bean
@@ -83,3 +94,4 @@ public class ProjectDevSecurityConfig {
     }
 
 }
+

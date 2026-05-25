@@ -30,7 +30,7 @@ import java.util.Map;
  * - Uses `Claims` from the JWT library to handle token data.
  * - Implements token type determination based on the provided or parsed claims.
  */
-public abstract class AbstractJwtTokenStrategy implements TokenStrategy {
+public abstract class AbstractJwtTokenStrategy extends AbstractTokenStrategy {
 
     protected final JWTConstants props;
     protected SecretKey key;

@@ -19,22 +19,17 @@ public class AccessTokenStrategy extends AbstractJwtTokenStrategy {
     }
 
     @Override
-    public String generate(String username) {
-        return createToken(username, type(), props.getAccessTokenExpirationTime());
-    }
-
-    @Override
-    public String generate(String username, Map<String, Object> claims) {
+    protected String doGenerate(String username, Map<String, Object> claims) {
         return createToken(username, type(), props.getAccessTokenExpirationTime(), claims);
     }
 
     @Override
-    public boolean validate(String token) {
+    protected boolean doValidate(String token) {
         return validateToken(token, type());
     }
 
     @Override
-    public String extractUsername(String token) {
+    protected String doExtractUsername(String token) {
         return parse(token).getSubject();
     }
 }
