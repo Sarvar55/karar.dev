@@ -91,6 +91,7 @@ class DecisionServiceTest {
             assertThat(response.getData().getTotalElements()).isEqualTo(1);
 
             verify(decisionRepository).findAll(pageable);
+            verifyNoMoreInteractions(decisionRepository);
         }
 
         @Test
