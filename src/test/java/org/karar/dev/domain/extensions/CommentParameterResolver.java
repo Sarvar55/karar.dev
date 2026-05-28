@@ -3,10 +3,10 @@ package org.karar.dev.domain.extensions;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolver;
-import org.karar.dev.domain.comment.Comment;
+import org.karar.dev.domain.comment.entity.Comment;
 import org.karar.dev.domain.comment.CommentFixture;
-import org.karar.dev.domain.decision.Decision;
-import org.karar.dev.domain.user.regular.RegularUser;
+import org.karar.dev.domain.decision.entity.Decision;
+import org.karar.dev.domain.user.regular.entity.RegularUser;
 
 public class CommentParameterResolver implements ParameterResolver {
     @Override

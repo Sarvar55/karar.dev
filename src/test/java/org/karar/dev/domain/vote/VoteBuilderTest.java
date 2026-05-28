@@ -1,8 +1,8 @@
 package org.karar.dev.domain.vote;
 
-import org.karar.dev.domain.decision.Decision;
-import org.karar.dev.domain.user.regular.RegularUser;
-import org.karar.dev.domain.vote.Vote;
+import org.karar.dev.domain.decision.entity.Decision;
+import org.karar.dev.domain.user.regular.entity.RegularUser;
+import org.karar.dev.domain.vote.entity.Vote;
 
 public class VoteBuilderTest {
 

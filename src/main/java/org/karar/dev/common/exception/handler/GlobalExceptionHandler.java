@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.karar.dev.common.exception.ExceptionMessages;
 import org.karar.dev.common.exception.base.BaseException;
 import org.karar.dev.common.exception.resolver.ExceptionMessageResolver;
-import org.karar.dev.domain.base.BaseResponse;
+import org.karar.dev.common.dto.BaseResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;

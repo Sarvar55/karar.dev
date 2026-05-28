@@ -1,7 +1,7 @@
 package org.karar.dev.domain.decision.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.karar.dev.common.enums.RegretLevel;
+import org.karar.dev.domain.decision.entity.RegretLevel;
 
 import java.time.LocalDateTime;
 import java.util.Set;

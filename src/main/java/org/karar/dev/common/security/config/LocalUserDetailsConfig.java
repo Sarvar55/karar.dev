@@ -2,8 +2,8 @@ package org.karar.dev.common.security.config;
 
 import org.karar.dev.common.enums.Role;
 import org.karar.dev.common.security.user.SecurityUser;
-import org.karar.dev.domain.user.company.CompanyUser;
-import org.karar.dev.domain.user.regular.RegularUser;
+import org.karar.dev.domain.user.company.entity.CompanyUser;
+import org.karar.dev.domain.user.regular.entity.RegularUser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;

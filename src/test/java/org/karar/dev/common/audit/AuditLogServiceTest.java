@@ -1,14 +1,17 @@
 package org.karar.dev.common.audit;
+import org.karar.dev.domain.audit.repository.AuditLogRepository;
+import org.karar.dev.domain.audit.entity.AuditLog;
+import org.karar.dev.domain.audit.service.AuditLogService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.karar.dev.common.audit.dto.AuditLogResponse;
-import org.karar.dev.common.exception.dto.PageResponse;
+import org.karar.dev.domain.audit.dto.AuditLogResponse;
+import org.karar.dev.common.dto.PageResponse;
 import org.karar.dev.domain.annotation.UnitTest;
-import org.karar.dev.domain.base.BaseResponse;
+import org.karar.dev.common.dto.BaseResponse;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

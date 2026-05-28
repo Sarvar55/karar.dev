@@ -1,11 +1,14 @@
 package org.karar.dev.domain.user.regular;
+import org.karar.dev.domain.user.regular.repository.RegularUserRepository;
+import org.karar.dev.domain.user.regular.service.RegularUserService;
+import org.karar.dev.domain.user.regular.entity.RegularUser;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.karar.dev.common.exception.dto.PageResponse;
-import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
+import org.karar.dev.common.dto.PageResponse;
+import org.karar.dev.common.exception.notfound.ResourceNotFoundException;
 import org.karar.dev.domain.annotation.UnitTest;
-import org.karar.dev.domain.base.BaseResponse;
+import org.karar.dev.common.dto.BaseResponse;
 import org.karar.dev.domain.user.regular.dto.RegularUserResponse;
 import org.karar.dev.domain.user.regular.dto.RegularUserUpdateRequest;
 import org.mockito.InjectMocks;

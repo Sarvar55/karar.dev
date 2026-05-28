@@ -4,16 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
-import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
+import org.karar.dev.common.exception.notfound.ResourceNotFoundException;
 import org.karar.dev.common.security.user.SecurityUser;
-import org.karar.dev.domain.comment.Comment;
-import org.karar.dev.domain.comment.CommentRepository;
-import org.karar.dev.domain.decision.Decision;
-import org.karar.dev.domain.decision.DecisionRepository;
-import org.karar.dev.domain.user.User;
-import org.karar.dev.domain.user.UserRepository;
-import org.karar.dev.domain.vote.Vote;
-import org.karar.dev.domain.vote.VoteRepository;
+import org.karar.dev.domain.comment.entity.Comment;
+import org.karar.dev.domain.comment.repository.CommentRepository;
+import org.karar.dev.domain.decision.entity.Decision;
+import org.karar.dev.domain.decision.repository.DecisionRepository;
+import org.karar.dev.domain.user.entity.User;
+import org.karar.dev.domain.user.repository.UserRepository;
+import org.karar.dev.domain.vote.entity.Vote;
+import org.karar.dev.domain.vote.repository.VoteRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;

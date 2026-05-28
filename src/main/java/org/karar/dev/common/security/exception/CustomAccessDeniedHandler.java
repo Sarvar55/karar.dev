@@ -2,7 +2,7 @@ package org.karar.dev.common.security.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.karar.dev.domain.base.BaseResponse;
+import org.karar.dev.common.dto.BaseResponse;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;

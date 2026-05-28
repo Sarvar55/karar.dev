@@ -1,9 +1,10 @@
 package org.karar.dev.domain.decision;
+import org.karar.dev.domain.decision.entity.Decision;
 
-import org.karar.dev.common.enums.RegretLevel;
-import org.karar.dev.domain.decisiontag.DecisionTag;
-import org.karar.dev.domain.tag.Tag;
-import org.karar.dev.domain.user.regular.RegularUser;
+import org.karar.dev.domain.decision.entity.RegretLevel;
+import org.karar.dev.domain.decision.entity.DecisionTag;
+import org.karar.dev.domain.tag.entity.Tag;
+import org.karar.dev.domain.user.regular.entity.RegularUser;
 import org.karar.dev.domain.user.regular.RegularUserBuilder;
 
 import java.util.HashSet;

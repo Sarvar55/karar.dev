@@ -3,7 +3,7 @@ package org.karar.dev.domain.decision.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.karar.dev.common.enums.RegretLevel;
+import org.karar.dev.domain.decision.entity.RegretLevel;
 
 import java.util.Set;
 import java.util.UUID;

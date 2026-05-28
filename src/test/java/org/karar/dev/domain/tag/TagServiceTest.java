@@ -1,4 +1,7 @@
 package org.karar.dev.domain.tag;
+import org.karar.dev.domain.tag.repository.TagRepository;
+import org.karar.dev.domain.tag.service.TagService;
+import org.karar.dev.domain.tag.entity.Tag;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -6,9 +9,9 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.karar.dev.common.exception.conflict.ConflictException;
-import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
+import org.karar.dev.common.exception.notfound.ResourceNotFoundException;
 import org.karar.dev.domain.annotation.UnitTest;
-import org.karar.dev.domain.base.BaseResponse;
+import org.karar.dev.common.dto.BaseResponse;
 import org.karar.dev.domain.extensions.TagServiceParameterResolver;
 import org.karar.dev.domain.tag.dto.TagRequest;
 import org.karar.dev.domain.tag.dto.TagResponse;

@@ -1,4 +1,5 @@
 package org.karar.dev.domain.user.company;
+import org.karar.dev.domain.user.company.entity.CompanyUser;
 
 import java.util.UUID;
 

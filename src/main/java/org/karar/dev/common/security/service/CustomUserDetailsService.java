@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.karar.dev.common.exception.ExceptionMessages;
 import org.karar.dev.common.security.user.SecurityUser;
-import org.karar.dev.domain.user.User;
-import org.karar.dev.domain.user.UserRepository;
+import org.karar.dev.domain.user.entity.User;
+import org.karar.dev.domain.user.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

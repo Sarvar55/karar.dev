@@ -2,8 +2,8 @@ package org.karar.dev.domain.auth.listener;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.karar.dev.domain.user.User;
-import org.karar.dev.domain.user.UserRepository;
+import org.karar.dev.domain.user.entity.User;
+import org.karar.dev.domain.user.repository.UserRepository;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;

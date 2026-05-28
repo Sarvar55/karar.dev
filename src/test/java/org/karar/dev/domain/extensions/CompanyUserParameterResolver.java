@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
-import org.karar.dev.domain.user.company.CompanyUser;
+import org.karar.dev.domain.user.company.entity.CompanyUser;
 import org.karar.dev.domain.user.company.CompanyUserBuilder;
 
 public class CompanyUserParameterResolver implements ParameterResolver {

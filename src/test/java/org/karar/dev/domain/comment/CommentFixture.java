@@ -1,9 +1,10 @@
 package org.karar.dev.domain.comment;
+import org.karar.dev.domain.comment.entity.Comment;
 
 import org.karar.dev.domain.comment.dto.CommentRequest;
 import org.karar.dev.domain.comment.dto.CommentUpdateRequest;
-import org.karar.dev.domain.decision.Decision;
-import org.karar.dev.domain.user.regular.RegularUser;
+import org.karar.dev.domain.decision.entity.Decision;
+import org.karar.dev.domain.user.regular.entity.RegularUser;
 
 import java.util.UUID;
 

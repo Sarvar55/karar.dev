@@ -1,15 +1,18 @@
 package org.karar.dev.domain.user.company;
+import org.karar.dev.domain.user.company.repository.CompanyUserRepository;
+import org.karar.dev.domain.user.company.service.CompanyUserService;
+import org.karar.dev.domain.user.company.entity.CompanyUser;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.karar.dev.common.exception.dto.PageResponse;
-import org.karar.dev.common.exception.notFound.ResourceNotFoundException;
+import org.karar.dev.common.dto.PageResponse;
+import org.karar.dev.common.exception.notfound.ResourceNotFoundException;
 import org.karar.dev.domain.annotation.UnitTest;
-import org.karar.dev.domain.base.BaseResponse;
+import org.karar.dev.common.dto.BaseResponse;
 import org.karar.dev.domain.extensions.CompanyUserParameterResolver;
-import org.karar.dev.domain.user.UserService;
+import org.karar.dev.domain.user.service.UserService;
 import org.karar.dev.domain.user.company.dto.CompanyUserResponse;
 import org.karar.dev.domain.user.company.dto.CompanyUserUpdateRequest;
 import org.mockito.InjectMocks;

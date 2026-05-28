@@ -1,4 +1,5 @@
 package org.karar.dev.domain.tag;
+import org.karar.dev.domain.tag.entity.Tag;
 
 import java.util.UUID;
 

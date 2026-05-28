@@ -1,6 +1,6 @@
 package org.karar.dev.domain.decision;
 
-import org.karar.dev.common.enums.RegretLevel;
+import org.karar.dev.domain.decision.entity.RegretLevel;
 import org.karar.dev.domain.decision.dto.DecisionRequest;
 
 import java.util.Set;
