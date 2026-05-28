@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 @Tag(name = "Regular User Management", description = "CRUD operations for regular users")
 public class RegularUserController {
@@ -27,7 +27,7 @@ public class RegularUserController {
     private final RegularUserService regularUserService;
     private final UserCommentService userCommentService;
 
-    @GetMapping("/{userId}/comments")
+    @GetMapping(value = "/{userId}/comments", produces = "application/vnd.karar.dev+json;v=1.0")
     @Operation(summary = "Get comments for a user")
     public ResponseEntity<BaseResponse<PageResponse<CommentResponse>>> getUserComments(
             @PathVariable UUID userId,
@@ -35,7 +35,7 @@ public class RegularUserController {
         return ResponseEntity.ok(userCommentService.getCommentsByUserId(userId, pageable));
     }
 
-    @GetMapping
+    @GetMapping(produces = "application/vnd.karar.dev+json;v=1.0")
     @Operation(summary = "Get all regular users")
     public ResponseEntity<BaseResponse<PageResponse<RegularUserResponse>>> getAll(
             @ParameterObject @PageableDefault(value = 5, sort = "createdAt") Pageable pageable) {
@@ -43,22 +43,23 @@ public class RegularUserController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = "application/vnd.karar.dev+json;v=1.0")
     @Operation(summary = "Get regular user by ID")
     public ResponseEntity<BaseResponse<RegularUserResponse>> getById(@PathVariable UUID id) {
         BaseResponse<RegularUserResponse> response = regularUserService.getUserById(id);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", produces = "application/vnd.karar.dev+json;v=1.0")
     @Operation(summary = "Update regular user")
     @PreAuthorize("@securityService.isAdminOrSelf(authentication, #id)")
-    public ResponseEntity<BaseResponse<RegularUserResponse>> update(@PathVariable UUID id, @Valid @RequestBody RegularUserUpdateRequest request) {
+    public ResponseEntity<BaseResponse<RegularUserResponse>> update(@PathVariable UUID id,
+            @Valid @RequestBody RegularUserUpdateRequest request) {
         BaseResponse<RegularUserResponse> response = regularUserService.update(id, request);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}", produces = "application/vnd.karar.dev+json;v=1.0")
     @Operation(summary = "Delete regular user")
     @PreAuthorize("@securityService.isAdminOrSelf(authentication, #id)")
     public ResponseEntity<BaseResponse<Void>> delete(@PathVariable UUID id) {

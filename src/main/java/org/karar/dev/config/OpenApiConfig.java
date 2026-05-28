@@ -5,8 +5,11 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.media.StringSchema;
+import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,6 +19,7 @@ public class OpenApiConfig {
     private static final String API_TITLE = "Karar Dev API";
     private static final String API_VERSION = "1.0";
     private static final String API_DESCRIPTION = "API documentation for Karar Dev Application";
+    private static final String VENDOR_MEDIA_TYPE = "application/vnd.karar.dev+json;v=1.0";
 
     private static final String CONTACT_NAME = "Karar Dev Team";
     private static final String CONTACT_EMAIL = "contact@karar.dev";
@@ -34,6 +38,29 @@ public class OpenApiConfig {
                 .info(apiInfo())
                 .addSecurityItem(securityRequirement())
                 .components(apiComponents());
+    }
+
+    /**
+     * Adds a global Accept header parameter to all operations in Swagger UI
+     * so that every request is sent with the versioned vendor media type.
+     * This enables content-negotiation-based API versioning from Swagger.
+     */
+    @Bean
+    public OpenApiCustomizer apiVersionHeaderCustomizer() {
+        return openApi -> openApi.getPaths().values()
+                .forEach(pathItem -> pathItem.readOperations().forEach(operation -> {
+                    operation.addParametersItem(
+                            new HeaderParameter()
+                                    .name("Accept")
+                                    .description("API version via content negotiation")
+                                    .required(false)
+                                    .schema(new StringSchema()
+                                            ._default(VENDOR_MEDIA_TYPE)
+                                            .addEnumItem(VENDOR_MEDIA_TYPE)
+                                            .addEnumItem("application/vnd.karar.dev+json;v=2.0")
+                                            .addEnumItem("application/vnd.karar.dev+json;v=3.0")
+                                            .addEnumItem("application/json")));
+                }));
     }
 
     private Info apiInfo() {

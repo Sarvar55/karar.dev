@@ -18,14 +18,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/companies")
+@RequestMapping("/companies")
 @RequiredArgsConstructor
 @Tag(name = "Company Management", description = "CRUD operations for company users")
 public class CompanyUserController {
 
     private final CompanyUserService companyUserService;
 
-    @GetMapping
+    @GetMapping(produces = "application/vnd.karar.dev+json;v=1.0")
     @Operation(summary = "Get all company users")
     public ResponseEntity<BaseResponse<PageResponse<CompanyUserResponse>>> getAll(
             @ParameterObject @PageableDefault(value = 5, sort = "createdAt") Pageable pageable) {
@@ -33,22 +33,23 @@ public class CompanyUserController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = "application/vnd.karar.dev+json;v=1.0")
     @Operation(summary = "Get company user by ID")
     public ResponseEntity<BaseResponse<CompanyUserResponse>> getById(@PathVariable UUID id) {
         BaseResponse<CompanyUserResponse> response = companyUserService.getCompanyById(id);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", produces = "application/vnd.karar.dev+json;v=1.0")
     @Operation(summary = "Update company user")
     @PreAuthorize("@securityService.isAdminOrSelf(authentication, #id)")
-    public ResponseEntity<BaseResponse<CompanyUserResponse>> update(@PathVariable UUID id, @Valid @RequestBody CompanyUserUpdateRequest request) {
+    public ResponseEntity<BaseResponse<CompanyUserResponse>> update(@PathVariable UUID id,
+            @Valid @RequestBody CompanyUserUpdateRequest request) {
         BaseResponse<CompanyUserResponse> response = companyUserService.update(id, request);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}", produces = "application/vnd.karar.dev+json;v=1.0")
     @Operation(summary = "Delete company user")
     @PreAuthorize("@securityService.isAdminOrSelf(authentication, #id)")
     public ResponseEntity<BaseResponse<Void>> delete(@PathVariable UUID id) {

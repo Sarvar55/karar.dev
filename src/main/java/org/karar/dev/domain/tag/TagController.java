@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/tags")
+@RequestMapping("/tags")
 @RequiredArgsConstructor
 @Tag(name = "Tag Management", description = "CRUD operations for tags")
 public class TagController {
@@ -38,7 +38,7 @@ public class TagController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))
             )
     })
-    @GetMapping
+    @GetMapping(produces = "application/vnd.karar.dev+json;v=1.0")
     public ResponseEntity<BaseResponse<List<TagResponse>>> getAllTags() {
         BaseResponse<List<TagResponse>> response = tagService.getAllTags();
         return ResponseEntity.status(response.getStatus()).body(response);
@@ -60,7 +60,7 @@ public class TagController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))
             )
     })
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = "application/vnd.karar.dev+json;v=1.0")
     public ResponseEntity<BaseResponse<TagResponse>> getTagById(
             @Parameter(description = "UUID of the tag to retrieve", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable UUID id) {
@@ -84,7 +84,7 @@ public class TagController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))
             )
     })
-    @GetMapping("/name/{name}")
+    @GetMapping(value = "/name/{name}", produces = "application/vnd.karar.dev+json;v=1.0")
     public ResponseEntity<BaseResponse<TagResponse>> getTagByName(
             @Parameter(description = "Name of the tag", required = true, example = "programming")
             @PathVariable String name) {
@@ -113,7 +113,7 @@ public class TagController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))
             )
     })
-    @PostMapping
+    @PostMapping(produces = "application/vnd.karar.dev+json;v=1.0")
     public ResponseEntity<BaseResponse<TagResponse>> createTag(
             @Valid @RequestBody TagRequest request) {
         BaseResponse<TagResponse> response = tagService.createTag(request);
@@ -146,7 +146,7 @@ public class TagController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))
             )
     })
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", produces = "application/vnd.karar.dev+json;v=1.0")
     public ResponseEntity<BaseResponse<TagResponse>> updateTag(
             @Parameter(description = "UUID of the tag to update", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable UUID id,
@@ -171,7 +171,7 @@ public class TagController {
                     content = @Content(schema = @Schema(implementation = BaseResponse.class))
             )
     })
-    @DeleteMapping("/{id}")
+    @DeleteMapping(value = "/{id}", produces = "application/vnd.karar.dev+json;v=1.0")
     public ResponseEntity<BaseResponse<Void>> deleteTag(
             @Parameter(description = "UUID of the tag to delete", required = true, example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable UUID id) {

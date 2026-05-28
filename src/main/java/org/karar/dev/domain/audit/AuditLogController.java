@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * All endpoints require ADMIN role access.
  */
 @RestController
-@RequestMapping("/api/audit-logs")
+@RequestMapping(value = "/audit-logs", produces = "application/vnd.karar.dev+json;v=1.0")
 @RequiredArgsConstructor
 @Tag(name = "Audit Logs", description = "Endpoints for querying audit trail records (Admin only)")
 @PreAuthorize("hasRole('ADMIN')")
@@ -33,14 +33,14 @@ public class AuditLogController {
 
     private final AuditLogService auditLogService;
 
-    @GetMapping
+    @GetMapping(produces = "application/vnd.karar.dev+json;v=1.0")
     @Operation(summary = "Get all audit logs", description = "Returns paginated list of all audit log entries, sorted by newest first")
     public ResponseEntity<BaseResponse<PageResponse<AuditLogResponse>>> getAllLogs(
             @ParameterObject @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(auditLogService.getAllLogs(pageable));
     }
 
-    @GetMapping("/entity/{entityName}")
+    @GetMapping(value = "/entity/{entityName}", produces = "application/vnd.karar.dev+json;v=1.0")
     @Operation(summary = "Get audit logs by entity name", description = "Filter audit logs by entity type (e.g., Decision, Comment)")
     public ResponseEntity<BaseResponse<PageResponse<AuditLogResponse>>> getLogsByEntity(
             @Parameter(description = "Name of the entity", example = "Decision")
@@ -49,7 +49,7 @@ public class AuditLogController {
         return ResponseEntity.ok(auditLogService.getLogsByEntityName(entityName, pageable));
     }
 
-    @GetMapping("/entity/{entityName}/{entityId}")
+    @GetMapping(value = "/entity/{entityName}/{entityId}", produces = "application/vnd.karar.dev+json;v=1.0")
     @Operation(summary = "Get audit logs for a specific entity instance", description = "Returns the complete audit history for a single entity")
     public ResponseEntity<BaseResponse<PageResponse<AuditLogResponse>>> getLogsByEntityInstance(
             @Parameter(description = "Name of the entity", example = "Decision")
@@ -60,7 +60,7 @@ public class AuditLogController {
         return ResponseEntity.ok(auditLogService.getLogsByEntityInstance(entityName, entityId, pageable));
     }
 
-    @GetMapping("/user/{email}")
+    @GetMapping(value = "/user/{email}", produces = "application/vnd.karar.dev+json;v=1.0")
     @Operation(summary = "Get audit logs by user", description = "Filter audit logs by the user who performed the action")
     public ResponseEntity<BaseResponse<PageResponse<AuditLogResponse>>> getLogsByUser(
             @Parameter(description = "Email of the user", example = "admin@karar.dev")
@@ -69,7 +69,7 @@ public class AuditLogController {
         return ResponseEntity.ok(auditLogService.getLogsByPerformedBy(email, pageable));
     }
 
-    @GetMapping("/action/{action}")
+    @GetMapping(value = "/action/{action}", produces = "application/vnd.karar.dev+json;v=1.0")
     @Operation(summary = "Get audit logs by action type", description = "Filter audit logs by action (CREATE, UPDATE, DELETE)")
     public ResponseEntity<BaseResponse<PageResponse<AuditLogResponse>>> getLogsByAction(
             @Parameter(description = "Type of action", example = "CREATE")

@@ -56,7 +56,7 @@ public class AuthService {
 
         // Create verification token and publish Kafka event
         String token = verificationTokenService.createToken(savedUser.getEmail());
-        String verificationUrl = verificationBaseUrl + "/api/v1/auth/verify?token=" + token;
+        String verificationUrl = verificationBaseUrl + "/api/auth/verify?token=" + token;
 
         emailVerificationProducer.send(
                 new EmailVerificationEvent(savedUser.getEmail(), token, verificationUrl));
@@ -130,7 +130,7 @@ public class AuthService {
 
         // Delete old token and create new one
         String token = verificationTokenService.createToken(user.getEmail());
-        String verificationUrl = verificationBaseUrl + "/api/v1/auth/verify?token=" + token;
+        String verificationUrl = verificationBaseUrl + "/api/auth/verify?token=" + token;
 
         emailVerificationProducer.send(
                 new EmailVerificationEvent(user.getEmail(), token, verificationUrl));
