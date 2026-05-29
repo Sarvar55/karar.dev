@@ -112,7 +112,7 @@ class RegularUserServiceTest {
         RegularUser user = RegularUserBuilder.user().withId(id).build();
 
         RegularUserUpdateRequest updateRequest =
-                new RegularUserUpdateRequest(emailUpdate, usernameUpdate);
+                new RegularUserUpdateRequest(emailUpdate, usernameUpdate, null, null, null, null, null, null, null, null, null, null);
 
 
         when(regularUserRepository.findById(id))

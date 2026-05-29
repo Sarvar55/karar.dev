@@ -21,6 +21,11 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  sql:
+    init:
+      data-locations:
+      - classpath:db/sql/data.sql
+      mode: never
   
 
   flyway:
@@ -73,7 +78,7 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
   # File output
   file:
-    name: logs/karar-dev.log
+    name: ${LOGS_PATH:karar.dev/logs}/karar-dev.log
   logback:
     rollingpolicy:
       # Her dosya max 50MB
@@ -83,7 +88,7 @@ logging:
       # Toplam disk limiti
       total-size-cap: 500MB
       # Arşiv dosya adı formatı
-      file-name-pattern: logs/karar-dev.%d{yyyy-MM-dd}.%i.log
+      file-name-pattern: karar.dev/logs/karar-dev.%d{yyyy-MM-dd}.%i.log
 
 
 
