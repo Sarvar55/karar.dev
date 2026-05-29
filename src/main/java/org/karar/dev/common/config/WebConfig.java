@@ -50,8 +50,14 @@ public class WebConfig implements WebMvcConfigurer {
 
         @Override
         public void configurePathMatch(PathMatchConfigurer configurer) {
-
-                configurer.addPathPrefix(PREFIX, controllerType -> true);
+                /*
+                 * Because of controllerType -> true, Spring Boot was attaching the
+                 * /api prefix to all controllers, including the internal ones provided by
+                 * springdoc-openapi. This meant Swagger UI was trying to load /v3/api-docs,
+                 * but your server had moved it to /api/v3/api-docs!
+                 */
+                configurer.addPathPrefix(PREFIX,
+                                controllerType -> controllerType.getPackageName().startsWith("org.karar.dev"));
         }
 
 }

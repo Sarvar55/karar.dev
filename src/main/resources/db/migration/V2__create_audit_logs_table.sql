@@ -4,7 +4,7 @@
 -- Stores a record of every CREATE, UPDATE, and DELETE
 -- operation performed on auditable entities.
 
-CREATE TABLE audit_logs (
+CREATE TABLE audit_logs  (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     entity_name     VARCHAR(255)    NOT NULL,
     entity_id       VARCHAR(255)    NOT NULL,
