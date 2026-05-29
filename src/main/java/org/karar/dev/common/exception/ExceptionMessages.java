@@ -48,6 +48,9 @@ public enum ExceptionMessages {
     VERIFICATION_TOKEN_NOT_FOUND("Invalid verification token"),
     EMAIL_ALREADY_VERIFIED("Email is already verified"),
 
+    // ── Storage ──────────────────────────────────────────────────────────
+    STORAGE_ERROR("Storage operation failed"),
+
     // ── Generic ──────────────────────────────────────────────────────────
     INTERNAL_SERVER_ERROR("An unexpected error occurred");
 

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.karar.dev.common.exception.ExceptionMessages;
 import org.karar.dev.common.exception.base.BaseException;
 import org.karar.dev.common.exception.resolver.ExceptionMessageResolver;
+import org.karar.dev.domain.media.minio.exception.StorageException;
 import org.karar.dev.common.dto.BaseResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -92,6 +93,16 @@ public class GlobalExceptionHandler {
                 exceptionMessageResolver.resolve(ex),
                 HttpStatus.UNAUTHORIZED);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @ExceptionHandler(StorageException.class)
+    public ResponseEntity<BaseResponse<?>> handleStorageException(StorageException ex) {
+        log.warn("Storage operation failed: {}", ex.getMessage());
+        BaseResponse<?> response = BaseResponse.error(
+                ExceptionMessages.STORAGE_ERROR.getMessage(),
+                ex.getMessage(),
+                ex.getStatus());
+        return ResponseEntity.status(ex.getStatus()).body(response);
     }
 
     @ExceptionHandler(Exception.class)
