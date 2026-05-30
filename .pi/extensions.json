@@ -1,5 +1,0 @@
-{
-  "scripts": {
-    "commit": ".pi/scripts/autocommit.sh"
-  }
-}
