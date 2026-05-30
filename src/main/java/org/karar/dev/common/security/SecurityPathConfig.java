@@ -1,6 +1,5 @@
 package org.karar.dev.common.security;
 
-
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
@@ -17,8 +16,8 @@ public final class SecurityPathConfig {
 
     }
 
-
-    public static void configure(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requests) {
+    public static void configure(
+            AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry requests) {
         configurePublicPaths(requests);
         configureSecuredPaths(requests);
         requests.anyRequest().authenticated();
@@ -33,9 +32,7 @@ public final class SecurityPathConfig {
 
         requests.requestMatchers("/api/auth/**").permitAll();
 
-
         requests.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
-
 
         // H2 Console — only active on 'local' profile (safe fallback for dev/prod)
         requests.requestMatchers("/h2-console/**").permitAll();
@@ -82,21 +79,19 @@ public final class SecurityPathConfig {
         requests.requestMatchers(HttpMethod.PUT, "/api/decisions/{id}").hasAnyRole(SecurityRoles.ALL_USERS);
         requests.requestMatchers(HttpMethod.DELETE, "/api/decisions/{id}").hasAnyRole(SecurityRoles.ALL_USERS);
 
-
         requests.requestMatchers(HttpMethod.POST, "/api/tags").hasRole(SecurityRoles.ADMIN);
         requests.requestMatchers(HttpMethod.PUT, "/api/tags/{id}").hasRole(SecurityRoles.ADMIN);
         requests.requestMatchers(HttpMethod.DELETE, "/api/tags/{id}").hasRole(SecurityRoles.ADMIN);
-
 
         requests.requestMatchers(HttpMethod.POST, "/api/comments").hasAnyRole(SecurityRoles.ALL_USERS);
         requests.requestMatchers(HttpMethod.PUT, "/api/comments/{id}").hasAnyRole(SecurityRoles.ALL_USERS);
         requests.requestMatchers(HttpMethod.DELETE, "/api/comments/{id}").hasAnyRole(SecurityRoles.ALL_USERS);
 
-
         // --- Votes (authenticated voting) ---
         requests.requestMatchers(HttpMethod.POST, "/api/votes").hasAnyRole(SecurityRoles.ALL_USERS);
         requests.requestMatchers(HttpMethod.DELETE, "/api/votes/{id}").hasAnyRole(SecurityRoles.ALL_USERS);
-        requests.requestMatchers(HttpMethod.DELETE, "/api/votes/users/{userId}/decisions/{decisionId}").hasAnyRole(SecurityRoles.ALL_USERS);
+        requests.requestMatchers(HttpMethod.DELETE, "/api/votes/users/{userId}/decisions/{decisionId}")
+                .hasAnyRole(SecurityRoles.ALL_USERS);
 
         // --- Users (authenticated profile operations) ---
         requests.requestMatchers(HttpMethod.PUT, "/api/users/{id}").hasAnyRole(SecurityRoles.ALL_USERS);

@@ -4,10 +4,10 @@ import java.io.InputStream;
 import java.util.UUID;
 
 import org.apache.commons.compress.utils.FileNameUtils;
-import org.apache.tika.Tika;
 import org.karar.dev.domain.media.minio.MinioProperties;
 import org.karar.dev.domain.media.minio.exception.StorageException;
 import org.karar.dev.domain.media.service.AbstractStorageService;
+import org.karar.dev.domain.media.service.ContentTypeResolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -31,8 +31,9 @@ public class MinioStorageService extends AbstractStorageService {
     private final MinioClient minioClient;
     private final MinioProperties minioProperties;
 
-    public MinioStorageService(Tika tika, MinioClient minioClient, MinioProperties minioProperties) {
-        super(tika);
+    public MinioStorageService(ContentTypeResolver contentTypeResolver, MinioClient minioClient,
+            MinioProperties minioProperties) {
+        super(contentTypeResolver);
         this.minioClient = minioClient;
         this.minioProperties = minioProperties;
     }

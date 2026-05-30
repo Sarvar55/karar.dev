@@ -7,8 +7,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.karar.dev.common.dto.PageResponse;
 import org.karar.dev.common.exception.notfound.ResourceNotFoundException;
+import org.karar.dev.common.security.service.SecurityService;
 import org.karar.dev.domain.annotation.UnitTest;
 import org.karar.dev.common.dto.BaseResponse;
+import org.karar.dev.domain.media.service.MediaService;
 import org.karar.dev.domain.user.regular.dto.RegularUserResponse;
 import org.karar.dev.domain.user.regular.dto.RegularUserUpdateRequest;
 import org.mockito.InjectMocks;
@@ -29,6 +31,10 @@ import static org.mockito.Mockito.*;
 class RegularUserServiceTest {
     @Mock
     private RegularUserRepository regularUserRepository;
+    @Mock
+    private MediaService mediaService;
+    @Mock
+    private SecurityService securityService;
 
     @InjectMocks
     private RegularUserService regularUserService;

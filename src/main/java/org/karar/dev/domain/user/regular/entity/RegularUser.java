@@ -22,6 +22,29 @@ public class RegularUser extends User {
 
     private String username;
 
+    private String photoUrl;
+    
+    @Column(columnDefinition = "TEXT")
+    private String bio;
+    
+    private String location;
+    private String jobTitle;
+    
+    @Column(columnDefinition = "TEXT")
+    private String experience;
+    
+    @Column(columnDefinition = "TEXT")
+    private String openTo;
+    
+    private String website;
+    private String githubUrl;
+    private String twitterUrl;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "regular_user_skills", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "skill")
+    private java.util.List<String> skills;
+
     @OneToMany(mappedBy = "user", orphanRemoval = true, fetch = FetchType.LAZY,
             cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     private Set<Decision> decisions;

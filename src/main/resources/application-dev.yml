@@ -110,7 +110,7 @@ app:
     base-url: ${VERIFICATION_BASE_URL:http://localhost:8080}
   minio:
     endpoint: http://localhost:9000
-    access-key: minioadmin
-    secret-key: minioadmin
+    access-key: user
+    secret-key: 123456789
     bucket-name: profile-images
     region: us-east-1

@@ -1,4 +1,5 @@
 package org.karar.dev.domain.decision.service;
+
 import org.karar.dev.domain.decision.entity.Decision;
 import org.karar.dev.domain.decision.repository.DecisionRepository;
 

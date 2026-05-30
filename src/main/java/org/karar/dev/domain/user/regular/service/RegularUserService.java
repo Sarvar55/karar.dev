@@ -1,4 +1,6 @@
 package org.karar.dev.domain.user.regular.service;
+
+import org.karar.dev.domain.media.service.MediaService;
 import org.karar.dev.domain.user.regular.entity.RegularUser;
 import org.karar.dev.domain.user.regular.repository.RegularUserRepository;
 
@@ -9,6 +11,7 @@ import org.karar.dev.common.audit.Auditable;
 import org.karar.dev.common.dto.PageResponse;
 import org.karar.dev.common.exception.notfound.ResourceNotFoundException;
 import org.karar.dev.common.dto.BaseResponse;
+import org.karar.dev.common.security.service.SecurityService;
 import org.karar.dev.domain.user.regular.dto.RegularUserResponse;
 import org.karar.dev.domain.user.regular.dto.RegularUserUpdateRequest;
 import org.springframework.data.domain.Page;
@@ -24,6 +27,8 @@ import java.util.UUID;
 public class RegularUserService {
 
     private final RegularUserRepository regularUserRepository;
+    private final MediaService mediaService;
+    private final SecurityService securityService;
 
     public BaseResponse<PageResponse<RegularUserResponse>> getAll(Pageable pageable) {
         log.debug("Getting all regular users");
@@ -34,13 +39,21 @@ public class RegularUserService {
     }
 
     @Transactional
-    @Auditable(action = AuditAction.UPDATE,entityName = "RegularUser")
+    @Auditable(action = AuditAction.UPDATE, entityName = "RegularUser")
     public BaseResponse<RegularUserResponse> update(UUID id, RegularUserUpdateRequest request) {
         log.debug("Updating regular user: {}", id);
         RegularUser user = findOrThrow(id);
 
         user.setEmail(request.email());
         user.setUsername(request.username());
+        user.setSkills(request.skills());
+        user.setBio(request.bio());
+        user.setLocation(request.location());
+        user.setWebsite(request.website());
+        user.setPhotoUrl(request.photoUrl());
+        user.setExperience(request.experience());
+
+        confirmProfilePhotoIfPresent(request.photoUrl());
 
         RegularUser saved = regularUserRepository.save(user);
         log.info("Regular user updated successfully: {}", id);
@@ -79,6 +92,15 @@ public class RegularUserService {
         log.debug("Finding regular user by id: {}", id);
         return regularUserRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("RegularUser", "id", id));
+    }
+
+    private void confirmProfilePhotoIfPresent(String photoUrl) {
+        if (photoUrl == null || photoUrl.isBlank()) {
+            return;
+        }
+
+        UUID currentUserId = securityService.getCurrentUserId();
+        mediaService.confirmPendingMediaByUrl(photoUrl, currentUserId);
     }
 
     private RegularUserResponse mapToResponse(RegularUser user) {

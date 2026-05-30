@@ -29,8 +29,6 @@ public class DecisionCommentService {
                                 comment.getDecision() != null ? comment.getDecision().getId() : null,
                                 comment.getDecision() != null ? comment.getDecision().getTitle() : null,
                                 comment.getCreatedAt(),
-                                comment.getUpdatedAt()
-                        ))
-        ));
+                                comment.getUpdatedAt()))));
     }
 }
