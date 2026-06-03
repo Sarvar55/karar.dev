@@ -34,16 +34,14 @@ public class MediaServiceImpl implements MediaService {
     @Override
     @Transactional
     public MediaResponse uploadMedia(MultipartFile file, String folder, UUID userId) {
-        // 1. Upload file to MinIO
+
         String objectName = storageService.uploadMultipartFile(file, folder);
 
-        // 2. Resolve true content type (using ContentTypeResolver)
         String contentType = contentTypeResolver.resolve(file.getOriginalFilename());
 
-        // 3. Create Media entity with PENDING status
         Media media = Media.builder()
                 .objectName(objectName)
-                .bucketName(minioProperties.getBucketName()) // from application.yml
+                .bucketName(minioProperties.getBucketName())
                 .originalFilename(file.getOriginalFilename())
                 .contentType(contentType)
                 .size(file.getSize())
@@ -53,11 +51,9 @@ public class MediaServiceImpl implements MediaService {
 
         media = mediaRepository.save(media);
 
-        // 3. Generate a presigned URL (valid for 1 hour by default in our
-        // StorageService)
         String presignedUrl = storageService.getObjectUrl(objectName, 3600L);
 
-        // 5. Return DTO
+
         return MediaResponse.builder()
                 .id(media.getId())
                 .url(presignedUrl)
