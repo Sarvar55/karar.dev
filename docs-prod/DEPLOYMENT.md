@@ -86,7 +86,7 @@ All secrets and configuration are externalized. No hardcoded values in productio
 | `DB_PASSWORD` | Database password | `*****` |
 | `JWT_SECRET` | JWT signing key (≥32 bytes) | `your-production-secret-key` |
 | `JWT_EXPIRATION` | Access token TTL (ms) | `3600000` (1 hour) |
-| `CORS_ALLOWED_ORIGINS` | Allowed frontend origin | `https://karar.dev` |
+| `CORS_ALLOWED_ORIGINS` | Allowed CORS origin | `https://karar.dev` |
 
 ### Optional Variables
 

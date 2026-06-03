@@ -7,11 +7,7 @@ High-level overview of the karar.dev system architecture and key design decision
 ## System Diagram
 
 ```
-┌─────────────────────────────────────────────┐
-│           karar-ui (Next.js 16)             │
-│         React 19 · TypeScript · TailwindCSS │
-└──────────────────┬──────────────────────────┘
-                   │  REST / JSON
+                   Client (REST / JSON)
                    ▼
 ┌─────────────────────────────────────────────┐
 │          karar.dev (Spring Boot 4)          │

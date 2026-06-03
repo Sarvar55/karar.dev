@@ -65,7 +65,6 @@ Think of it as a "Stack Overflow for life decisions" — a place to learn from o
 ### Prerequisites
 
 - Java 17+
-- Node.js 18+
 - Docker & Docker Compose
 
 ### 1. Start Infrastructure Services
