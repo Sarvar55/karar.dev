@@ -1,174 +1,287 @@
-# 🎯 Karar.dev
+<div align="center">
 
-> **Karar** (Turkish for "Decision") — A social platform for sharing decisions, regrets, and community feedback.
+# ⚖️ karar.dev
 
-[![Java](https://img.shields.io/badge/Java-17-blue.svg)](https://openjdk.java.net/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.3-brightgreen.svg)](https://spring.io/projects/spring-boot)
-[![Next.js](https://img.shields.io/badge/Next.js-React-black.svg)](https://nextjs.org/)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+**A social platform where people share their life decisions, explain why they made them, and let the community vote and discuss.**
 
----
+Built with **Spring Boot 4** · **Next.js 16** · **PostgreSQL** · **Kafka** · **Redis** · **MinIO**
 
-## 📖 What is Karar.dev and What Problem Does it Solve?
+[![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Kafka](https://img.shields.io/badge/Apache_Kafka-231F20?style=for-the-badge&logo=apache-kafka&logoColor=white)](https://kafka.apache.org/)
+[![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
-People make thousands of decisions daily. Over time, some decisions lead to success, while others lead to profound regret. However, there is no dedicated social platform to document these life choices, reflect on their outcomes, and share them with a broader community for feedback. 
-
-**Karar.dev** is a social knowledge base for decision-making. It solves the problem of "isolated experiences" by allowing users to:
-- **Document Decisions:** Post decisions with detailed reasoning, alternatives considered, and outcomes.
-- **Track Regret Levels:** Categorize the emotional outcome of a decision (e.g., `LOW`, `MEDIUM`, `HIGH` regret).
-- **Gain Community Insights:** Allow other users to vote, comment, and provide feedback on shared decisions.
-- **Discover Patterns:** Use tags to find decisions on similar topics (e.g., career, finance, relationships) and learn from others' experiences before making similar choices.
-
-Whether it is a company deciding on a new tech stack or an individual reflecting on a career change, Karar.dev provides the platform to analyze, share, and learn from past choices.
+</div>
 
 ---
 
-## 🛠️ Technology Stack
+## 📖 What is karar.dev?
 
-Karar.dev is a modern, full-stack application built using the following technologies:
+**karar.dev** (Turkish: *karar* = decision) is a community-driven platform where users can:
 
-### **Backend**
-- **Java 17 LTS:** Modern Java features with strong type safety.
-- **Spring Boot 4.0.3:** Core application framework for rapid development.
-- **Spring Security:** Robust authentication and authorization (JWT & Opaque tokens).
-- **Spring Data JPA / Hibernate:** Object-Relational Mapping (ORM) for data access.
-- **Apache Kafka:** Event-driven architecture for asynchronous tasks like email verification.
-- **Redis:** High-performance caching and ephemeral data storage.
-- **Spring AI:** Integration with OpenAI-compatible LLMs.
+- 📝 **Share decisions** they've made in life — career changes, tech choices, moving to a new city, etc.
+- 💡 **Explain the reasoning** behind each decision and any alternatives they considered
+- 😔 **Rate their regret level** (Low / Medium / High)
+- 🗳️ **Vote** on other people's decisions
+- 💬 **Comment** and discuss
+- 🏷️ **Tag** decisions for discoverability
 
-### **Frontend**
-- **Next.js & React:** Server-side rendered (SSR) React framework for a highly responsive UI (`karar-ui`).
-- **TypeScript:** Typed JavaScript for improved developer experience and safety.
-- **Tailwind CSS:** Utility-first CSS framework for rapid UI styling.
-
-### **Database & Infrastructure**
-- **PostgreSQL:** Primary relational database for production environments.
-- **H2 Database:** In-memory database for rapid local development.
-- **Mailpit:** Local email testing tool for the async verification workflows.
-- **Maven:** Dependency and build management.
+Think of it as a "Stack Overflow for life decisions" — a place to learn from other people's choices.
 
 ---
 
-## 🏛️ Domain Models, Request/Response Models & Design Patterns
+## 🏗️ Tech Stack
 
-Karar.dev relies heavily on **Domain-Driven Design (DDD)** concepts. Below is a breakdown of the core domains, their Request/Response models, and the key design patterns applied.
+### Backend
 
-### **Core Domains**
-1. **User (Auth & Management):** Handles `RegularUser` (individuals) and `CompanyUser` (businesses).
-2. **Decision:** The core entity representing a user's choice, its reasoning, and its regret level.
-3. **Tag / DecisionTag:** A categorization engine allowing decisions to be grouped dynamically.
-4. **Comment:** User-generated feedback on decisions.
-5. **Vote:** A system to track community consensus on a decision.
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **Java** | 17 | Language |
+| **Spring Boot** | 4.0.3 | Application framework |
+| **Spring Security** | 6.x | Authentication & authorization (JWT + RBAC) |
+| **Spring Data JPA** | — | ORM & data access |
+| **PostgreSQL** | 18 | Primary database |
+| **Flyway** | — | Database migration management |
+| **Redis** | 7 | Caching layer |
+| **Apache Kafka** | — | Async event processing (email verification) |
+| **MinIO** | 8.5 | Object storage for media uploads |
+| **Apache Tika** | 2.9 | File content-type detection |
+| **Lombok** | 1.18 | Boilerplate reduction |
+| **SpringDoc OpenAPI** | 3.0 | Auto-generated Swagger docs |
+| **Thymeleaf** | — | Email HTML templates |
 
-### **Request / Response Models**
-Instead of exposing raw database entities to the client, the application uses isolated Data Transfer Objects (DTOs) for incoming requests and outgoing responses (e.g., `DecisionRequest`, `DecisionResponse`, `RegisterRequest`). A unified `BaseResponse<T>` wraps all API responses to ensure a consistent contract with the frontend:
-```json
-{
-  "success": true,
-  "data": { ... },
-  "error": null,
-  "timestamp": "2026-05-29T12:00:00",
-  "status": "OK"
-}
+### Frontend
+
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **Next.js** | 16 | React framework (SSR + routing) |
+| **React** | 19 | UI library |
+| **TypeScript** | 5 | Type safety |
+| **TailwindCSS** | 4 | Styling |
+| **Zustand** | 5 | State management |
+| **Axios** | — | HTTP client with interceptors |
+| **Tiptap** | 3 | Rich text editor |
+| **Framer Motion** | 12 | Animations |
+| **React Hook Form + Zod** | — | Form validation |
+
+### Infrastructure
+
+| Technology | Purpose |
+|-----------|---------|
+| **Docker + Docker Compose** | Containerized development & deployment |
+| **Multi-stage Dockerfile** | Optimized production image (JDK build → JRE runtime) |
+| **Mailpit** | Local SMTP testing with web UI |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Java 17+
+- Node.js 18+
+- Docker & Docker Compose
+
+### 1. Start Infrastructure Services
+
+```bash
+cd karar.dev
+docker compose up -d db redis kafka minio mailpit
 ```
 
-### **Applied Design Patterns**
+This starts PostgreSQL, Redis, Kafka, MinIO, and Mailpit.
 
-- **DTO (Data Transfer Object) Pattern:** Segregates the REST API layer from the persistence layer, ensuring security and versioning flexibility.
-- **Strategy & Template Method Patterns:** The `TokenStrategy` infrastructure (e.g., `AbstractJwtTokenStrategy`) uses the Template Method to define the skeleton of token generation/validation, allowing specific strategies (JWT vs. Opaque tokens) to implement the details.
-- **Observer / Publish-Subscribe Pattern:** Used extensively in the asynchronous workflow. For example, upon user registration, Spring Security events trigger a Kafka producer (`EmailVerificationProducer`) which asynchronously handles sending verification emails.
-- **Builder Pattern:** Provided via Lombok (`@Builder`), simplifying the instantiation of complex domain entities and DTOs.
-- **MVC (Model-View-Controller) / Layered Architecture:** The codebase is strictly divided into `Controller` -> `Service` -> `Repository` layers to maintain a clean separation of concerns.
+### 2. Run the Backend
+
+```bash
+./mvnw spring-boot:run
+```
+
+The API will be available at `http://localhost:8080`.  
+Swagger UI: `http://localhost:8080/swagger-ui.html`
+
+### 3. Run the Frontend
+
+```bash
+cd ../karar-ui
+npm install
+npm run dev
+```
+
+The UI will be available at `http://localhost:3000`.
+
+### 4. Useful URLs
+
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:3000 |
+| Backend API | http://localhost:8080/api |
+| Swagger UI | http://localhost:8080/swagger-ui.html |
+| Mailpit (email testing) | http://localhost:8025 |
+| MinIO Console | http://localhost:9001 |
 
 ---
 
 ## 📂 Project Structure
 
-The backend project (`karar.dev`) follows a **Domain-Based Directory Structure**, isolating features into self-contained modules.
-
-```text
-org.karar.dev/
-├── common/              # Shared infrastructure
-│   ├── entity/          # Abstract base entities (e.g., Auditable entities)
-│   ├── enums/           # Global Enums (Role, RegretLevel)
-│   ├── exception/       # Centralized error handling (GlobalExceptionHandler)
-│   └── security/        # Security configurations, token strategies, custom auth checks
-├── config/              # Application-wide configuration (Kafka, Redis, Swagger, Async)
-└── domain/              # Feature modules (Domain-Driven Structure)
-    ├── auth/            # Registration, Login, and Async Email Verification
-    ├── comment/         # Decision comments (Controller, Service, Repository, DTOs)
-    ├── decision/        # Core decision logic
-    ├── tag/             # Categorization tags
-    ├── user/            # User profile management (Regular vs Company)
-    └── vote/            # Voting mechanics
+```
+karardev/
+├── karar.dev/                 # Backend (Spring Boot)
+│   ├── src/main/java/
+│   │   └── org/karar/dev/
+│   │       ├── common/        # Shared: security, exceptions, configs, audit
+│   │       └── domain/        # Business domains
+│   │           ├── auth/      # Authentication (register, login, email verify)
+│   │           ├── decision/  # Core: decisions with regret levels
+│   │           ├── comment/   # Comments on decisions
+│   │           ├── vote/      # Voting system
+│   │           ├── tag/       # Categorization tags
+│   │           ├── user/      # Users (Regular + Company)
+│   │           ├── media/     # File uploads (MinIO)
+│   │           └── audit/     # Audit logging
+│   ├── src/main/resources/
+│   │   ├── db/migration/      # Flyway SQL migrations
+│   │   └── application-*.yml  # Profile-based configs (local/dev/prod)
+│   ├── Dockerfile             # Multi-stage production build
+│   ├── docker-compose.yml     # Full dev environment
+│   └── docs-prod/             # Detailed documentation
+│
+└── karar-ui/                  # Frontend (Next.js)
+    └── src/
+        ├── app/               # Pages (decisions, profile, write, admin, etc.)
+        ├── components/        # Reusable UI components
+        ├── lib/               # API client, types, utilities
+        ├── store/             # Zustand auth store
+        └── hooks/             # Custom React hooks
 ```
 
 ---
 
-## 🗄️ Database Relationships
+## 🔑 Key Features
 
-The database is highly normalized to ensure data integrity and prevent duplication.
+### Authentication & Security
+- JWT-based auth with access + refresh token rotation
+- Async email verification via Kafka → SMTP pipeline
+- Role-based access control (User / Admin)
+- Account locking after failed login attempts
 
-### **Entity Relationships Schema**
+### API Design
+- Content-negotiation versioning (`Accept: application/vnd.karar.dev+json;v=1.0`)
+- Unified `BaseResponse<T>` envelope for all responses
+- Global exception handling with structured error codes
+- Pagination & dynamic filtering via query parameters
 
-```text
-┌─────────────┐     ┌─────────────┐
-│RegularUser  │     │CompanyUser  │
-└──────┬──────┘     └─────────────┘
-       │ (Inherits from Base User)
-       │ 1:N
-       ▼
-┌─────────────┐     ┌─────────────┐
-│  Decision   │◄────│    Vote     │ (1 Vote per User per Decision)
-└──────┬──────┘     └─────────────┘
-       │
-   ┌───┼───┬────────────┐
-   │   │   │            │
-   ▼   ▼   ▼            ▼
-┌─────┐ │ ┌─────┐  ┌──────────┐
-│Comment│ │ │Tag  │  │DecisionTag│
-└─────┘ │ └──┬──┘  └──────────┘
-        │    │
-        └────┘ (N:M Relationship)
-```
+### Data Integrity
+- Flyway-managed database migrations (5 versioned migrations)
+- JPA Auditing: auto-populated `createdAt`, `updatedAt`, `createdBy`, `updatedBy`
+- AOP-based audit logging — every CUD operation is tracked with user & IP
 
-### **Relationship Details**
-- **User ↔ Decision (1:N):** A user can author multiple decisions.
-- **User ↔ Vote (1:N):** A user can cast multiple votes, but only **one vote per specific decision** (Composite Unique Constraint: `userId` + `decisionId`).
-- **Decision ↔ Comment (1:N):** A decision can have multiple comments from various users.
-- **Decision ↔ Tag (N:M):** A decision can have multiple tags, and a tag can belong to multiple decisions. This is resolved via the `DecisionTag` junction table.
-- **Inheritance:** `RegularUser` and `CompanyUser` extend from a base `User` entity, utilizing JPA inheritance strategies for role-based capabilities.
+### Architecture
+- Domain-driven package layout with clean separation of concerns
+- Single Table Inheritance for polymorphic user types
+- Event-driven email flow: `AuthService → Kafka → EmailConsumer → MailService`
+- Strategy pattern for token management
 
 ---
 
-## 🚀 Quick Start
+## 🗄️ Database Schema
 
-### **1. Prerequisites**
-- Java 17+
-- Node.js 18+ (for frontend)
-- Docker & Docker Compose (for Kafka, Redis, PostgreSQL, Mailpit)
-
-### **2. Running the Backend**
-```bash
-cd karar.dev
-
-# Start infrastructure dependencies
-docker-compose up -d
-
-# Run the Spring Boot application
-./mvnw spring-boot:run
 ```
-The API will be available at `http://localhost:8080/api/v1`.
-Interactive Swagger API Docs: `http://localhost:8080/swagger-ui.html`
+users ──┬── regular_users (username, bio, profile photo)
+        └── company_users (company_name)
 
-### **3. Running the Frontend**
-```bash
-cd karar-ui
+decisions (title, why, alternative, regret_level, vote_count)
+    ├── comments (content, user_id, decision_id)
+    ├── decision_tags ←→ tags (many-to-many)
+    └── votes (user_id + decision_id unique)
 
-# Install dependencies
-npm install
-
-# Start the Next.js development server
-npm run dev
+audit_logs (entity, action, performed_by, ip_address, details)
+medias (filename, content_type, size, url, folder)
 ```
-The application UI will be available at `http://localhost:3000`.
+
+Migrations are in `src/main/resources/db/migration/` (V1 through V5).
+
+---
+
+## 🐳 Docker
+
+### Multi-Stage Build
+
+The Dockerfile uses a two-stage approach for minimal production images:
+
+1. **Builder stage** — `eclipse-temurin:17-jdk-alpine` compiles the JAR
+2. **Runtime stage** — `eclipse-temurin:17-jre-alpine` runs it as a non-root user
+
+```bash
+# Build & run everything
+docker compose up --build
+
+# Or just the infrastructure
+docker compose up -d db redis kafka minio mailpit
+```
+
+---
+
+## ⚙️ Configuration
+
+The app uses Spring profiles for environment-specific settings:
+
+| Profile | Database | Logging | Use Case |
+|---------|----------|---------|----------|
+| `local` | H2 (in-memory) | DEBUG | Quick prototyping |
+| `dev` | PostgreSQL | DEBUG + file output | Development |
+| `prod` | PostgreSQL | WARN + file output | Production |
+
+All secrets are externalized via environment variables (`.env.dev`).
+
+---
+
+## 📚 Documentation
+
+For deeper dives, check the `docs-prod/` folder:
+
+| Document | Description |
+|----------|-------------|
+| [Architecture](./docs-prod/ARCHITECTURE.md) | System design, package structure, design patterns |
+| [API Reference](./docs-prod/API.md) | All endpoints with auth levels and response formats |
+| [Database Design](./docs-prod/DATABASE.md) | ER diagram, migration history, data modeling decisions |
+| [Deployment Guide](./docs-prod/DEPLOYMENT.md) | Docker setup, environment variables, Spring profiles |
+
+---
+
+## 🧪 Testing
+
+The project includes tests organized by domain:
+
+```
+src/test/java/org/karar/dev/domain/
+├── auth/        # Authentication tests
+├── comment/     # Comment service tests
+├── decision/    # Decision CRUD tests
+├── media/       # Media upload tests
+├── tag/         # Tag tests
+├── user/        # User tests
+├── vote/        # Vote tests
+└── extensions/  # Custom JUnit extensions (MediaParameterResolver)
+```
+
+```bash
+./mvnw test
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0).
+
+---
+
+<div align="center">
+
+**Built with ❤️ by [Sarvar](https://github.com/sarvar55)**
+
+</div>
