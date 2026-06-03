@@ -4,11 +4,10 @@
 
 **A social platform where people share their life decisions, explain why they made them, and let the community vote and discuss.**
 
-Built with **Spring Boot 4** · **Next.js 16** · **PostgreSQL** · **Kafka** · **Redis** · **MinIO**
+Built with **Spring Boot 4** · **PostgreSQL** · **Kafka** · **Redis** · **MinIO**
 
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
-[![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Kafka](https://img.shields.io/badge/Apache_Kafka-231F20?style=for-the-badge&logo=apache-kafka&logoColor=white)](https://kafka.apache.org/)
 [![Redis](https://img.shields.io/badge/Redis-7-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
@@ -35,8 +34,6 @@ Think of it as a "Stack Overflow for life decisions" — a place to learn from o
 
 ## 🏗️ Tech Stack
 
-### Backend
-
 | Technology | Version | Purpose |
 |-----------|---------|---------|
 | **Java** | 17 | Language |
@@ -52,20 +49,6 @@ Think of it as a "Stack Overflow for life decisions" — a place to learn from o
 | **Lombok** | 1.18 | Boilerplate reduction |
 | **SpringDoc OpenAPI** | 3.0 | Auto-generated Swagger docs |
 | **Thymeleaf** | — | Email HTML templates |
-
-### Frontend
-
-| Technology | Version | Purpose |
-|-----------|---------|---------|
-| **Next.js** | 16 | React framework (SSR + routing) |
-| **React** | 19 | UI library |
-| **TypeScript** | 5 | Type safety |
-| **TailwindCSS** | 4 | Styling |
-| **Zustand** | 5 | State management |
-| **Axios** | — | HTTP client with interceptors |
-| **Tiptap** | 3 | Rich text editor |
-| **Framer Motion** | 12 | Animations |
-| **React Hook Form + Zod** | — | Form validation |
 
 ### Infrastructure
 
@@ -103,21 +86,10 @@ This starts PostgreSQL, Redis, Kafka, MinIO, and Mailpit.
 The API will be available at `http://localhost:8080`.  
 Swagger UI: `http://localhost:8080/swagger-ui.html`
 
-### 3. Run the Frontend
-
-```bash
-cd ../karar-ui
-npm install
-npm run dev
-```
-
-The UI will be available at `http://localhost:3000`.
-
-### 4. Useful URLs
+### 3. Useful URLs
 
 | Service | URL |
 |---------|-----|
-| Frontend | http://localhost:3000 |
 | Backend API | http://localhost:8080/api |
 | Swagger UI | http://localhost:8080/swagger-ui.html |
 | Mailpit (email testing) | http://localhost:8025 |
@@ -148,14 +120,6 @@ karardev/
 │   ├── Dockerfile             # Multi-stage production build
 │   ├── docker-compose.yml     # Full dev environment
 │   └── docs-prod/             # Detailed documentation
-│
-└── karar-ui/                  # Frontend (Next.js)
-    └── src/
-        ├── app/               # Pages (decisions, profile, write, admin, etc.)
-        ├── components/        # Reusable UI components
-        ├── lib/               # API client, types, utilities
-        ├── store/             # Zustand auth store
-        └── hooks/             # Custom React hooks
 ```
 
 ---
