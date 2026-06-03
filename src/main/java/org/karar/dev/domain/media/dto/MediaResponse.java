@@ -13,8 +13,9 @@ import java.util.UUID;
 @AllArgsConstructor
 public class MediaResponse {
     private UUID id;
-    private String url;          // Presigned URL for temporary access
+    private String url;
     private String filename;
     private String contentType;
     private Long size;
 }
+

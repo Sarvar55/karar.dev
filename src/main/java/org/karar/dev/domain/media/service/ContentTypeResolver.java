@@ -4,3 +4,4 @@ public interface ContentTypeResolver {
 
     String resolve(String filename);
 }
+

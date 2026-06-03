@@ -45,3 +45,4 @@ public class Media extends BaseEntity {
 
     private UUID uploadedByUserId;
 }
+

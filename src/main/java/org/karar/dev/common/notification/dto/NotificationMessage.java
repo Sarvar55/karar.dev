@@ -5,3 +5,4 @@ import lombok.Builder;
 @Builder
 public record NotificationMessage(String email, String verificationUrl,String message) {
 }
+

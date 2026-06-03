@@ -9,3 +9,4 @@ public class ValidationException extends BaseException {
         super(ExceptionMessages.VALIDATION_FAILED.getMessage(), HttpStatus.BAD_REQUEST, errors);
     }
 }
+

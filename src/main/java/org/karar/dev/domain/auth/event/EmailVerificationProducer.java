@@ -19,3 +19,4 @@ public class EmailVerificationProducer {
         kafkaTemplate.send(TOPIC, event.email(), event);
     }
 }
+

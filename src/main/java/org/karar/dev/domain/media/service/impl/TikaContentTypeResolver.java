@@ -27,3 +27,4 @@ public class TikaContentTypeResolver implements ContentTypeResolver {
         return "application/octet-stream";
     }
 }
+

@@ -33,3 +33,4 @@ public class RefreshTokenStrategy extends AbstractJwtTokenStrategy {
         return parse(token).getSubject();
     }
 }
+

@@ -7,3 +7,4 @@ public record CompanyUserResponse(
     String email,
     String companyName
 ) {}
+

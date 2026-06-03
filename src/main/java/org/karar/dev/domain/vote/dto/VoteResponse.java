@@ -30,3 +30,4 @@ public record VoteResponse(
         LocalDateTime updatedAt
 ) {
 }
+

@@ -16,7 +16,7 @@ public class SecurityUser implements UserDetails {
     private final String email;
     private final String password;
     private final boolean emailVerified;
-    private final boolean accountLocked; 
+    private final boolean accountLocked;
     private final LocalDateTime lockedUntil;
     private final Collection<? extends GrantedAuthority> authorities;
 
@@ -55,14 +55,14 @@ public class SecurityUser implements UserDetails {
     @Override
     public boolean isAccountNonLocked() {
         if (lockedUntil != null && lockedUntil.isAfter(LocalDateTime.now())) {
-            return false;//15:00.isAfter(14:00) → true
+            return false;
         }
         return !accountLocked;
     }
 
     @Override
     public boolean isEnabled() {
-        return emailVerified; // 🔥 KRİTİK
+        return emailVerified;
     }
 
     @Override
@@ -75,3 +75,4 @@ public class SecurityUser implements UserDetails {
         return true;
     }
 }
+

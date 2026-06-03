@@ -10,3 +10,4 @@ import java.util.UUID;
 public interface RegularUserRepository extends JpaRepository<RegularUser, UUID> {
 
 }
+

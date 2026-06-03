@@ -18,3 +18,4 @@ public record RegisterRequest(
         return companyName != null && !companyName.isBlank();
     }
 }
+

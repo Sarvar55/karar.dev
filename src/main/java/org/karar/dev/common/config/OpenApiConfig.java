@@ -40,11 +40,6 @@ public class OpenApiConfig {
                 .components(apiComponents());
     }
 
-    /**
-     * Adds a global Accept header parameter to all operations in Swagger UI
-     * so that every request is sent with the versioned vendor media type.
-     * This enables content-negotiation-based API versioning from Swagger.
-     */
     @Bean
     public OpenApiCustomizer apiVersionHeaderCustomizer() {
         return openApi -> openApi.getPaths().values()
@@ -103,3 +98,4 @@ public class OpenApiConfig {
                 .description(SECURITY_DESCRIPTION);
     }
 }
+

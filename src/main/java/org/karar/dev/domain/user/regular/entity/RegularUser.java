@@ -12,7 +12,6 @@ import org.karar.dev.domain.vote.entity.Vote;
 
 import java.util.Set;
 
-
 @Entity
 @Table(name = "regular_users")
 @Getter
@@ -23,19 +22,19 @@ public class RegularUser extends User {
     private String username;
 
     private String photoUrl;
-    
+
     @Column(columnDefinition = "TEXT")
     private String bio;
-    
+
     private String location;
     private String jobTitle;
-    
+
     @Column(columnDefinition = "TEXT")
     private String experience;
-    
+
     @Column(columnDefinition = "TEXT")
     private String openTo;
-    
+
     private String website;
     private String githubUrl;
     private String twitterUrl;
@@ -68,3 +67,4 @@ public class RegularUser extends User {
         this.setPassword(password);
     }
 }
+

@@ -22,5 +22,5 @@ public class NotificationSenderFactory {
         return senderMap.get(type);
     }
 
-
 }
+

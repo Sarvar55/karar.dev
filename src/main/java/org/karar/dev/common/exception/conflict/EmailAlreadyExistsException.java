@@ -7,3 +7,4 @@ public class EmailAlreadyExistsException extends ConflictException {
         super(ExceptionMessages.EMAIL_ALREADY_EXISTS.format(email));
     }
 }
+

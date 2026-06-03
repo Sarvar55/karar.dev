@@ -53,7 +53,6 @@ public class MediaServiceImpl implements MediaService {
 
         String presignedUrl = storageService.getObjectUrl(objectName, 3600L);
 
-
         return MediaResponse.builder()
                 .id(media.getId())
                 .url(presignedUrl)
@@ -111,3 +110,4 @@ public class MediaServiceImpl implements MediaService {
         return URLDecoder.decode(objectName, StandardCharsets.UTF_8);
     }
 }
+

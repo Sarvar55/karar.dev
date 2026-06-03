@@ -42,15 +42,11 @@ public abstract class User extends BaseEntity {
         this.role = role;
     }
 
-    /**
-     * Account is locked if lockedUntil is set and still in the future.
-     * Auto-unlocks once the lockout period expires.
-     */
     public boolean isAccountLocked() {
         if (lockedUntil != null && lockedUntil.isAfter(LocalDateTime.now())) {
             return true;
         }
-        // Auto-unlock: clear stale lock
+
         if (lockedUntil != null && lockedUntil.isBefore(LocalDateTime.now())) {
             this.accountLocked = false;
             this.lockedUntil = null;

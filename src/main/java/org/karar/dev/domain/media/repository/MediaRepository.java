@@ -12,12 +12,13 @@ import java.util.UUID;
 
 @Repository
 public interface MediaRepository extends JpaRepository<Media, UUID> {
-    
+
     List<Media> findByStatusAndCreatedAtBefore(MediaStatus status, LocalDateTime date);
 
     Optional<Media> findByStatusAndUploadedByUserIdAndObjectName(
             MediaStatus status,
             UUID uploadedByUserId,
             String objectName);
-    
+
 }
+

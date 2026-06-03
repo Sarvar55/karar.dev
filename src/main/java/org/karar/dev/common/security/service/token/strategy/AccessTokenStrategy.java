@@ -33,3 +33,4 @@ public class AccessTokenStrategy extends AbstractJwtTokenStrategy {
         return parse(token).getSubject();
     }
 }
+

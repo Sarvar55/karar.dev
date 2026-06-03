@@ -8,7 +8,6 @@ import lombok.Setter;
 import org.karar.dev.common.enums.Role;
 import org.karar.dev.domain.user.entity.User;
 
-
 @Entity
 @Table(name = "company_users")
 @Getter
@@ -23,3 +22,4 @@ public class CompanyUser extends User {
         this.companyName = companyName;
     }
 }
+

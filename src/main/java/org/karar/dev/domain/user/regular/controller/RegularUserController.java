@@ -69,3 +69,4 @@ public class RegularUserController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 }
+

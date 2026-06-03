@@ -108,3 +108,4 @@ public class RegularUserService {
         return new RegularUserResponse(user.getId(), user.getEmail(), user.getUsername());
     }
 }
+

@@ -8,3 +8,4 @@ public class NotFoundException extends BaseException {
         super(message, HttpStatus.NOT_FOUND);
     }
 }
+

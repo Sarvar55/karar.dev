@@ -13,16 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-/**
- * Listens to Spring Security authentication events to track failed login
- * attempts and automatically lock accounts after too many failures.
- * <p>
- * Rules:
- * <ul>
- *   <li>After {@value #MAX_FAILED_ATTEMPTS} consecutive failures → lock for {@value #LOCK_DURATION_MINUTES} minutes</li>
- *   <li>On successful login → reset counter and unlock</li>
- * </ul>
- */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -73,7 +63,6 @@ public class AuthenticationEventListener {
 
         User user = userOpt.get();
 
-        // Only update if there were previous failed attempts
         if (user.getFailedLoginAttempts() > 0 || user.getLockedUntil() != null) {
             user.setFailedLoginAttempts(0);
             user.setAccountLocked(false);
@@ -93,3 +82,4 @@ public class AuthenticationEventListener {
         return null;
     }
 }
+

@@ -3,7 +3,6 @@ package org.karar.dev.common.security.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-
 import org.karar.dev.common.exception.notfound.ResourceNotFoundException;
 import org.karar.dev.common.security.user.SecurityUser;
 import org.karar.dev.domain.comment.entity.Comment;
@@ -20,13 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-/**
- * Provides ownership-checking methods used by {@code @PreAuthorize} SpEL
- * expressions, and helper methods for extracting authenticated user info.
- * <p>
- * Convention: {@code authentication.getName()} returns the user's <b>email</b>
- * (see {@link org.karar.dev.common.security.user.SecurityUser#getUsername()}).
- */
 @Component("securityService")
 @RequiredArgsConstructor
 @Slf4j
@@ -37,25 +29,12 @@ public class SecurityService {
     private final VoteRepository voteRepository;
     private final UserRepository userRepository;
 
-    // ========================
-    // Authenticated User Helpers
-    // ========================
-
-    /**
-     * Returns the UUID of the currently authenticated user.
-     * Extracts it from the SecurityUser principal stored in SecurityContextHolder.
-     *
-     * @throws IllegalStateException if no authenticated user is found
-     */
     public UUID getCurrentUserId() {
         SecurityUser securityUser = getCurrentSecurityUser();
         log.debug("Current authenticated user ID: {}", securityUser.getUserId());
         return securityUser.getUserId();
     }
 
-    /**
-     * Returns the email of the currently authenticated user.
-     */
     public String getCurrentUserEmail() {
         SecurityUser securityUser = getCurrentSecurityUser();
         return securityUser.getUsername();
@@ -145,3 +124,4 @@ public class SecurityService {
                 .anyMatch(a -> a.getAuthority().equals(role));
     }
 }
+

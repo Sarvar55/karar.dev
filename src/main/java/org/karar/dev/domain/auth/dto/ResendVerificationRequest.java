@@ -9,3 +9,4 @@ public record ResendVerificationRequest(
         String email
 ) {
 }
+

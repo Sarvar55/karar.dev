@@ -22,3 +22,4 @@ public class TokenStrategyFactory {
         return strategies.get(type);
     }
 }
+

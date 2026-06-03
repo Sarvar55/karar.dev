@@ -9,16 +9,6 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Redis-backed verification token service.
- * <p>
- * Two keys per verification:
- * <ul>
- *   <li>{@code verify:token:{uuid}} → email (lookup by token)</li>
- *   <li>{@code verify:email:{email}} → uuid (for resend — delete old before creating new)</li>
- * </ul>
- * Both keys share the same TTL.
- */
 @Service
 @Slf4j
 public class VerificationTokenService {
@@ -36,20 +26,15 @@ public class VerificationTokenService {
         this.tokenTtlHours = tokenTtlHours;
     }
 
-    /**
-     * Generates a UUID token, stores it in Redis with TTL, and returns the token string.
-     */
     public String createToken(String email) {
-        // Delete any existing token for this email
+
         deleteByEmail(email);
 
         String token = UUID.randomUUID().toString();
 
-        // verify:token:{uuid} → email
         redisTemplate.opsForValue().set(
                 TOKEN_PREFIX + token, email, tokenTtlHours, TimeUnit.HOURS);
 
-        // verify:email:{email} → uuid
         redisTemplate.opsForValue().set(
                 EMAIL_PREFIX + email, token, tokenTtlHours, TimeUnit.HOURS);
 
@@ -57,11 +42,6 @@ public class VerificationTokenService {
         return token;
     }
 
-    /**
-     * Validates and consumes the token: gets email from Redis, deletes both keys, returns email.
-     *
-     * @throws IllegalArgumentException if token not found or expired
-     */
     public String verifyToken(String token) {
         String tokenKey = TOKEN_PREFIX + token;
         String email = redisTemplate.opsForValue().get(tokenKey);
@@ -71,7 +51,6 @@ public class VerificationTokenService {
                     ExceptionMessages.VERIFICATION_TOKEN_NOT_FOUND.getMessage());
         }
 
-        // Delete both keys (consumed)
         redisTemplate.delete(tokenKey);
         redisTemplate.delete(EMAIL_PREFIX + email);
 
@@ -79,9 +58,6 @@ public class VerificationTokenService {
         return email;
     }
 
-    /**
-     * Deletes any existing token for the given email (used during resend).
-     */
     public void deleteByEmail(String email) {
         String emailKey = EMAIL_PREFIX + email;
         String existingToken = redisTemplate.opsForValue().get(emailKey);
@@ -93,3 +69,4 @@ public class VerificationTokenService {
         }
     }
 }
+

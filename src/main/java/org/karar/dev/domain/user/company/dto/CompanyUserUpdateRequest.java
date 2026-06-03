@@ -7,3 +7,4 @@ public record CompanyUserUpdateRequest(
     @NotBlank @Email String email,
     @NotBlank String companyName
 ) {}
+

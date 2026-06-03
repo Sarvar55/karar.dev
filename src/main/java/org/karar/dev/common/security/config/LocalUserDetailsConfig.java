@@ -11,10 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 
-/**
- * Provides in-memory test users for local development.
- * Active only under the "local" profile.
- */
 @Configuration
 @Profile("local")
 public class LocalUserDetailsConfig {
@@ -32,3 +28,4 @@ public class LocalUserDetailsConfig {
         return new InMemoryUserDetailsManager(user, admin, company);
     }
 }
+

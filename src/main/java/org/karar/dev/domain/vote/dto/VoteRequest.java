@@ -15,3 +15,4 @@ public record VoteRequest(
         UUID decisionId
 ) {
 }
+

@@ -34,3 +34,4 @@ public record AuditLogResponse(
         LocalDateTime createdAt
 ) {
 }
+

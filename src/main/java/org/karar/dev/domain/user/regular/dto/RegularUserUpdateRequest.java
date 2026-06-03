@@ -18,3 +18,4 @@ public record RegularUserUpdateRequest(
     String twitterUrl
 ) {
 }
+

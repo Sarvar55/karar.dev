@@ -25,8 +25,6 @@ public class KafkaTopicConfig {
     @Value("${spring.kafka.bootstrap-servers:localhost:9092}")
     private String bootstrapServers;
 
-    // ── Topic ───────────────────────────────────────────────────────────
-
     @Bean
     public NewTopic emailVerificationTopic() {
         return TopicBuilder.name("email-verification")
@@ -34,8 +32,6 @@ public class KafkaTopicConfig {
                 .replicas(1)
                 .build();
     }
-
-    // ── Producer ────────────────────────────────────────────────────────
 
     @Bean
     public ProducerFactory<String, Object> producerFactory() {
@@ -50,8 +46,6 @@ public class KafkaTopicConfig {
     public KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
-
-    // ── Consumer ────────────────────────────────────────────────────────
 
     @Bean
     public ConsumerFactory<String, Object> consumerFactory() {
@@ -73,3 +67,4 @@ public class KafkaTopicConfig {
         return factory;
     }
 }
+

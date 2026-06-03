@@ -74,7 +74,7 @@ public class ProjectDevSecurityConfig {
             ApplicationEventPublisher eventPublisher) {
 
         ProviderManager providerManager = new ProviderManager(List.of(provider));
-        
+
         providerManager.setAuthenticationEventPublisher(
                 new DefaultAuthenticationEventPublisher(eventPublisher));
         return providerManager;

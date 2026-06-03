@@ -14,3 +14,4 @@ public interface DecisionTagRepository extends JpaRepository<DecisionTag, Decisi
     List<DecisionTag> findByTagId(UUID tagId);
     void deleteByDecisionId(UUID decisionId);
 }
+

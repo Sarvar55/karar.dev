@@ -9,3 +9,4 @@ public interface StorageReadOperations {
     boolean exists(String objectName);
 
 }
+

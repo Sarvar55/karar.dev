@@ -24,3 +24,4 @@ public record CommentResponse(
 
                 @Schema(description = "Timestamp when the comment was last updated", example = "2025-01-20T10:30:00") LocalDateTime updatedAt) {
 }
+

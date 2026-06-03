@@ -19,19 +19,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-/**
- * Security filter chain for the "local" profile.
- * <p>
- * Responsibilities (single):
- * - Assemble the {@link SecurityFilterChain} by composing
- * {@link SecurityPathConfig} (authorization rules) and
- * exception-handling beans.
- * <p>
- * Separated concerns:
- * - Endpoint authorization rules  → {@link SecurityPathConfig}
- * - In-memory test users          → {@link LocalUserDetailsConfig}
- * - Role constants                → {@link SecurityRoles}
- */
 @Configuration
 @Profile("local")
 @EnableMethodSecurity
@@ -51,19 +38,14 @@ public class ProjectLocalSecurityConfig {
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
-
         http.csrf(AbstractHttpConfigurer::disable);
-
 
         http.authorizeHttpRequests(SecurityPathConfig::configure);
 
-
         http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
-
 
         http.formLogin(withDefaults());
         http.httpBasic(withDefaults());
-
 
         http.exceptionHandling(ex -> ex
                 .authenticationEntryPoint(authenticationEntryPoint)
@@ -83,3 +65,4 @@ public class ProjectLocalSecurityConfig {
         return config.getAuthenticationManager();
     }
 }
+

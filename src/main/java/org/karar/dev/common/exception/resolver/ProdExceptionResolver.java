@@ -13,3 +13,4 @@ public class ProdExceptionResolver implements ExceptionMessageResolver {
         return DEFAULT_ERROR_MESSAGE;
     }
 }
+

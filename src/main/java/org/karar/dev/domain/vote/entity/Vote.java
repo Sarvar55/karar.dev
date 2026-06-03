@@ -26,3 +26,4 @@ public class Vote extends BaseEntity {
     @JoinColumn(name = "decision_id", nullable = false)
     private Decision decision;
 }
+

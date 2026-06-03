@@ -22,3 +22,4 @@ public class DecisionTagId implements Serializable {
     }
 
 }
+

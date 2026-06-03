@@ -30,7 +30,7 @@ public class AdminSeed implements CommandLineRunner {
         admin.setRole(Role.ADMIN);
         admin.setEmailVerified(true);
 
-
         userRepository.save(admin);
     }
 }
+

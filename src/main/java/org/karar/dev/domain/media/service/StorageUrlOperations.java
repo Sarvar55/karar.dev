@@ -8,3 +8,4 @@ public interface StorageUrlOperations {
     String getObjectUrl(String objectName, Long expireInSeconds);
 
 }
+

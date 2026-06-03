@@ -8,7 +8,6 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
-
 import java.io.IOException;
 
 @Component
@@ -37,3 +36,4 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.getWriter().write(objectMapper.writeValueAsString(errorData));
     }
 }
+

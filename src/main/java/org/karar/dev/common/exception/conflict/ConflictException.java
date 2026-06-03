@@ -8,3 +8,4 @@ public class ConflictException extends BaseException {
         super(message, HttpStatus.CONFLICT);
     }
 }
+

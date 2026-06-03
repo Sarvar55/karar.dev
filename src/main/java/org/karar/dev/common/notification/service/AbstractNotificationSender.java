@@ -28,3 +28,4 @@ public abstract class AbstractNotificationSender implements NotificationSender {
 
     protected abstract void doSend(NotificationMessage message, String content);
 }
+

@@ -58,3 +58,4 @@ public class CompanyUserController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 }
+

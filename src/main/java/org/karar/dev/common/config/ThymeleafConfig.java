@@ -6,7 +6,6 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
 import org.thymeleaf.templatemode.TemplateMode;
 
-
 @Configuration
 public class ThymeleafConfig {
 
@@ -29,3 +28,4 @@ public class ThymeleafConfig {
     }
 
 }
+

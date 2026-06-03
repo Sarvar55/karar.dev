@@ -3,7 +3,6 @@ package org.karar.dev.common.exception.resolver;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-
 @Component
 @Profile("dev")
 public class DevExceptionResolver implements ExceptionMessageResolver {
@@ -12,3 +11,4 @@ public class DevExceptionResolver implements ExceptionMessageResolver {
         return e.getMessage();
     }
 }
+

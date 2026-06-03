@@ -8,3 +8,4 @@ public interface NotificationSender {
 
     NotificationType type();
 }
+

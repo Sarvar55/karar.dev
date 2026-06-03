@@ -7,3 +7,4 @@ public record RegularUserResponse(
                 String email,
                 String username) {
 }
+

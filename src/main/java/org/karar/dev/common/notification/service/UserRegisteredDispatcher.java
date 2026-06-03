@@ -7,7 +7,6 @@ import org.karar.dev.common.notification.enums.NotificationType;
 import org.karar.dev.domain.auth.event.EmailVerificationEvent;
 import org.springframework.stereotype.Service;
 
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -29,3 +28,4 @@ public class UserRegisteredDispatcher implements NotificationDispatcher {
         sender.send(message);
     }
 }
+

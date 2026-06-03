@@ -9,3 +9,4 @@ public interface StorageWriteOperations {
     void delete(String objectName);
 
 }
+

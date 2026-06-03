@@ -123,7 +123,6 @@ public class VoteService {
         RegularUser user = regularUserService.getById(currentUserId);
         Decision decision = decisionService.getById(request.decisionId());
 
-        // Check if user has already voted on this decision
         if (voteRepository.existsByUserIdAndDecisionId(currentUserId, request.decisionId())) {
             log.warn("User {} has already voted on decision {}", currentUserId, request.decisionId());
             throw new ConflictException("User has already voted on this decision");
@@ -136,7 +135,6 @@ public class VoteService {
 
         Vote savedVote = voteRepository.saveAndFlush(vote);
 
-        // Update vote count on the decision
         decisionService.incrementVoteCount(request.decisionId());
 
         log.info("Vote created successfully: {}", savedVote.getId());
@@ -149,7 +147,6 @@ public class VoteService {
         log.debug("Deleting vote: {}", id);
         Vote vote = findVoteOrThrow(id);
 
-        // Decrease vote count on the decision
         if (vote.getDecision() != null) {
             decisionService.decrementVoteCount(vote.getDecision().getId());
         }
@@ -176,7 +173,6 @@ public class VoteService {
                 .orElseThrow(() -> new ResourceNotFoundException("Vote", "userId and decisionId",
                         "userId=" + userId + ", decisionId=" + decisionId));
 
-        // Decrease vote count on the decision
         decisionService.decrementVoteCount(decisionId);
 
         voteRepository.delete(vote);
@@ -199,3 +195,4 @@ public class VoteService {
                 vote.getUpdatedAt());
     }
 }
+

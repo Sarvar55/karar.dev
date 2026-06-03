@@ -26,3 +26,4 @@ public class Tag extends BaseEntity {
     @OneToMany(mappedBy = "tag", fetch = FetchType.LAZY)
     private Set<DecisionTag> decisionTags;
 }
+

@@ -31,3 +31,4 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
     }
 }
+

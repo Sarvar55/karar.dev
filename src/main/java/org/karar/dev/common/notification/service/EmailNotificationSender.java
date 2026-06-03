@@ -51,3 +51,4 @@ public class EmailNotificationSender extends AbstractNotificationSender {
         return NotificationType.EMAIL;
     }
 }
+

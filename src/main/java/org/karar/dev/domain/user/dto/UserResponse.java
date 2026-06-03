@@ -9,3 +9,4 @@ public record UserResponse(
         String role
 ) {
 }
+

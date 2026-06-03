@@ -34,3 +34,4 @@ public class CustomUserDetailsService implements UserDetailsService {
                         ExceptionMessages.RESOURCE_NOT_FOUND.format("User", "username", username)));
     }
 }
+

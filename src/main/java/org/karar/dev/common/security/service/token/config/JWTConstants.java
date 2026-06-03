@@ -15,3 +15,4 @@ public class JWTConstants {
     private Long accessTokenExpirationTime;
     private Long refreshTokenExpirationTime;
 }
+

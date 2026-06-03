@@ -34,3 +34,4 @@ public record DecisionResponse(
 
                 @Schema(description = "Timestamp when the decision was last updated", example = "2025-01-20T10:30:00") LocalDateTime updatedAt) {
 }
+

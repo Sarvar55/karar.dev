@@ -30,3 +30,4 @@ public record DecisionUpdateRequest(
         Set<UUID> tagIds
 ) {
 }
+

@@ -18,3 +18,4 @@ public record CommentRequest(
         UUID decisionId
 ) {
 }
+

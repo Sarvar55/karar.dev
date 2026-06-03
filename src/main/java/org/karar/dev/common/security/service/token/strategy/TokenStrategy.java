@@ -4,12 +4,6 @@ import org.karar.dev.common.security.service.token.base.TokenType;
 
 import java.util.Map;
 
-/**
- * Represents a strategy for handling tokens in a security framework.
- * This interface defines the essential operations required for managing
- * tokens, including token type identification, generation, validation,
- * and data extraction.
- */
 public interface TokenStrategy {
     TokenType type();
 
@@ -21,3 +15,4 @@ public interface TokenStrategy {
 
     String extractUsername(String token);
 }
+

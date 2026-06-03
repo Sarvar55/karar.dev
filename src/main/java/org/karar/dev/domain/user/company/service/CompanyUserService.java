@@ -76,3 +76,4 @@ public class CompanyUserService {
         return new CompanyUserResponse(company.getId(), company.getEmail(), company.getCompanyName());
     }
 }
+

@@ -54,7 +54,6 @@ public class AuthService {
         User savedUser = userRepository.save(user);
         log.info("User registered successfully: {}", savedUser.getEmail());
 
-        // Create verification token and publish Kafka event
         String token = verificationTokenService.createToken(savedUser.getEmail());
         String verificationUrl = verificationBaseUrl + "/api/auth/verify?token=" + token;
 
@@ -128,7 +127,6 @@ public class AuthService {
             return ExceptionMessages.EMAIL_ALREADY_VERIFIED.getMessage();
         }
 
-        // Delete old token and create new one
         String token = verificationTokenService.createToken(user.getEmail());
         String verificationUrl = verificationBaseUrl + "/api/auth/verify?token=" + token;
 
@@ -164,3 +162,4 @@ public class AuthService {
         return new AuthResponse(user.getId(), user.getEmail(), user.getRole(), accessToken, refreshToken);
     }
 }
+

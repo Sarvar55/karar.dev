@@ -19,3 +19,4 @@ public class EmailVerificationConsumer {
         userRegisteredDispatcher.dispatch(event);
     }
 }
+

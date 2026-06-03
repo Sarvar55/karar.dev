@@ -14,11 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service for creating and querying audit log entries.
- * Uses REQUIRES_NEW propagation for log creation to ensure
- * audit records are persisted even if the parent transaction rolls back.
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -26,10 +21,6 @@ public class AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
 
-    /**
-     * Creates an audit log entry in a new transaction.
-     * This ensures the audit record is saved even if the calling transaction fails.
-     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void logAction(String entityName,
                           String entityId,
@@ -98,3 +89,4 @@ public class AuditLogService {
         return new PageResponse<>(page);
     }
 }
+

@@ -8,3 +8,4 @@ public final class JwtClaims {
     public static final String USERID = "userId";
 
 }
+

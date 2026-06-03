@@ -29,3 +29,4 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "decision_id")
     private Decision decision;
 }
+

@@ -43,3 +43,4 @@ public class Decision extends BaseEntity {
     private Set<Vote> votes;
 
 }
+

@@ -10,15 +10,12 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 public class CorsConfiguration {
-    /** Allowed origins for CORS */
+
     private String[] allowedOrigins;
 
-    /** Allowed methods for CORS */
     private String[] allowedMethods;
 
-    /** Allowed headers for CORS */
     private String[] allowedHeaders;
 
-    /** Whether credentials are allowed */
     private boolean allowCredentials;
 }

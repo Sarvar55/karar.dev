@@ -17,3 +17,4 @@ public class MinioProperties {
     private String bucketName;
     private String region;
 }
+

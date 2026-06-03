@@ -6,3 +6,4 @@ import java.util.UUID;
 
 public interface CompanyUserRepository extends JpaRepository<CompanyUser, UUID> {
 }
+

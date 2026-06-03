@@ -143,9 +143,9 @@ public class DecisionService {
         if (request.tagIds() != null && !request.tagIds().isEmpty()) {
             Set<UUID> existingTagIds = decision.getTags().stream()
                     .map(dt -> dt.getTag().getId())
-                    .collect(Collectors.toSet());/// 1 2
+                    .collect(Collectors.toSet());
 
-            Set<UUID> newTagIds = request.tagIds();// 3
+            Set<UUID> newTagIds = request.tagIds();
 
             decision.getTags().removeIf(dt -> !newTagIds.contains(dt.getTag().getId()));
 
@@ -220,11 +220,9 @@ public class DecisionService {
     }
 
     private void updateDecisionTags(Decision decision, Set<UUID> newTagIds) {
-        // Remove existing tag associations
-        decision.getTags().clear();
-        // decisionTagService.deleteByDecisionId(decision.getId());
 
-        // Add new tag associations
+        decision.getTags().clear();
+
         if (!newTagIds.isEmpty()) {
             associateTagsWithDecision(decision, newTagIds);
         }
@@ -268,3 +266,4 @@ public class DecisionService {
                 decision.getUpdatedAt());
     }
 }
+

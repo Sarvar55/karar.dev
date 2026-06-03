@@ -20,10 +20,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * REST controller for querying audit logs.
- * All endpoints require ADMIN role access.
- */
 @RestController
 @RequestMapping(value = "/audit-logs", produces = "application/vnd.karar.dev+json;v=1.0")
 @RequiredArgsConstructor
@@ -78,3 +74,4 @@ public class AuditLogController {
         return ResponseEntity.ok(auditLogService.getLogsByAction(action, pageable));
     }
 }
+

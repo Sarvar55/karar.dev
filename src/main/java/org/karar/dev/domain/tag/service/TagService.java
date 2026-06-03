@@ -78,7 +78,6 @@ public class TagService {
         log.debug("Updating tag: {}, {}", id, request);
         Tag tag = findTagOrThrow(id);
 
-        // Check if another tag with the same name exists
         if (tagRepository.existsByNameAndIdNot(request.name(), id)) {
             log.warn("Tag with name '{}' already exists", request.name());
             throw new ConflictException("Tag with name '" + request.name() + "' already exists");
@@ -130,3 +129,4 @@ public class TagService {
                 tag.getUpdatedAt());
     }
 }
+
