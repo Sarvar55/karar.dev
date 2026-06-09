@@ -5,12 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.karar.dev.common.exception.ExceptionMessages;
 import org.karar.dev.common.exception.base.ValidationException;
 import org.karar.dev.common.exception.conflict.EmailAlreadyExistsException;
+import org.karar.dev.common.security.provider.OtpAuthenticationToken;
 import org.karar.dev.common.security.service.token.TokenManager;
 import org.karar.dev.common.security.service.token.base.JwtClaims;
 import org.karar.dev.common.security.user.SecurityUser;
 import org.karar.dev.domain.auth.dto.*;
 import org.karar.dev.domain.auth.event.EmailVerificationEvent;
 import org.karar.dev.domain.auth.event.EmailVerificationProducer;
+import org.karar.dev.domain.auth.event.OtpEmailEvent;
+import org.karar.dev.domain.auth.event.OtpEmailProducer;
 import org.karar.dev.domain.auth.service.VerificationTokenService;
 import org.karar.dev.domain.user.entity.User;
 import org.karar.dev.domain.user.repository.UserRepository;
@@ -38,6 +41,8 @@ public class AuthService {
     private final TokenManager tokenManager;
     private final VerificationTokenService verificationTokenService;
     private final EmailVerificationProducer emailVerificationProducer;
+    private final OtpTokenService otpTokenService;
+    private final OtpEmailProducer otpEmailProducer;
 
     @Value("${app.verification.base-url:http://localhost:8080}")
     private String verificationBaseUrl;
@@ -136,6 +141,43 @@ public class AuthService {
         log.info("Verification email resent to: {}", user.getEmail());
         return "Verification email resent";
     }
+
+    // ===================== OTP Login =====================
+
+    /**
+     * Generate OTP, store in Redis, and send via email (Kafka).
+     */
+    public String sendOtp(OtpRequest request) {
+        // Verify the user exists before sending OTP
+        userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new BadCredentialsException(
+                        ExceptionMessages.INVALID_CREDENTIALS.getMessage()));
+
+        String code = otpTokenService.createOtp(request.email());
+        otpEmailProducer.send(new OtpEmailEvent(request.email(), code));
+
+        log.info("OTP sent to email: {}", request.email());
+        return "OTP sent to your email";
+    }
+
+    /**
+     * Verify OTP and return JWT tokens — same response as regular login.
+     */
+    public AuthResponse loginWithOtp(OtpVerifyRequest request) {
+        Authentication authentication = authenticationManager.authenticate(
+                new OtpAuthenticationToken(request.email(), request.code()));
+
+        SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
+
+        User user = userRepository.findByEmail(securityUser.getUsername())
+                .orElseThrow(() -> new BadCredentialsException(
+                        ExceptionMessages.INVALID_CREDENTIALS.getMessage()));
+
+        log.info("User logged in via OTP: {}", user.getEmail());
+        return buildAuthResponse(user);
+    }
+
+    // ===================== Helpers =====================
 
     private User createUser(RegisterRequest request) {
         if (request.isCompanyRegistration()) {

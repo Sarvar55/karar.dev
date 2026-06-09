@@ -5,6 +5,7 @@ import org.karar.dev.common.security.exception.CustomAccessDeniedHandler;
 import org.karar.dev.common.security.exception.CustomAuthenticationEntryPoint;
 import org.karar.dev.common.security.filter.AuthenticationTokenFilter;
 import org.karar.dev.common.security.provider.CustomAuthenticationProvider;
+import org.karar.dev.common.security.provider.OtpAuthenticationProvider;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -70,10 +71,12 @@ public class ProjectDevSecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
-            CustomAuthenticationProvider provider,
+            CustomAuthenticationProvider passwordProvider,
+            OtpAuthenticationProvider otpProvider,
             ApplicationEventPublisher eventPublisher) {
 
-        ProviderManager providerManager = new ProviderManager(List.of(provider));
+        ProviderManager providerManager = new ProviderManager(
+                List.of(passwordProvider, otpProvider));
 
         providerManager.setAuthenticationEventPublisher(
                 new DefaultAuthenticationEventPublisher(eventPublisher));

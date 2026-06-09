@@ -39,11 +39,15 @@ public class EmailNotificationSender extends AbstractNotificationSender {
 
     @Override
     protected String buildContent(NotificationMessage message) {
+        String template = message.templateName() != null ? message.templateName() : "verification-email.html";
+        Map<String, Object> vars = message.variables() != null ? message.variables() : 
+                Map.of("email", message.email(), "verificationUrl", message.verificationUrl());
+                
         EmailTemplateModel model = EmailTemplateModel.builder()
-                .variables(Map.of("email", message.email(), "verificationUrl", message.verificationUrl()))
+                .variables(vars)
                 .build();
 
-        return emailTemplateEngine.render("verification-email.html", model);
+        return emailTemplateEngine.render(template, model);
     }
 
     @Override

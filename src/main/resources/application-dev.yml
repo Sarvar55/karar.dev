@@ -114,3 +114,6 @@ app:
     secret-key: 123456789
     bucket-name: profile-images
     region: us-east-1
+  otp:
+    ttl-minutes: ${OTP_TTL_MINUTES:5}
+    length: ${OTP_LENGTH:6}

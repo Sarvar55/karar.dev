@@ -82,5 +82,29 @@ public class AuthController {
                 String message = authService.resendVerification(request);
                 return ResponseEntity.ok(BaseResponse.success(message));
         }
+
+        // ===================== OTP Login =====================
+
+        @Operation(summary = "Send OTP code", description = "Sends a one-time password to the user's email for passwordless login.")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "OTP sent successfully"),
+                        @ApiResponse(responseCode = "401", description = "Email not found")
+        })
+        @PostMapping(value = "/otp/send", produces = "application/vnd.karar.dev+json;v=1.0")
+        public ResponseEntity<BaseResponse<String>> sendOtp(@Valid @RequestBody OtpRequest request) {
+                String message = authService.sendOtp(request);
+                return ResponseEntity.ok(BaseResponse.success(message));
+        }
+
+        @Operation(summary = "Verify OTP and login", description = "Validates the OTP code and returns JWT tokens.")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "OTP verified, login successful"),
+                        @ApiResponse(responseCode = "401", description = "Invalid or expired OTP")
+        })
+        @PostMapping(value = "/otp/verify", produces = "application/vnd.karar.dev+json;v=1.0")
+        public ResponseEntity<BaseResponse<AuthResponse>> verifyOtp(@Valid @RequestBody OtpVerifyRequest request) {
+                AuthResponse authResponse = authService.loginWithOtp(request);
+                return ResponseEntity.ok(BaseResponse.success(authResponse));
+        }
 }
 

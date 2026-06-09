@@ -46,7 +46,7 @@ public class RegularUserService {
 
         user.setEmail(request.email());
         user.setUsername(request.username());
-        user.setSkills(request.skills());
+        user.setSkills(request.skills() != null ? new java.util.HashSet<>(request.skills()) : null);
         user.setBio(request.bio());
         user.setLocation(request.location());
         user.setWebsite(request.website());
