@@ -87,6 +87,11 @@ This leverages Spring Boot 4's native `ApiVersionConfigurer` and keeps URLs clea
 4. `SecurityPathConfig` enforces RBAC rules per endpoint
 5. On 401, client auto-refreshes via `/api/auth/refresh`
 
+> **Note on Authentication Methods:** 
+> The system supports both traditional passwords and passwordless **OTP (Magic Code)** logins. Both methods are seamlessly handled through Spring Security's `AuthenticationManager` and ultimately yield the exact same JWT tokens. 
+> 
+> 📖 **Read more:** [OTP Authentication Architecture](OTP-AUTHENTICATION.md)
+
 ---
 
 [← Back to README](../README.md)
